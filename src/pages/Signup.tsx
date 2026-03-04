@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Waves } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,13 +7,28 @@ import { Label } from '@/components/ui/label';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Signup = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user, role } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const from = (location.state as any)?.from || null;
+
+  useEffect(() => {
+    if (user && role) {
+      if (from) navigate(from, { replace: true });
+      else if (role === 'diver') navigate('/app/discover', { replace: true });
+      else navigate('/admin', { replace: true });
+    } else if (user && !role) {
+      navigate('/select-role', { replace: true });
+    }
+  }, [user, role]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
