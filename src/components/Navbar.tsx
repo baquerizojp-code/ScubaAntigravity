@@ -16,21 +16,21 @@ const Navbar = () => {
           <span className="text-lg font-bold text-foreground">Scuba Planner</span>
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}
-            className="gap-1.5 text-muted-foreground"
+            className="gap-1 text-muted-foreground px-2 sm:px-3"
           >
             <Globe className="w-4 h-4" />
-            {t('nav.language')}
+            <span className="hidden sm:inline">{t('nav.language')}</span>
           </Button>
           <Link to="/login">
-            <Button variant="ghost" size="sm">{t('nav.login')}</Button>
+            <Button variant="ghost" size="sm" className="px-2 sm:px-3">{t('nav.login')}</Button>
           </Link>
           <Link to="/signup">
-            <Button size="sm" className="bg-gradient-ocean text-primary-foreground hover:opacity-90 shadow-ocean">
+            <Button size="sm" className="bg-gradient-ocean text-primary-foreground hover:opacity-90 shadow-ocean text-xs sm:text-sm px-3 sm:px-4">
               {t('nav.signup')}
             </Button>
           </Link>

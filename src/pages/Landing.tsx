@@ -104,7 +104,7 @@ const Landing = () => {
               </Button>
             </Link>
             <Link to="/signup">
-              <Button size="lg" variant="outline" className="border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 font-semibold px-8">
+              <Button size="lg" variant="hero-outline" className="font-semibold px-8">
                 {t('landing.cta.center')}
               </Button>
             </Link>
