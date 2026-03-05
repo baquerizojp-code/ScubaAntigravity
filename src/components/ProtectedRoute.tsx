@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
   skipRoleCheck?: boolean;
 }
 
-const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login' }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login', skipRoleCheck = false }: ProtectedRouteProps) => {
   const { user, role, loading } = useAuth();
   const location = useLocation();
 
