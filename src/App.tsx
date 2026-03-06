@@ -19,7 +19,7 @@ import AdminSettings from "./pages/admin/Settings";
 import DiverDiscover from "./pages/app/Discover";
 import TripDetail from "./pages/app/TripDetail";
 import MyBookings from "./pages/app/MyBookings";
-import GroupChat from "./pages/app/GroupChat";
+// GroupChat removed
 import DiverProfile from "./pages/app/DiverProfile";
 import NotFound from "./pages/NotFound";
 
