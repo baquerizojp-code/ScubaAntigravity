@@ -64,7 +64,7 @@ const App = () => (
             }>
               <Route path="discover" element={<DiverDiscover />} />
               <Route path="trip/:id" element={<TripDetail />} />
-              <Route path="trip/:id/group" element={<GroupChat />} />
+              
               <Route path="bookings" element={<MyBookings />} />
               <Route path="profile" element={<DiverProfile />} />
             </Route>
