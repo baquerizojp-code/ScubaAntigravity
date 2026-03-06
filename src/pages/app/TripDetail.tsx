@@ -178,11 +178,6 @@ const TripDetail = () => {
                   {statusMap[existingBooking.status]?.label}
                 </Badge>
               </div>
-              {existingBooking.status === 'confirmed' && (
-                <Button size="sm" onClick={() => navigate(`/app/trip/${trip.id}/group`)}>
-                  {t('diver.trip.viewGroup')} <ChevronRight className="w-4 h-4" />
-                </Button>
-              )}
             </div>
             {existingBooking.rejection_reason && (
               <p className="text-sm text-destructive mt-2">{existingBooking.rejection_reason}</p>
