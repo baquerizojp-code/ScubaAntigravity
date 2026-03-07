@@ -239,11 +239,11 @@ const AdminTrips = () => {
               </div>
               <div>
                 <Label>{t('common.price')} (USD)</Label>
-                <Input type="number" min={0} step={0.01} value={form.price_usd} onChange={(e) => setForm({ ...form, price_usd: Number(e.target.value) })} required />
+                <Input type="number" min={0} step={0.01} value={form.price_usd || ''} onChange={(e) => setForm({ ...form, price_usd: Number(e.target.value) })} required />
               </div>
               <div>
                 <Label>{t('admin.trips.field.spots')}</Label>
-                <Input type="number" min={1} value={form.total_spots} onChange={(e) => setForm({ ...form, total_spots: Number(e.target.value) })} required />
+                <Input type="number" min={1} value={form.total_spots || ''} onChange={(e) => setForm({ ...form, total_spots: Number(e.target.value) })} required />
               </div>
               <div>
                 <Label>{t('admin.trips.field.difficulty')}</Label>
