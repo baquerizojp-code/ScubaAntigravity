@@ -5,7 +5,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,19 +12,24 @@ import { toast } from '@/hooks/use-toast';
 import { Check, X, CalendarCheck, Clock, Ban } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const AdminBookings = () => {
   const { diveCenterId } = useAuth();
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const [rejectDialog, setRejectDialog] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+
+  // Determine default tab from query params
+  const tabParam = searchParams.get('tab');
+  const defaultTab = tabParam === 'confirmed-month' ? 'confirmed-month' : tabParam === 'confirmed' ? 'confirmed' : tabParam === 'rejected' ? 'rejected' : 'pending';
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ['admin-bookings', diveCenterId],
     queryFn: async () => {
       if (!diveCenterId) return [];
-      // Get trips for this center, then bookings for those trips
       const { data: trips } = await supabase
         .from('trips')
         .select('id')
@@ -88,7 +92,85 @@ const AdminBookings = () => {
     return <Badge variant="outline" className={className}><Icon className="h-3 w-3 mr-1" />{status}</Badge>;
   };
 
-  const filterBookings = (status: string) => bookings?.filter(b => b.status === status) || [];
+  const filterBookings = (status: string) => {
+    if (!bookings) return [];
+    if (status === 'confirmed-month') {
+      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      return bookings.filter(b => b.status === 'confirmed' && new Date(b.updated_at) >= monthStart)
+        .sort((a, b) => {
+          const dateA = (a as any).trips?.trip_date || '';
+          const dateB = (b as any).trips?.trip_date || '';
+          return dateA.localeCompare(dateB);
+        });
+    }
+    const filtered = bookings.filter(b => b.status === status);
+    if (status === 'pending') {
+      return filtered.sort((a, b) => {
+        const dateA = (a as any).trips?.trip_date || '';
+        const dateB = (b as any).trips?.trip_date || '';
+        return dateA.localeCompare(dateB);
+      });
+    }
+    return filtered;
+  };
+
+  const renderBookingCard = (booking: any, showActions: boolean) => (
+    <Card key={booking.id} className="p-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="font-semibold text-foreground">
+              {booking.diver_profiles?.full_name || 'Unknown'}
+            </h3>
+            {statusBadge(booking.status)}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {booking.trips?.title} · {booking.trips?.dive_site}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {booking.trips?.trip_date && format(new Date(booking.trips.trip_date), 'dd/MM/yyyy')} · {booking.trips?.trip_time?.slice(0, 5)}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Cert: {booking.diver_profiles?.certification || '-'} · {booking.diver_profiles?.logged_dives ?? 0} dives
+          </p>
+          {booking.notes && <p className="text-xs text-muted-foreground mt-1 italic">"{booking.notes}"</p>}
+          {booking.rejection_reason && <p className="text-xs text-destructive mt-1">Reason: {booking.rejection_reason}</p>}
+        </div>
+        {showActions && (
+          <div className="flex gap-2 shrink-0">
+            <Button 
+              size="sm" className="gap-1"
+              onClick={() => confirmMutation.mutate(booking.id)}
+              disabled={confirmMutation.isPending}
+            >
+              <Check className="h-3.5 w-3.5" /> {t('common.confirm')}
+            </Button>
+            <Button 
+              size="sm" variant="outline" className="gap-1 text-destructive"
+              onClick={() => setRejectDialog(booking.id)}
+            >
+              <X className="h-3.5 w-3.5" /> {t('admin.bookings.reject')}
+            </Button>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+
+  const renderTabContent = (status: string, showActions: boolean) => {
+    const filtered = filterBookings(status);
+    return isLoading ? (
+      <p className="text-muted-foreground py-8">{t('common.loading')}</p>
+    ) : !filtered.length ? (
+      <Card className="flex items-center justify-center py-12">
+        <p className="text-muted-foreground">{t('admin.bookings.empty')}</p>
+      </Card>
+    ) : (
+      <div className="grid gap-3 mt-4">
+        {filtered.map((booking: any) => renderBookingCard(booking, showActions))}
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -97,7 +179,7 @@ const AdminBookings = () => {
         <p className="text-sm text-muted-foreground">{t('admin.bookings.subtitle')}</p>
       </div>
 
-      <Tabs defaultValue="pending">
+      <Tabs defaultValue={defaultTab}>
         <TabsList>
           <TabsTrigger value="pending" className="gap-1">
             <Clock className="h-3.5 w-3.5" /> {t('admin.bookings.pending')} ({filterBookings('pending').length})
@@ -105,67 +187,18 @@ const AdminBookings = () => {
           <TabsTrigger value="confirmed" className="gap-1">
             <Check className="h-3.5 w-3.5" /> {t('admin.bookings.confirmedTab')} ({filterBookings('confirmed').length})
           </TabsTrigger>
+          <TabsTrigger value="confirmed-month" className="gap-1">
+            <CalendarCheck className="h-3.5 w-3.5" /> {t('admin.dashboard.confirmedMonth')} ({filterBookings('confirmed-month').length})
+          </TabsTrigger>
           <TabsTrigger value="rejected" className="gap-1">
             <Ban className="h-3.5 w-3.5" /> {t('admin.bookings.rejectedTab')} ({filterBookings('rejected').length})
           </TabsTrigger>
         </TabsList>
 
-        {['pending', 'confirmed', 'rejected'].map((status) => (
-          <TabsContent key={status} value={status}>
-            {isLoading ? (
-              <p className="text-muted-foreground py-8">{t('common.loading')}</p>
-            ) : !filterBookings(status).length ? (
-              <Card className="flex items-center justify-center py-12">
-                <p className="text-muted-foreground">{t('admin.bookings.empty')}</p>
-              </Card>
-            ) : (
-              <div className="grid gap-3 mt-4">
-                {filterBookings(status).map((booking: any) => (
-                  <Card key={booking.id} className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-foreground">
-                            {booking.diver_profiles?.full_name || 'Unknown'}
-                          </h3>
-                          {statusBadge(booking.status)}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {booking.trips?.title} · {booking.trips?.dive_site}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          {booking.trips?.trip_date && format(new Date(booking.trips.trip_date), 'dd/MM/yyyy')} · {booking.trips?.trip_time?.slice(0, 5)}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Cert: {booking.diver_profiles?.certification || '-'} · {booking.diver_profiles?.logged_dives ?? 0} dives
-                        </p>
-                        {booking.notes && <p className="text-xs text-muted-foreground mt-1 italic">"{booking.notes}"</p>}
-                        {booking.rejection_reason && <p className="text-xs text-destructive mt-1">Reason: {booking.rejection_reason}</p>}
-                      </div>
-                      {status === 'pending' && (
-                        <div className="flex gap-2 shrink-0">
-                          <Button 
-                            size="sm" className="gap-1"
-                            onClick={() => confirmMutation.mutate(booking.id)}
-                            disabled={confirmMutation.isPending}
-                          >
-                            <Check className="h-3.5 w-3.5" /> {t('common.confirm')}
-                          </Button>
-                          <Button 
-                            size="sm" variant="outline" className="gap-1 text-destructive"
-                            onClick={() => setRejectDialog(booking.id)}
-                          >
-                            <X className="h-3.5 w-3.5" /> {t('admin.bookings.reject')}
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        ))}
+        <TabsContent value="pending">{renderTabContent('pending', true)}</TabsContent>
+        <TabsContent value="confirmed">{renderTabContent('confirmed', false)}</TabsContent>
+        <TabsContent value="confirmed-month">{renderTabContent('confirmed-month', false)}</TabsContent>
+        <TabsContent value="rejected">{renderTabContent('rejected', false)}</TabsContent>
       </Tabs>
 
       {/* Reject Dialog */}

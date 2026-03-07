@@ -11,6 +11,17 @@ const AdminDashboard = () => {
   const { diveCenterId } = useAuth();
   const { t } = useI18n();
 
+  // Auto-complete past trips on dashboard load
+  useQuery({
+    queryKey: ['auto-complete-trips'],
+    queryFn: async () => {
+      await supabase.rpc('auto_complete_past_trips');
+      return true;
+    },
+    enabled: !!diveCenterId,
+    staleTime: 1000 * 60 * 5, // run at most every 5 min
+  });
+
   const { data: stats } = useQuery({
     queryKey: ['admin-stats', diveCenterId],
     queryFn: async () => {
@@ -46,9 +57,9 @@ const AdminDashboard = () => {
   });
 
   const cards = [
-    { icon: Ship, label: t('admin.dashboard.upcomingTrips'), value: stats?.trips ?? 0 },
-    { icon: CalendarCheck, label: t('admin.dashboard.pendingBookings'), value: stats?.pendingBookings ?? 0 },
-    { icon: Users, label: t('admin.dashboard.confirmedMonth'), value: stats?.confirmedThisMonth ?? 0 },
+    { icon: Ship, label: t('admin.dashboard.upcomingTrips'), value: stats?.trips ?? 0, to: '/admin/trips?filter=upcoming' },
+    { icon: CalendarCheck, label: t('admin.dashboard.pendingBookings'), value: stats?.pendingBookings ?? 0, to: '/admin/bookings?tab=pending' },
+    { icon: Users, label: t('admin.dashboard.confirmedMonth'), value: stats?.confirmedThisMonth ?? 0, to: '/admin/bookings?tab=confirmed-month' },
   ];
 
   return (
@@ -63,16 +74,18 @@ const AdminDashboard = () => {
       </div>
       <p className="text-sm text-muted-foreground mb-8">{t('admin.dashboard.subtitle')}</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {cards.map(({ icon: Icon, label, value }) => (
-          <Card key={label} className="p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Icon className="h-5 w-5 text-primary" />
+        {cards.map(({ icon: Icon, label, value, to }) => (
+          <Link key={label} to={to}>
+            <Card className="p-6 hover:shadow-card-hover transition-shadow cursor-pointer">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Icon className="h-5 w-5 text-primary" />
+                </div>
               </div>
-            </div>
-            <p className="text-sm text-muted-foreground">{label}</p>
-            <p className="text-3xl font-bold text-foreground mt-1">{value}</p>
-          </Card>
+              <p className="text-sm text-muted-foreground">{label}</p>
+              <p className="text-3xl font-bold text-foreground mt-1">{value}</p>
+            </Card>
+          </Link>
         ))}
       </div>
     </div>

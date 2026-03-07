@@ -389,6 +389,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auto_complete_past_trips: { Args: never; Returns: undefined }
       confirm_booking: { Args: { _booking_id: string }; Returns: boolean }
       create_notification: {
         Args: {

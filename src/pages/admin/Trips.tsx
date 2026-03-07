@@ -63,6 +63,8 @@ const AdminTrips = () => {
     }
   }, [searchParams, setSearchParams]);
 
+  const filterParam = searchParams.get('filter');
+
   const { data: trips, isLoading } = useQuery({
     queryKey: ['admin-trips', diveCenterId],
     queryFn: async () => {
@@ -77,6 +79,18 @@ const AdminTrips = () => {
     },
     enabled: !!diveCenterId,
   });
+
+  // Apply filter if coming from dashboard
+  const filteredTrips = (() => {
+    if (!trips) return [];
+    if (filterParam === 'upcoming') {
+      const today = new Date().toISOString().split('T')[0];
+      return trips
+        .filter(t => t.status === 'published' && t.trip_date >= today)
+        .sort((a, b) => a.trip_date.localeCompare(b.trip_date));
+    }
+    return trips;
+  })();
 
   const saveMutation = useMutation({
     mutationFn: async (data: TripFormData) => {
@@ -154,16 +168,25 @@ const AdminTrips = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground">{t('admin.nav.trips')}</h1>
-          <p className="text-sm text-muted-foreground">{t('admin.trips.subtitle')}</p>
+          <p className="text-sm text-muted-foreground">
+            {filterParam === 'upcoming' ? t('admin.dashboard.upcomingTrips') : t('admin.trips.subtitle')}
+          </p>
         </div>
-        <Button onClick={openCreate} className="gap-2">
-          <Plus className="h-4 w-4" /> {t('admin.trips.create')}
-        </Button>
+        <div className="flex gap-2">
+          {filterParam && (
+            <Button variant="outline" onClick={() => setSearchParams({}, { replace: true })}>
+              {t('admin.nav.trips')}
+            </Button>
+          )}
+          <Button onClick={openCreate} className="gap-2">
+            <Plus className="h-4 w-4" /> {t('admin.trips.create')}
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (
         <p className="text-muted-foreground">{t('common.loading')}</p>
-      ) : !trips?.length ? (
+      ) : !filteredTrips.length ? (
         <Card className="flex flex-col items-center justify-center py-16">
           <Ship className="h-12 w-12 text-muted-foreground/40 mb-4" />
           <p className="text-muted-foreground">{t('admin.trips.empty')}</p>
@@ -173,7 +196,7 @@ const AdminTrips = () => {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {trips.map((trip) => (
+          {filteredTrips.map((trip) => (
             <Card key={trip.id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
