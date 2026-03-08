@@ -160,7 +160,7 @@ const TripDetail = () => {
       role: 'diver',
     });
     if (roleError && !roleError.message.includes('duplicate')) {
-      toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
+      toast.error(t('diver.trip.bookError'));
       setCreatingProfile(false);
       return;
     }
