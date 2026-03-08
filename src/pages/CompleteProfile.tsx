@@ -82,6 +82,7 @@ const CompleteProfile = () => {
       return;
     }
 
+    await refreshRole();
     toast.success(t('completeProfile.success'));
     const dest = pendingRedirect || '/app/discover';
     localStorage.removeItem('pending_redirect');
