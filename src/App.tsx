@@ -10,7 +10,7 @@ import Landing from "./pages/Landing";
 
 // Lazy-loaded routes
 const Login = lazy(() => import("./pages/Login"));
-const Signup = lazy(() => import("./pages/Signup"));
+// Signup is now part of Login page
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const CompleteProfile = lazy(() => import("./pages/CompleteProfile"));
@@ -53,7 +53,7 @@ const App = () => (
               <Route path="/explore/:id" element={<ExploreTrip />} />
               
               <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/signup" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/complete-profile" element={

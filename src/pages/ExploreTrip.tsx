@@ -48,7 +48,7 @@ const ExploreTrip = () => {
     } else {
       const redirectUrl = `/app/trip/${id}`;
       localStorage.setItem('pending_redirect', redirectUrl);
-      navigate(`/signup?redirect=${redirectUrl}`);
+      navigate(`/login?mode=signup&redirect=${redirectUrl}`);
     }
   };
 

@@ -10,6 +10,10 @@ import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+const isSafeRedirect = (url: string): boolean => {
+  return url.startsWith('/') && !url.startsWith('//');
+};
+
 const Login = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -22,7 +26,12 @@ const Login = () => {
 
   const searchParams = new URLSearchParams(location.search);
   const redirectParam = searchParams.get('redirect');
-  const from = (location.state as any)?.from || redirectParam || null;
+  const rawFrom = (location.state as any)?.from || redirectParam || null;
+  const from = rawFrom && isSafeRedirect(rawFrom) ? rawFrom : null;
+
+  // Determine initial mode from URL search param or path
+  const modeParam = searchParams.get('mode');
+  const [isSignup, setIsSignup] = useState(modeParam === 'signup' || location.pathname === '/signup');
 
   // Redirect if already logged in
   useEffect(() => {
@@ -31,7 +40,8 @@ const Login = () => {
       else if (role === 'diver') navigate('/app/discover', { replace: true });
       else navigate('/admin', { replace: true });
     } else if (user && !role) {
-      navigate('/complete-profile', { replace: true });
+      if (from) localStorage.setItem('pending_redirect', from);
+      navigate('/complete-profile', { replace: true, state: { from } });
     }
   }, [user, role]);
 
@@ -45,7 +55,27 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    } else if (data.session) {
+      toast.success('¡Cuenta creada!');
+    } else {
+      toast.success(t('registerCenter.checkEmail'));
+      setIsSignup(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    if (from) localStorage.setItem('pending_redirect', from);
     const { lovable } = await import('@/integrations/lovable');
     const result = await lovable.auth.signInWithOAuth('google', {
       redirect_uri: window.location.origin,
@@ -53,7 +83,8 @@ const Login = () => {
     if (result?.error) toast.error(String(result.error));
   };
 
-  const handleAppleLogin = async () => {
+  const handleAppleAuth = async () => {
+    if (from) localStorage.setItem('pending_redirect', from);
     const { lovable } = await import('@/integrations/lovable');
     const result = await lovable.auth.signInWithOAuth('apple', {
       redirect_uri: window.location.origin,
@@ -69,16 +100,43 @@ const Login = () => {
             <ScubaMaskLogo className="h-10 w-8 text-primary" />
             <span className="text-xl font-bold text-foreground">ScubaTrip</span>
           </Link>
-          <h1 className="text-2xl font-bold text-foreground">{t('auth.login.title')}</h1>
-          <p className="text-muted-foreground mt-1">{t('auth.login.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-foreground">
+            {isSignup ? t('auth.signup.title') : t('auth.login.title')}
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            {isSignup ? t('auth.signup.subtitle') : t('auth.login.subtitle')}
+          </p>
         </div>
 
         <div className="bg-card rounded-xl shadow-card p-6 border border-border">
-          <Button
-            variant="outline"
-            className="w-full mb-2"
-            onClick={handleGoogleLogin}
-          >
+          {/* Tab toggle */}
+          <div className="flex rounded-lg bg-muted p-1 mb-5">
+            <button
+              type="button"
+              onClick={() => setIsSignup(false)}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+                !isSignup
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t('auth.login.button')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsSignup(true)}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
+                isSignup
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t('auth.signup.button')}
+            </button>
+          </div>
+
+          {/* OAuth buttons */}
+          <Button variant="outline" className="w-full mb-2" onClick={handleGoogleAuth}>
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
               <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
@@ -87,11 +145,7 @@ const Login = () => {
             </svg>
             {t('auth.google')}
           </Button>
-          <Button
-            variant="outline"
-            className="w-full mb-4"
-            onClick={handleAppleLogin}
-          >
+          <Button variant="outline" className="w-full mb-4" onClick={handleAppleAuth}>
             <Apple className="w-5 h-5 mr-2" />
             {t('auth.apple')}
           </Button>
@@ -101,37 +155,40 @@ const Login = () => {
             <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">o</span></div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={isSignup ? handleSignup : handleLogin} className="space-y-4">
             <div>
               <Label htmlFor="email">{t('auth.email')}</Label>
               <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
             </div>
             <div>
               <Label htmlFor="password">{t('auth.password')}</Label>
-              <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+              <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={isSignup ? 6 : undefined} />
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="rememberMe"
-                checked={rememberMe}
-                onChange={e => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-              />
-              <Label htmlFor="rememberMe" className="text-sm font-normal text-muted-foreground cursor-pointer">
-                {t('auth.rememberMe')}
-              </Label>
-            </div>
+            {!isSignup && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  checked={rememberMe}
+                  onChange={e => setRememberMe(e.target.checked)}
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                />
+                <Label htmlFor="rememberMe" className="text-sm font-normal text-muted-foreground cursor-pointer">
+                  {t('auth.rememberMe')}
+                </Label>
+              </div>
+            )}
             <Button type="submit" className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90" disabled={loading}>
-              {loading ? t('common.loading') : t('auth.login.button')}
+              {loading ? t('common.loading') : isSignup ? t('auth.signup.button') : t('auth.login.button')}
             </Button>
           </form>
 
           <div className="flex flex-col items-center gap-2 mt-4">
-            <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary hover:underline">
-              {t('auth.forgot')}
-            </Link>
-            <Link to="/signup" className="text-sm text-primary hover:underline">{t('auth.signup.link')}</Link>
+            {!isSignup && (
+              <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary hover:underline">
+                {t('auth.forgot')}
+              </Link>
+            )}
             <Link to="/register-center" className="text-sm text-muted-foreground hover:underline">{t('landing.hero.cta.center')}</Link>
           </div>
         </div>

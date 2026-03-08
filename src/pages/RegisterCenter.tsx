@@ -230,7 +230,7 @@ const RegisterCenter = () => {
 
         {/* Link to diver signup */}
         <p className="text-center text-sm text-muted-foreground mt-4">
-          <Link to="/signup" className="hover:underline">{t('registerCenter.diverLink')}</Link>
+          <Link to="/login?mode=signup" className="hover:underline">{t('registerCenter.diverLink')}</Link>
         </p>
       </div>
     </div>
