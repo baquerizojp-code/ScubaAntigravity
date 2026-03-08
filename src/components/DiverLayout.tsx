@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import NotificationBell from '@/components/NotificationBell';
+import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 
 const DiverLayout = () => {
   const { pathname } = useLocation();
