@@ -1,7 +1,8 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, CalendarCheck, Users, Settings, ChevronRight, Anchor, Fish, MapPin, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
+import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import heroImage from '@/assets/hero-ocean.jpg';
 
@@ -27,6 +28,19 @@ const steps = [
 
 const Landing = () => {
   const { t } = useI18n();
+  const { user, role, loading } = useAuth();
+  const navigate = useNavigate();
+
+  // Auto-redirect logged-in users to their dashboard
+  if (!loading && user && role) {
+    if (role === 'diver') {
+      navigate('/app/discover', { replace: true });
+      return null;
+    } else {
+      navigate('/admin', { replace: true });
+      return null;
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
