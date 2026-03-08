@@ -448,6 +448,10 @@ export type Database = {
         Args: { _center_id: string; _user_id: string }
         Returns: boolean
       }
+      staff_can_view_diver: {
+        Args: { _diver_profile_id: string; _staff_user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "diver" | "dive_center_admin" | "dive_center_staff"
