@@ -21,9 +21,9 @@ const DiverLayout = () => {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top bar */}
       <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border px-4">
-        <div className="container mx-auto h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <ScubaMaskLogo className="h-7 w-5 text-primary" />
+        <div className="container mx-auto h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-h-[48px]">
+            <ScubaMaskLogo className="h-9 w-7 text-primary" />
             <span className="text-lg font-bold text-foreground">ScubaTrip</span>
           </div>
           <div className="flex items-center gap-1">

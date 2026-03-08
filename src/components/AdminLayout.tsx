@@ -88,11 +88,11 @@ const AdminLayout = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <header className="lg:hidden flex items-center gap-4 p-4 border-b border-border bg-card">
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
+        <header className="lg:hidden flex items-center gap-4 px-4 py-3 border-b border-border bg-card min-h-[56px]">
+          <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
-          <ScubaMaskLogo className="h-7 w-5 text-primary" />
+          <ScubaMaskLogo className="h-9 w-7 text-primary" />
           <span className="font-bold text-foreground flex-1">ScubaTrip</span>
           <NotificationBell />
         </header>
