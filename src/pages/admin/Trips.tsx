@@ -142,7 +142,7 @@ const AdminTrips = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-trips'] });
-      toast({ title: t('admin.trips.deleted') });
+      toast.success(t('admin.trips.deleted'));
     },
   });
 
