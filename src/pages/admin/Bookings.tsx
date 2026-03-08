@@ -159,7 +159,7 @@ const AdminBookings = () => {
     return filtered;
   };
 
-  const renderBookingCard = (booking: any, showActions: boolean) => (
+  const renderBookingCard = (booking: any, showActions: boolean, showCancellationActions?: boolean) => (
     <Card key={booking.id} className="p-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex-1 min-w-0">
@@ -198,11 +198,29 @@ const AdminBookings = () => {
             </Button>
           </div>
         )}
+        {showCancellationActions && (
+          <div className="flex gap-2 shrink-0">
+            <Button 
+              size="sm" variant="destructive" className="gap-1"
+              onClick={() => approveCancellationMutation.mutate(booking.id)}
+              disabled={approveCancellationMutation.isPending}
+            >
+              <Check className="h-3.5 w-3.5" /> {t('admin.bookings.approveCancellation')}
+            </Button>
+            <Button 
+              size="sm" variant="outline" className="gap-1"
+              onClick={() => denyCancellationMutation.mutate(booking.id)}
+              disabled={denyCancellationMutation.isPending}
+            >
+              <X className="h-3.5 w-3.5" /> {t('admin.bookings.denyCancellation')}
+            </Button>
+          </div>
+        )}
       </div>
     </Card>
   );
 
-  const renderTabContent = (status: string, showActions: boolean) => {
+  const renderTabContent = (status: string, showActions: boolean, showCancellationActions?: boolean) => {
     const filtered = filterBookings(status);
     return isLoading ? (
       <p className="text-muted-foreground py-8">{t('common.loading')}</p>
@@ -212,7 +230,7 @@ const AdminBookings = () => {
       </Card>
     ) : (
       <div className="grid gap-3 mt-4">
-        {filtered.map((booking: any) => renderBookingCard(booking, showActions))}
+        {filtered.map((booking: any) => renderBookingCard(booking, showActions, showCancellationActions))}
       </div>
     );
   };
