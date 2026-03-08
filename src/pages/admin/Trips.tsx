@@ -223,14 +223,13 @@ const AdminTrips = () => {
                 </p>
               </div>
               <div className="flex gap-2 shrink-0">
-                <Button variant="ghost" size="icon" onClick={() => openEdit(trip)}>
+                <Button variant="ghost" size="icon" onClick={() => openEdit(trip)} aria-label={t('admin.trips.edit')}>
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="ghost" size="icon" 
-                  onClick={() => {
-                    if (confirm(t('admin.trips.confirmDelete'))) deleteMutation.mutate(trip.id);
-                  }}
+                  aria-label={t('admin.trips.confirmDelete')}
+                  onClick={() => setDeleteId(trip.id)}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
