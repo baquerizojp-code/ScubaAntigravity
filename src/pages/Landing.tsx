@@ -102,7 +102,7 @@ const Landing = () => {
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
-                <Link to="/signup" className="w-full sm:w-auto">
+                <Link to="/register-center" className="w-full sm:w-auto">
                   <Button size="lg" variant="hero-outline" className="w-full sm:w-auto font-semibold text-base px-7">
                     {t('landing.hero.cta.center')}
                   </Button>
