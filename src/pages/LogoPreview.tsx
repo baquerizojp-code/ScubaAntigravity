@@ -1,122 +1,123 @@
 const LogoSVG = ({ className = "w-48 h-48", color = "currentColor" }: { className?: string; color?: string }) => (
   <svg
-    viewBox="0 0 200 250"
+    viewBox="0 0 200 260"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
   >
-    {/* Location pin outline */}
+    {/* ===== PIN OUTLINE ===== */}
     <path
-      d="M100 18
-         C54 18 20 52 20 92
-         C20 114 30 132 44 150
-         L100 216
-         L156 150
-         C170 132 180 114 180 92
-         C180 52 146 18 100 18Z"
+      d="M100 14
+         C50 14 16 48 16 92
+         C16 118 28 140 46 162
+         L100 224
+         L154 162
+         C172 140 184 118 184 92
+         C184 48 150 14 100 14Z"
       stroke={color}
-      strokeWidth="9"
+      strokeWidth="8"
       strokeLinejoin="round"
       strokeLinecap="round"
       fill="none"
     />
 
-    {/* Strap / headband arc — open arc from left side over top to right side */}
+    {/* ===== STRAP ARC — thick band over top ===== */}
     <path
-      d="M46 86
-         C50 52 72 36 100 36
-         C128 36 150 52 154 86"
+      d="M38 88
+         C42 50 68 32 100 32
+         C132 32 158 50 162 88"
       stroke={color}
-      strokeWidth="8.5"
+      strokeWidth="9"
       strokeLinecap="round"
       fill="none"
     />
 
-    {/* Left side buckle — short connector between strap end and mask */}
-    <rect x="42" y="80" width="12" height="14" rx="3" stroke={color} strokeWidth="5" fill="none" />
-
-    {/* Right side buckle — short connector between strap end and mask */}
-    <rect x="146" y="80" width="12" height="14" rx="3" stroke={color} strokeWidth="5" fill="none" />
-
-    {/* Mask — single continuous frame with two lens openings and nose */}
-    {/* Outer mask frame */}
+    {/* ===== MASK FRAME — single wide continuous shape ===== */}
+    {/* This is the main mask body: wide band with curved bottom for nose pocket */}
     <path
-      d="M54 78
-         C54 70 60 64 70 64
-         L90 64
-         C94 64 97 66 100 70
-         C103 66 106 64 110 64
-         L130 64
-         C140 64 146 70 146 78
-         L146 92
-         C146 102 140 108 130 108
-         L118 108
-         C112 108 108 106 105 102
-         L100 96
-         L95 102
-         C92 106 88 108 82 108
-         L70 108
-         C60 108 54 102 54 92Z"
+      d="M34 86
+         L34 96
+         C34 108 44 116 56 116
+         L82 116
+         C86 116 90 114 92 110
+         L100 100
+         L108 110
+         C110 114 114 116 118 116
+         L144 116
+         C156 116 166 108 166 96
+         L166 86
+         C166 74 156 64 144 64
+         L118 64
+         C114 64 110 66 108 70
+         L100 80
+         L92 70
+         C90 66 86 64 82 64
+         L56 64
+         C44 64 34 74 34 86Z"
       stroke={color}
       strokeWidth="7"
       strokeLinejoin="round"
       fill="none"
     />
 
-    {/* Left lens cutout — slightly recessed */}
+    {/* Left lens — subtle fill inside mask */}
     <path
-      d="M62 80
-         C62 74 66 70 72 70
-         L86 70
-         C89 70 91 72 92 75
-         L93 80
-         C94 86 92 92 88 96
-         C84 100 78 102 72 100
-         C66 98 62 90 62 80Z"
+      d="M42 86
+         C42 78 48 72 56 72
+         L80 72
+         C83 72 86 74 87 76
+         L92 84
+         C92 84 90 92 86 98
+         C82 104 76 108 68 108
+         L56 108
+         C48 108 42 100 42 92Z"
       fill={color}
-      opacity="0.15"
+      opacity="0.1"
     />
 
-    {/* Right lens cutout */}
+    {/* Right lens — subtle fill inside mask */}
     <path
-      d="M138 80
-         C138 74 134 70 128 70
-         L114 70
-         C111 70 109 72 108 75
-         L107 80
-         C106 86 108 92 112 96
-         C116 100 122 102 128 100
-         C134 98 138 90 138 80Z"
+      d="M158 86
+         C158 78 152 72 144 72
+         L120 72
+         C117 72 114 74 113 76
+         L108 84
+         C108 84 110 92 114 98
+         C118 104 124 108 132 108
+         L144 108
+         C152 108 158 100 158 92Z"
       fill={color}
-      opacity="0.15"
+      opacity="0.1"
     />
 
-    {/* Nose piece — prominent triangular/heart shape hanging below mask */}
+    {/* ===== NOSE PIECE — triangular shape below mask center ===== */}
     <path
-      d="M88 108
-         C88 108 90 116 94 122
-         C96 126 100 128 100 128
-         C100 128 104 126 106 122
-         C110 116 112 108 112 108"
+      d="M86 116
+         C88 122 92 132 100 136
+         C108 132 112 122 114 116"
       stroke={color}
-      strokeWidth="5.5"
+      strokeWidth="6"
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
     />
 
-    {/* Inner nose detail — V shape */}
+    {/* Inner nose V detail */}
     <path
-      d="M94 114 L100 122 L106 114"
+      d="M92 124 L100 132 L108 124"
       stroke={color}
-      strokeWidth="3"
+      strokeWidth="3.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
     />
 
-    {/* Bottom dot below pin point */}
-    <circle cx="100" cy="230" r="7" fill={color} />
+    {/* ===== SIDE BUCKLES — small connectors between strap and mask ===== */}
+    <line x1="36" y1="84" x2="36" y2="92" stroke={color} strokeWidth="6" strokeLinecap="round" />
+    <line x1="164" y1="84" x2="164" y2="92" stroke={color} strokeWidth="6" strokeLinecap="round" />
+
+    {/* ===== BOTTOM DOT ===== */}
+    <circle cx="100" cy="240" r="7" fill={color} />
   </svg>
 );
 
@@ -146,9 +147,9 @@ const LogoPreview = () => {
           </div>
         </div>
 
-        {/* Small sizes in context */}
+        {/* Sizes in context */}
         <div className="md:col-span-2 bg-muted rounded-2xl p-8">
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-6 text-center">Tamaños en contexto (navbar, headers)</h2>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-6 text-center">Tamaños en contexto</h2>
           <div className="flex items-center justify-center gap-12 flex-wrap">
             <div className="flex items-center gap-2">
               <LogoSVG className="w-6 h-8" color="#0f5e5a" />
