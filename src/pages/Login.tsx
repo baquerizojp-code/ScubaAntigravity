@@ -119,6 +119,18 @@ const Login = () => {
               <Label htmlFor="password">{t('auth.password')}</Label>
               <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
             </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={e => setRememberMe(e.target.checked)}
+                className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+              />
+              <Label htmlFor="rememberMe" className="text-sm font-normal text-muted-foreground cursor-pointer">
+                {t('auth.rememberMe')}
+              </Label>
+            </div>
             <Button type="submit" className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90" disabled={loading}>
               {loading ? t('common.loading') : t('auth.login.button')}
             </Button>

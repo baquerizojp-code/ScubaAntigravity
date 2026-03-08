@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, CalendarCheck, Users, Settings, ChevronRight, Anchor, Fish, MapPin, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -31,16 +32,15 @@ const Landing = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Auto-redirect logged-in users to their dashboard
-  if (!loading && user && role) {
-    if (role === 'diver') {
-      navigate('/app/discover', { replace: true });
-      return null;
-    } else {
-      navigate('/admin', { replace: true });
-      return null;
+  useEffect(() => {
+    if (!loading && user && role) {
+      if (role === 'diver') {
+        navigate('/app/discover', { replace: true });
+      } else {
+        navigate('/admin', { replace: true });
+      }
     }
-  }
+  }, [loading, user, role, navigate]);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
