@@ -28,11 +28,11 @@ const DiverLayout = () => {
           </div>
           <div className="flex items-center gap-1">
             <NotificationBell />
-            <Button variant="ghost" size="icon" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}>
-              <Globe className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}>
+              <Globe className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={signOut}>
-              <LogOut className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={signOut}>
+              <LogOut className="w-5 h-5" />
             </Button>
           </div>
         </div>

@@ -45,9 +45,9 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
             variant="ghost"
             size="sm"
             onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}
-            className="gap-1 text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10 px-2 sm:px-3"
+            className="gap-1 text-primary-foreground/70 hover:text-primary-foreground hover:bg-white/10 px-2 sm:px-3 min-h-[44px] min-w-[44px]"
           >
-            <Globe className="w-4 h-4" />
+            <Globe className="w-5 h-5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">{t('nav.language')}</span>
           </Button>
           {user ? (
