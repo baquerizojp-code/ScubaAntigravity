@@ -157,9 +157,6 @@ const RegisterCenter = () => {
             <ScubaMaskLogo className="h-10 w-8 text-primary" />
             <span className="text-xl font-bold text-foreground">ScubaTrip</span>
           </Link>
-          <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-4">
-            <Building2 className="w-6 h-6 text-accent" />
-          </div>
           <h1 className="text-2xl font-bold text-foreground">{t('registerCenter.title')}</h1>
           <p className="text-muted-foreground mt-1">
             {step === 1 ? t('registerCenter.subtitle') : t('registerCenter.centerInfo')}
