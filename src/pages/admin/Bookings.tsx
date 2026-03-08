@@ -78,7 +78,7 @@ const AdminBookings = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
       setRejectDialog(null);
       setRejectReason('');
-      toast({ title: t('admin.bookings.rejected') });
+      toast.success(t('admin.bookings.rejected'));
     },
   });
 
