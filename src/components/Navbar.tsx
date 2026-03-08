@@ -17,7 +17,7 @@ const Navbar = () => {
           <div className="w-9 h-9 rounded-lg bg-gradient-ocean flex items-center justify-center">
             <Waves className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-bold text-foreground">Scuba Planner</span>
+          <span className="text-lg font-bold text-foreground">ScubaTrip</span>
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">
@@ -25,20 +25,20 @@ const Navbar = () => {
             variant="ghost"
             size="sm"
             onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}
-            className="gap-1 text-muted-foreground px-2 sm:px-3"
-          >
+            className="gap-1 text-muted-foreground px-2 sm:px-3">
+            
             <Globe className="w-4 h-4" />
             <span className="hidden sm:inline">{t('nav.language')}</span>
           </Button>
-          {user ? (
-            <Link to={dashboardPath}>
+          {user ?
+          <Link to={dashboardPath}>
               <Button size="sm" className="bg-gradient-ocean text-primary-foreground hover:opacity-90 shadow-ocean text-xs sm:text-sm px-3 sm:px-4 gap-1">
                 <User className="w-4 h-4" />
                 {t('nav.dashboard')}
               </Button>
-            </Link>
-          ) : (
-            <>
+            </Link> :
+
+          <>
               <Link to="/login">
                 <Button variant="ghost" size="sm" className="px-2 sm:px-3">{t('nav.login')}</Button>
               </Link>
@@ -48,11 +48,11 @@ const Navbar = () => {
                 </Button>
               </Link>
             </>
-          )}
+          }
         </div>
       </div>
-    </nav>
-  );
+    </nav>);
+
 };
 
 export default Navbar;
