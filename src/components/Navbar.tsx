@@ -4,7 +4,7 @@ import { Globe, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/contexts/AuthContext';
-import ScubaMaskLogo from '@/components/ScubaMaskLogo';
+import AppLogo from '@/components/AppLogo';
 
 interface NavbarProps {
   transparent?: boolean;
@@ -35,9 +35,8 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
       }`}
     >
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/" className={`flex items-center gap-2 ${isTransparent ? 'drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]' : ''}`}>
-          <ScubaMaskLogo className="w-7 h-9 text-primary-foreground" />
-          <span className="text-lg font-bold text-primary-foreground">ScubaTrip</span>
+        <Link to="/" className={`${isTransparent ? 'drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]' : ''}`}>
+          <AppLogo variant="white" className="h-9 w-9" textClassName="text-lg font-bold text-primary-foreground" />
         </Link>
 
         <div className="flex items-center gap-1 sm:gap-2">
