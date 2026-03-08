@@ -155,7 +155,7 @@ const Login = () => {
             <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">o</span></div>
           </div>
 
-          <form onSubmit={isSignup ? handleSignup : handleLogin} className="space-y-4">
+          <form key={isSignup ? 'signup' : 'login'} onSubmit={isSignup ? handleSignup : handleLogin} className="space-y-4 animate-fade-in">
             <div>
               <Label htmlFor="email">{t('auth.email')}</Label>
               <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
