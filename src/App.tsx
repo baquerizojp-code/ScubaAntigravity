@@ -27,7 +27,7 @@ import DiverProfile from "./pages/app/DiverProfile";
 import Explore from "./pages/Explore";
 import ExploreTrip from "./pages/ExploreTrip";
 import NotFound from "./pages/NotFound";
-import LogoPreview from "./pages/LogoPreview";
+
 
 const queryClient = new QueryClient();
 
