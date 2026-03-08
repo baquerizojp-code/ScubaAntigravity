@@ -275,7 +275,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'landing.stats.divers': 'active divers',
     'landing.stats.rating': 'rating',
     'landing.features.badge': 'Features',
-    'landing.features.title': 'Why Scuba Planner?',
+    'landing.features.title': 'Why ScubaTrip?',
     'landing.features.discover.title': 'Discover Dives',
     'landing.features.discover.desc': 'Find the best dive trips near you with detailed information',
     'landing.features.book.title': 'Easy Booking',
