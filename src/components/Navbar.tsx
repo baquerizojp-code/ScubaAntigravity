@@ -22,7 +22,7 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [transparent]);
 
-  const dashboardPath = role === 'diver' ? '/app/discover' : role ? '/admin' : '/select-role';
+  const dashboardPath = role === 'diver' ? '/app/discover' : role ? '/admin' : '/login';
 
   const isTransparent = transparent && !scrolled;
 
@@ -51,7 +51,7 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
             <Globe className="w-5 h-5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">{t('nav.language')}</span>
           </Button>
-          {user ? (
+          {user && role ? (
             <Link to={dashboardPath}>
               <Button
                 size="sm"
@@ -62,12 +62,13 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
               </Button>
             </Link>
           ) : (
-            <Link to="/signup">
+            <Link to="/login">
               <Button
                 size="sm"
-                className="bg-cyan-electric text-cyan-electric-foreground hover:bg-cyan-electric/85 font-semibold text-xs sm:text-sm px-3 sm:px-4 min-h-[44px] min-w-[44px]"
+                className="bg-cyan-electric text-cyan-electric-foreground hover:bg-cyan-electric/85 font-semibold text-xs sm:text-sm px-3 sm:px-4 gap-1 min-h-[44px] min-w-[44px]"
               >
-                {t('nav.getStarted')}
+                <User className="w-4 h-4" />
+                {t('nav.enter')}
               </Button>
             </Link>
           )}
