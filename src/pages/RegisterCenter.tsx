@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Waves, Building2, Apple } from 'lucide-react';
+import { Building2, Apple } from 'lucide-react';
+import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
