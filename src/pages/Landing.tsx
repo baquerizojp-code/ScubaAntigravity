@@ -102,10 +102,8 @@ const Landing = () => {
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
-                <Link to="/register-center" className="w-full sm:w-auto">
-                  <Button size="lg" variant="hero-outline" className="w-full sm:w-auto font-semibold text-base px-7">
-                    {t('landing.hero.cta.center')}
-                  </Button>
+                <Link to="/register-center" className="text-ocean-300/70 hover:text-ocean-100 text-sm underline underline-offset-4 transition-colors mt-1 sm:mt-0 sm:ml-2">
+                  {t('landing.hero.cta.center')}
                 </Link>
               </div>
             </div>
