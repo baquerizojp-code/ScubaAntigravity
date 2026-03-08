@@ -10,11 +10,6 @@ export type TripWithCenter = Tables<'trips'> & {
   dive_centers: { name: string; logo_url: string | null } | null;
 };
 
-const difficultyColors: Record<string, string> = {
-  beginner: 'bg-green-100 text-green-800',
-  intermediate: 'bg-yellow-100 text-yellow-800',
-  advanced: 'bg-red-100 text-red-800',
-};
 
 const bookingStatusColors: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
