@@ -31,7 +31,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'landing.stats.divers': 'buzos activos',
     'landing.stats.rating': 'calificación',
     'landing.features.badge': 'Características',
-    'landing.features.title': '¿Por qué Scuba Planner?',
+    'landing.features.title': '¿Por qué ScubaTrip?',
     'landing.features.discover.title': 'Descubre Inmersiones',
     'landing.features.discover.desc': 'Encuentra los mejores trips de buceo cerca de ti con información detallada',
     'landing.features.book.title': 'Reserva Fácil',
