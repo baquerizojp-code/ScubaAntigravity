@@ -23,6 +23,7 @@ const DiverLayout = () => {
         <div className="container mx-auto h-14 flex items-center justify-between">
           <span className="text-lg font-bold text-foreground">Scuba Planner</span>
           <div className="flex items-center gap-1">
+            <NotificationBell />
             <Button variant="ghost" size="icon" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}>
               <Globe className="w-4 h-4" />
             </Button>
