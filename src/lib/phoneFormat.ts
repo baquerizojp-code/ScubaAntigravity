@@ -92,7 +92,8 @@ export function formatPhoneNumber(raw: string): string {
 
   const { format, localStart } = match;
   const countryDigits = digits.slice(0, localStart);
-  const localDigits = digits.slice(localStart);
+  // Truncate local digits to the max allowed for this country
+  const localDigits = digits.slice(localStart, localStart + format.totalLocal);
 
   let result = '+' + countryDigits;
   let pos = 0;
