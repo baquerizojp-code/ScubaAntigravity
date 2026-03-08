@@ -98,7 +98,7 @@ const NotificationBell = () => {
       </Button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 lg:left-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-[60] overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <h3 className="font-semibold text-sm text-foreground">{t('notifications.title')}</h3>
             {unreadCount > 0 && (
@@ -131,8 +131,8 @@ const NotificationBell = () => {
                       <span className="mt-1.5 w-2 h-2 rounded-full bg-primary shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{n.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{n.body}</p>
+                      <p className="text-sm font-medium text-foreground line-clamp-2">{n.title}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{n.body}</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {formatDistanceToNow(new Date(n.created_at), {
                           addSuffix: true,
