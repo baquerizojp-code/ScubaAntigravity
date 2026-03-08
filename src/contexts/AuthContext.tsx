@@ -22,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   diveCenterId: null,
   loading: true,
   signOut: async () => {},
+  refreshRole: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
