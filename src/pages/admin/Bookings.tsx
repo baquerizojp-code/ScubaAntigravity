@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
-import { Check, X, CalendarCheck, Clock, Ban } from 'lucide-react';
+import { Check, X, CalendarCheck, Clock, Ban, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -82,11 +82,56 @@ const AdminBookings = () => {
     },
   });
 
+  const approveCancellationMutation = useMutation({
+    mutationFn: async (bookingId: string) => {
+      // Find the booking to get trip_id for restoring available spots
+      const booking = bookings?.find(b => b.id === bookingId);
+      if (!booking) throw new Error('Booking not found');
+      
+      // Update status to cancelled
+      const { error: updateError } = await supabase
+        .from('bookings')
+        .update({ status: 'cancelled' })
+        .eq('id', bookingId);
+      if (updateError) throw updateError;
+      
+      // Restore available spot
+      const { error: tripError } = await supabase
+        .from('trips')
+        .update({ available_spots: (booking as any).trips?.available_spots + 1 || 1 })
+        .eq('id', booking.trip_id);
+      // Non-critical if this fails
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
+      toast({ title: t('admin.bookings.cancellationApproved') });
+    },
+    onError: (err: any) => {
+      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+    },
+  });
+
+  const denyCancellationMutation = useMutation({
+    mutationFn: async (bookingId: string) => {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: 'confirmed' })
+        .eq('id', bookingId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
+      toast({ title: t('admin.bookings.cancellationDenied') });
+    },
+  });
+
   const statusBadge = (status: string) => {
     const config: Record<string, { icon: typeof Clock; className: string }> = {
       pending: { icon: Clock, className: 'bg-warning/10 text-warning border-warning/20' },
       confirmed: { icon: Check, className: 'bg-primary/10 text-primary border-primary/20' },
       rejected: { icon: Ban, className: 'bg-destructive/10 text-destructive border-destructive/20' },
+      cancellation_requested: { icon: AlertTriangle, className: 'bg-orange-100 text-orange-800 border-orange-200' },
+      cancelled: { icon: X, className: 'bg-muted text-muted-foreground border-muted' },
     };
     const { icon: Icon, className } = config[status] || config.pending;
     return <Badge variant="outline" className={className}><Icon className="h-3 w-3 mr-1" />{status}</Badge>;
@@ -114,7 +159,7 @@ const AdminBookings = () => {
     return filtered;
   };
 
-  const renderBookingCard = (booking: any, showActions: boolean) => (
+  const renderBookingCard = (booking: any, showActions: boolean, showCancellationActions?: boolean) => (
     <Card key={booking.id} className="p-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex-1 min-w-0">
@@ -153,11 +198,29 @@ const AdminBookings = () => {
             </Button>
           </div>
         )}
+        {showCancellationActions && (
+          <div className="flex gap-2 shrink-0">
+            <Button 
+              size="sm" variant="destructive" className="gap-1"
+              onClick={() => approveCancellationMutation.mutate(booking.id)}
+              disabled={approveCancellationMutation.isPending}
+            >
+              <Check className="h-3.5 w-3.5" /> {t('admin.bookings.approveCancellation')}
+            </Button>
+            <Button 
+              size="sm" variant="outline" className="gap-1"
+              onClick={() => denyCancellationMutation.mutate(booking.id)}
+              disabled={denyCancellationMutation.isPending}
+            >
+              <X className="h-3.5 w-3.5" /> {t('admin.bookings.denyCancellation')}
+            </Button>
+          </div>
+        )}
       </div>
     </Card>
   );
 
-  const renderTabContent = (status: string, showActions: boolean) => {
+  const renderTabContent = (status: string, showActions: boolean, showCancellationActions?: boolean) => {
     const filtered = filterBookings(status);
     return isLoading ? (
       <p className="text-muted-foreground py-8">{t('common.loading')}</p>
@@ -167,7 +230,7 @@ const AdminBookings = () => {
       </Card>
     ) : (
       <div className="grid gap-3 mt-4">
-        {filtered.map((booking: any) => renderBookingCard(booking, showActions))}
+        {filtered.map((booking: any) => renderBookingCard(booking, showActions, showCancellationActions))}
       </div>
     );
   };
@@ -180,9 +243,12 @@ const AdminBookings = () => {
       </div>
 
       <Tabs defaultValue={defaultTab}>
-        <TabsList>
+        <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="pending" className="gap-1">
             <Clock className="h-3.5 w-3.5" /> {t('admin.bookings.pending')} ({filterBookings('pending').length})
+          </TabsTrigger>
+          <TabsTrigger value="cancellation_requested" className="gap-1">
+            <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.bookings.cancellationRequests')} ({filterBookings('cancellation_requested').length})
           </TabsTrigger>
           <TabsTrigger value="confirmed" className="gap-1">
             <Check className="h-3.5 w-3.5" /> {t('admin.bookings.confirmedTab')} ({filterBookings('confirmed').length})
@@ -196,6 +262,7 @@ const AdminBookings = () => {
         </TabsList>
 
         <TabsContent value="pending">{renderTabContent('pending', true)}</TabsContent>
+        <TabsContent value="cancellation_requested">{renderTabContent('cancellation_requested', false, true)}</TabsContent>
         <TabsContent value="confirmed">{renderTabContent('confirmed', false)}</TabsContent>
         <TabsContent value="confirmed-month">{renderTabContent('confirmed-month', false)}</TabsContent>
         <TabsContent value="rejected">{renderTabContent('rejected', false)}</TabsContent>

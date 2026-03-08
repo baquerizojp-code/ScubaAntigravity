@@ -428,7 +428,12 @@ export type Database = {
     }
     Enums: {
       app_role: "diver" | "dive_center_admin" | "dive_center_staff"
-      booking_status: "pending" | "confirmed" | "rejected" | "cancelled"
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "rejected"
+        | "cancelled"
+        | "cancellation_requested"
       certification_level:
         | "open_water"
         | "advanced_open_water"
@@ -567,7 +572,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["diver", "dive_center_admin", "dive_center_staff"],
-      booking_status: ["pending", "confirmed", "rejected", "cancelled"],
+      booking_status: [
+        "pending",
+        "confirmed",
+        "rejected",
+        "cancelled",
+        "cancellation_requested",
+      ],
       certification_level: [
         "open_water",
         "advanced_open_water",

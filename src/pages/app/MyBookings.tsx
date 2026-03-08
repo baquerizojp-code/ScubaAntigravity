@@ -43,6 +43,7 @@ const statusBadge: Record<string, string> = {
   confirmed: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800',
   cancelled: 'bg-muted text-muted-foreground',
+  cancellation_requested: 'bg-orange-100 text-orange-800',
 };
 
 const MyBookings = () => {
@@ -161,7 +162,7 @@ const MyBookings = () => {
           </TabsList>
           <TabsContent value="confirmed" className="mt-4">{renderList(['confirmed'])}</TabsContent>
           <TabsContent value="pending" className="mt-4">{renderList(['pending'])}</TabsContent>
-          <TabsContent value="other" className="mt-4">{renderList(['rejected', 'cancelled'])}</TabsContent>
+          <TabsContent value="other" className="mt-4">{renderList(['rejected', 'cancelled', 'cancellation_requested'])}</TabsContent>
         </Tabs>
       )}
 
