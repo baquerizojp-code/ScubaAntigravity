@@ -94,7 +94,7 @@ const Landing = () => {
               {/* CTA buttons */}
               <div className="flex flex-col gap-3 animate-fade-in" style={{ animationDelay: '0.24s' }}>
                 <div className="flex flex-col gap-3">
-                  <Link to="/signup" className="w-full sm:w-auto">
+                  <Link to="/explore" className="w-full sm:w-auto">
                     <Button size="lg" className="w-full sm:w-auto bg-cyan-electric text-cyan-electric-foreground hover:bg-cyan-electric/85 font-semibold text-base px-7">
                       {t('landing.hero.cta.diver')}
                       <ChevronRight className="w-4 h-4 ml-1" />
@@ -189,7 +189,7 @@ const Landing = () => {
             {t('landing.cta.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link to="/signup" className="w-full sm:w-auto">
+            <Link to="/explore" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto bg-cyan-electric text-cyan-electric-foreground hover:bg-cyan-electric/85 font-semibold px-8">
                 {t('landing.cta.diver')}
                 <ChevronRight className="w-4 h-4 ml-1" />
@@ -213,7 +213,7 @@ const Landing = () => {
         <div className="container mx-auto px-5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-ocean-400 text-sm">© {new Date().getFullYear()} Scuba Planner</p>
           <div className="flex gap-6">
-            <Link to="/signup" className="text-ocean-400 hover:text-ocean-200 text-sm transition-colors">
+            <Link to="/explore" className="text-ocean-400 hover:text-ocean-200 text-sm transition-colors">
               {t('nav.getStarted')}
             </Link>
             <Link to="/register-center" className="text-ocean-400 hover:text-ocean-200 text-sm transition-colors">

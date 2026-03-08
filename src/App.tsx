@@ -24,6 +24,8 @@ import TripDetail from "./pages/app/TripDetail";
 import MyBookings from "./pages/app/MyBookings";
 // GroupChat removed
 import DiverProfile from "./pages/app/DiverProfile";
+import Explore from "./pages/Explore";
+import ExploreTrip from "./pages/ExploreTrip";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,8 @@ const App = () => (
           <Routes>
             {/* Public */}
             <Route path="/" element={<Landing />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/explore/:id" element={<ExploreTrip />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />

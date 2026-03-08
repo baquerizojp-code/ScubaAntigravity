@@ -19,7 +19,9 @@ const Login = () => {
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const from = (location.state as any)?.from || null;
+  const searchParams = new URLSearchParams(location.search);
+  const redirectParam = searchParams.get('redirect');
+  const from = (location.state as any)?.from || redirectParam || null;
 
   // Redirect if already logged in
   useEffect(() => {
