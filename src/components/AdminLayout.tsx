@@ -45,8 +45,8 @@ const AdminLayout = () => {
       )}>
         <div className="p-6 border-b border-border flex items-center justify-between">
           <Link to="/admin" className="flex items-center gap-2">
-            <Ship className="h-7 w-7 text-primary" />
-            <span className="text-lg font-bold text-foreground">Scuba Planner</span>
+            <ScubaMaskLogo className="h-8 w-6 text-primary" />
+            <span className="text-lg font-bold text-foreground">ScubaTrip</span>
           </Link>
           <div className="hidden lg:block">
             <NotificationBell />
