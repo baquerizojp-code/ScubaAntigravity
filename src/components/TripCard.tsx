@@ -10,11 +10,6 @@ export type TripWithCenter = Tables<'trips'> & {
   dive_centers: { name: string; logo_url: string | null } | null;
 };
 
-const difficultyColors: Record<string, string> = {
-  beginner: 'bg-green-100 text-green-800',
-  intermediate: 'bg-yellow-100 text-yellow-800',
-  advanced: 'bg-red-100 text-red-800',
-};
 
 const bookingStatusColors: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -47,11 +42,6 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
               <p className="text-sm opacity-90 mt-0.5">{trip.dive_centers?.name}</p>
             </div>
             <div className="flex flex-col items-end gap-1">
-              {trip.difficulty && (
-                <Badge className={difficultyColors[trip.difficulty] + ' text-xs'}>
-                  {trip.difficulty}
-                </Badge>
-              )}
               {bookingStatus && (
                 <Badge className={bookingStatusColors[bookingStatus] + ' text-xs border'}>
                   {bookingStatusLabels[bookingStatus]?.[locale] || bookingStatus}
