@@ -141,6 +141,7 @@ const Login = () => {
               {t('auth.forgot')}
             </Link>
             <Link to="/signup" className="text-sm text-primary hover:underline">{t('auth.signup.link')}</Link>
+            <Link to="/register-center" className="text-sm text-muted-foreground hover:underline">{t('landing.hero.cta.center')}</Link>
           </div>
         </div>
       </div>

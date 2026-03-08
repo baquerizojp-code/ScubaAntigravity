@@ -215,6 +215,9 @@ const Landing = () => {
             <Link to="/signup" className="text-ocean-400 hover:text-ocean-200 text-sm transition-colors">
               {t('nav.signup')}
             </Link>
+            <Link to="/register-center" className="text-ocean-400 hover:text-ocean-200 text-sm transition-colors">
+              {t('landing.hero.cta.center')}
+            </Link>
           </div>
         </div>
       </footer>
