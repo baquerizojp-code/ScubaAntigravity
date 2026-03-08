@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { formatPhoneNumber, stripPhoneFormat } from '@/lib/phoneFormat';
+import { formatPhoneNumber, isPhoneComplete } from '@/lib/phoneFormat';
 
 interface Country {
   code: string;
