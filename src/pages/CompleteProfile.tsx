@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppLogo from '@/components/AppLogo';
+import { Waves } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -74,8 +74,8 @@ const CompleteProfile = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <AppLogo variant="dark" className="h-12 w-12" showText={false} />
+          <div className="w-12 h-12 rounded-lg bg-gradient-ocean flex items-center justify-center mx-auto mb-4">
+            <Waves className="w-7 h-7 text-primary-foreground" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">{t('completeProfile.title')}</h1>
           <p className="text-muted-foreground mt-1">{t('completeProfile.subtitle')}</p>

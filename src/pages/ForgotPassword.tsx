@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import AppLogo from '@/components/AppLogo';
+import { Waves } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,8 +32,11 @@ const ForgotPassword = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex mb-6">
-            <AppLogo variant="dark" className="h-10 w-10" textClassName="text-xl font-bold text-foreground" />
+          <Link to="/" className="inline-flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-gradient-ocean flex items-center justify-center">
+              <Waves className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <span className="text-xl font-bold text-foreground">Scuba Planner</span>
           </Link>
           <h1 className="text-2xl font-bold text-foreground">{t('auth.forgot.title')}</h1>
           <p className="text-muted-foreground mt-1">{t('auth.forgot.subtitle')}</p>
