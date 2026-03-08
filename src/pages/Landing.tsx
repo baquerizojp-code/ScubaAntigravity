@@ -189,7 +189,7 @@ const Landing = () => {
             {t('landing.cta.subtitle')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-            <Link to="/signup" className="w-full sm:w-auto">
+            <Link to="/explore" className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto bg-cyan-electric text-cyan-electric-foreground hover:bg-cyan-electric/85 font-semibold px-8">
                 {t('landing.cta.diver')}
                 <ChevronRight className="w-4 h-4 ml-1" />
