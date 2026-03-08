@@ -51,8 +51,34 @@ const translations: Record<Locale, Record<string, string>> = {
     'landing.steps.dive.desc': 'Disfruta tu aventura submarina',
     'landing.cta.title': '¿Listo para sumergirte?',
     'landing.cta.subtitle': 'Únete a cientos de buzos que ya planifican sus inmersiones con nosotros',
-    'landing.cta.diver': 'Crear Cuenta de Buzo',
+    'landing.cta.diver': 'Crear Cuenta Gratis',
     'landing.cta.center': 'Registrar mi Centro',
+
+    // Complete Profile
+    'completeProfile.title': 'Completa tu perfil',
+    'completeProfile.subtitle': 'Cuéntanos sobre ti para personalizar tu experiencia',
+    'completeProfile.button': 'Comenzar a Explorar',
+    'completeProfile.success': '¡Perfil creado! Bienvenido a Scuba Planner',
+
+    // Register Center
+    'registerCenter.title': 'Registra tu Centro de Buceo',
+    'registerCenter.subtitle': 'Gestiona trips, reservas y conecta con buzos',
+    'registerCenter.centerInfo': 'Datos del centro',
+    'registerCenter.descPlaceholder': 'Explora el Caribe con nosotros...',
+    'registerCenter.button': 'Registrar Centro',
+    'registerCenter.success': '¡Centro creado exitosamente!',
+    'registerCenter.checkEmail': 'Revisa tu correo para confirmar tu cuenta',
+    'registerCenter.diverLink': '¿Eres buzo? Crea una cuenta de buzo',
+
+    // Certification labels
+    'profile.cert.none': 'Sin certificación',
+    'profile.cert.openWater': 'Open Water',
+    'profile.cert.advanced': 'Advanced Open Water',
+    'profile.cert.rescue': 'Rescue Diver',
+    'profile.cert.divemaster': 'Divemaster',
+    'profile.cert.instructor': 'Instructor',
+
+    'common.optional': 'opcional',
 
     // Auth
     'auth.login.title': 'Bienvenido de vuelta',
@@ -261,8 +287,34 @@ const translations: Record<Locale, Record<string, string>> = {
     'landing.steps.dive.desc': 'Enjoy your underwater adventure',
     'landing.cta.title': 'Ready to dive in?',
     'landing.cta.subtitle': 'Join hundreds of divers already planning their dives with us',
-    'landing.cta.diver': 'Create Diver Account',
+    'landing.cta.diver': 'Create Free Account',
     'landing.cta.center': 'Register My Center',
+
+    // Complete Profile
+    'completeProfile.title': 'Complete your profile',
+    'completeProfile.subtitle': 'Tell us about yourself to personalize your experience',
+    'completeProfile.button': 'Start Exploring',
+    'completeProfile.success': 'Profile created! Welcome to Scuba Planner',
+
+    // Register Center
+    'registerCenter.title': 'Register Your Dive Center',
+    'registerCenter.subtitle': 'Manage trips, bookings, and connect with divers',
+    'registerCenter.centerInfo': 'Center details',
+    'registerCenter.descPlaceholder': 'Explore the Caribbean with us...',
+    'registerCenter.button': 'Register Center',
+    'registerCenter.success': 'Center created successfully!',
+    'registerCenter.checkEmail': 'Check your email to confirm your account',
+    'registerCenter.diverLink': 'Are you a diver? Create a diver account',
+
+    // Certification labels
+    'profile.cert.none': 'No certification',
+    'profile.cert.openWater': 'Open Water',
+    'profile.cert.advanced': 'Advanced Open Water',
+    'profile.cert.rescue': 'Rescue Diver',
+    'profile.cert.divemaster': 'Divemaster',
+    'profile.cert.instructor': 'Instructor',
+
+    'common.optional': 'optional',
 
     // Auth
     'auth.login.title': 'Welcome back',

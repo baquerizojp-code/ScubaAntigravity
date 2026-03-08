@@ -27,7 +27,7 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login', skipRol
 
   // No role yet → send to role selection (unless we're already there)
   if (!role && !skipRoleCheck) {
-    return <Navigate to="/select-role" replace />;
+    return <Navigate to="/complete-profile" replace />;
   }
 
   // Check allowed roles

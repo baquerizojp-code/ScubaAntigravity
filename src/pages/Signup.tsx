@@ -26,7 +26,7 @@ const Signup = () => {
       else if (role === 'diver') navigate('/app/discover', { replace: true });
       else navigate('/admin', { replace: true });
     } else if (user && !role) {
-      navigate('/select-role', { replace: true });
+      navigate('/complete-profile', { replace: true });
     }
   }, [user, role]);
 

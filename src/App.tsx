@@ -12,7 +12,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import SelectRole from "./pages/SelectRole";
+import CompleteProfile from "./pages/CompleteProfile";
+import RegisterCenter from "./pages/RegisterCenter";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminTrips from "./pages/admin/Trips";
 import AdminBookings from "./pages/admin/Bookings";
@@ -41,11 +42,12 @@ const App = () => (
             <Route path="/signup" element={<Signup />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/select-role" element={
+            <Route path="/complete-profile" element={
               <ProtectedRoute skipRoleCheck>
-                <SelectRole />
+                <CompleteProfile />
               </ProtectedRoute>
             } />
+            <Route path="/register-center" element={<RegisterCenter />} />
 
             {/* Admin routes with shared layout */}
             <Route path="/admin" element={

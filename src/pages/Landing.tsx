@@ -102,7 +102,7 @@ const Landing = () => {
                     <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
-                <Link to="/signup" className="w-full sm:w-auto">
+                <Link to="/register-center" className="w-full sm:w-auto">
                   <Button size="lg" variant="hero-outline" className="w-full sm:w-auto font-semibold text-base px-7">
                     {t('landing.hero.cta.center')}
                   </Button>
@@ -195,7 +195,7 @@ const Landing = () => {
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </Link>
-            <Link to="/signup" className="w-full sm:w-auto">
+            <Link to="/register-center" className="w-full sm:w-auto">
               <Button size="lg" variant="hero-outline" className="w-full sm:w-auto font-semibold px-8">
                 {t('landing.cta.center')}
               </Button>
@@ -214,6 +214,9 @@ const Landing = () => {
             </Link>
             <Link to="/signup" className="text-ocean-400 hover:text-ocean-200 text-sm transition-colors">
               {t('nav.signup')}
+            </Link>
+            <Link to="/register-center" className="text-ocean-400 hover:text-ocean-200 text-sm transition-colors">
+              {t('landing.hero.cta.center')}
             </Link>
           </div>
         </div>
