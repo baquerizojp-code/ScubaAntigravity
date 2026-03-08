@@ -73,7 +73,7 @@ const AdminSettings = () => {
         .update({
           name,
           description,
-          whatsapp_number: whatsapp || null,
+          whatsapp_number: whatsapp ? stripPhoneFormat(whatsapp) : null,
           location: location || null,
           operating_hours: operatingHours || null,
           website: website || null,
