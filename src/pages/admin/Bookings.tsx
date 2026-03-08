@@ -107,7 +107,7 @@ const AdminBookings = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
-      toast({ title: t('admin.bookings.cancellationDenied') });
+      toast.success(t('admin.bookings.cancellationDenied'));
     },
   });
 

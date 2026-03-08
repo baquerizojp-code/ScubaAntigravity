@@ -88,7 +88,7 @@ const AdminSettings = () => {
       toast.success(t('admin.settings.saved'));
     },
     onError: (err: any) => {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(err.message || 'Error');
     },
   });
 

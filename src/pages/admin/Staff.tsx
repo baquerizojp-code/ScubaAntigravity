@@ -83,7 +83,7 @@ const AdminStaff = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-staff'] });
-      toast({ title: t('admin.staff.removed') });
+      toast.success(t('admin.staff.removed'));
     },
   });
 
