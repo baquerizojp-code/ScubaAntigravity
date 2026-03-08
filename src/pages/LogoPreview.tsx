@@ -5,15 +5,15 @@ const LogoSVG = ({ className = "w-48 h-48", color = "currentColor" }: { classNam
     xmlns="http://www.w3.org/2000/svg"
     className={className}
   >
-    {/* Pin outline: circle top + V bottom to point */}
+    {/* Location pin outline */}
     <path
-      d="M100 16
-         C56 16 22 50 22 90
-         C22 110 30 126 42 142
-         L100 214
-         L158 142
-         C170 126 178 110 178 90
-         C178 50 144 16 100 16Z"
+      d="M100 18
+         C54 18 20 52 20 92
+         C20 114 30 132 44 150
+         L100 216
+         L156 150
+         C170 132 180 114 180 92
+         C180 52 146 18 100 18Z"
       stroke={color}
       strokeWidth="9"
       strokeLinejoin="round"
@@ -21,99 +21,93 @@ const LogoSVG = ({ className = "w-48 h-48", color = "currentColor" }: { classNam
       fill="none"
     />
 
-    {/* Headband/strap arc across the top — connects to mask sides */}
+    {/* Strap / headband arc — open arc from left side over top to right side */}
     <path
-      d="M52 82
-         C52 50 72 34 100 34
-         C128 34 148 50 148 82"
+      d="M46 86
+         C50 52 72 36 100 36
+         C128 36 150 52 154 86"
       stroke={color}
-      strokeWidth="8"
+      strokeWidth="8.5"
       strokeLinecap="round"
       fill="none"
     />
 
-    {/* Mask frame — continuous shape wrapping both lenses */}
+    {/* Left side buckle — short connector between strap end and mask */}
+    <rect x="42" y="80" width="12" height="14" rx="3" stroke={color} strokeWidth="5" fill="none" />
+
+    {/* Right side buckle — short connector between strap end and mask */}
+    <rect x="146" y="80" width="12" height="14" rx="3" stroke={color} strokeWidth="5" fill="none" />
+
+    {/* Mask — single continuous frame with two lens openings and nose */}
+    {/* Outer mask frame */}
     <path
-      d="M48 84
-         C48 72 56 66 68 66
-         L88 66
-         C92 66 95 68 97 72
-         L100 76
-         L103 72
-         C105 68 108 66 112 66
-         L132 66
-         C144 66 152 72 152 84
-         C152 96 144 106 132 108
-         L120 108
-         C112 108 106 104 103 98
-         L100 94
-         L97 98
-         C94 104 88 108 80 108
-         L68 108
-         C56 108 48 96 48 84Z"
+      d="M54 78
+         C54 70 60 64 70 64
+         L90 64
+         C94 64 97 66 100 70
+         C103 66 106 64 110 64
+         L130 64
+         C140 64 146 70 146 78
+         L146 92
+         C146 102 140 108 130 108
+         L118 108
+         C112 108 108 106 105 102
+         L100 96
+         L95 102
+         C92 106 88 108 82 108
+         L70 108
+         C60 108 54 102 54 92Z"
       stroke={color}
       strokeWidth="7"
       strokeLinejoin="round"
       fill="none"
     />
 
-    {/* Left lens inner shape */}
+    {/* Left lens cutout — slightly recessed */}
     <path
-      d="M58 84
-         C58 76 64 72 72 72
-         L84 72
-         C88 72 90 74 91 77
-         C92 80 92 84 90 90
-         C88 96 82 100 74 100
-         C64 100 58 94 58 84Z"
+      d="M62 80
+         C62 74 66 70 72 70
+         L86 70
+         C89 70 91 72 92 75
+         L93 80
+         C94 86 92 92 88 96
+         C84 100 78 102 72 100
+         C66 98 62 90 62 80Z"
       fill={color}
-      opacity="0.12"
+      opacity="0.15"
     />
 
-    {/* Right lens inner shape */}
+    {/* Right lens cutout */}
     <path
-      d="M142 84
-         C142 76 136 72 128 72
-         L116 72
-         C112 72 110 74 109 77
-         C108 80 108 84 110 90
-         C112 96 118 100 126 100
-         C136 100 142 94 142 84Z"
+      d="M138 80
+         C138 74 134 70 128 70
+         L114 70
+         C111 70 109 72 108 75
+         L107 80
+         C106 86 108 92 112 96
+         C116 100 122 102 128 100
+         C134 98 138 90 138 80Z"
       fill={color}
-      opacity="0.12"
+      opacity="0.15"
     />
 
-    {/* Left strap connector / buckle */}
+    {/* Nose piece — prominent triangular/heart shape hanging below mask */}
     <path
-      d="M48 82 L42 78"
+      d="M88 108
+         C88 108 90 116 94 122
+         C96 126 100 128 100 128
+         C100 128 104 126 106 122
+         C110 116 112 108 112 108"
       stroke={color}
-      strokeWidth="7"
-      strokeLinecap="round"
-    />
-
-    {/* Right strap connector / buckle */}
-    <path
-      d="M152 82 L158 78"
-      stroke={color}
-      strokeWidth="7"
-      strokeLinecap="round"
-    />
-
-    {/* Nose piece — prominent triangular shape */}
-    <path
-      d="M88 100
-         C90 108 94 118 100 120
-         C106 118 110 108 112 100"
-      stroke={color}
-      strokeWidth="6"
+      strokeWidth="5.5"
       strokeLinecap="round"
       strokeLinejoin="round"
       fill="none"
     />
 
-    {/* Nose bridge detail */}
+    {/* Inner nose detail — V shape */}
     <path
-      d="M94 108 L100 116 L106 108"
+      d="M94 114 L100 122 L106 114"
       stroke={color}
       strokeWidth="3"
       strokeLinecap="round"
@@ -121,8 +115,8 @@ const LogoSVG = ({ className = "w-48 h-48", color = "currentColor" }: { classNam
       fill="none"
     />
 
-    {/* Bottom dot */}
-    <circle cx="100" cy="228" r="7" fill={color} />
+    {/* Bottom dot below pin point */}
+    <circle cx="100" cy="230" r="7" fill={color} />
   </svg>
 );
 
@@ -152,7 +146,7 @@ const LogoPreview = () => {
           </div>
         </div>
 
-        {/* Reference comparison */}
+        {/* Small sizes in context */}
         <div className="md:col-span-2 bg-muted rounded-2xl p-8">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-6 text-center">Tamaños en contexto (navbar, headers)</h2>
           <div className="flex items-center justify-center gap-12 flex-wrap">
