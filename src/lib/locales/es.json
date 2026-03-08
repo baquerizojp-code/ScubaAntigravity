@@ -229,5 +229,6 @@
   "diver.profile.emergency": "Contacto de Emergencia",
   "diver.profile.saved": "Perfil actualizado",
   "diver.profile.error": "Error al guardar",
-  "explore.loginRequired": "Necesitas crear una cuenta para reservar"
+  "explore.loginRequired": "Necesitas crear una cuenta para reservar",
+  "auth.useAnotherAccount": "Usar otra cuenta"
 }
