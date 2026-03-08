@@ -69,7 +69,7 @@ const AdminStaff = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-invites'] });
       setInviteOpen(false);
       setInviteEmail('');
-      toast({ title: t('admin.staff.invited') });
+      toast.success(t('admin.staff.invited'));
     },
     onError: (err: any) => {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
