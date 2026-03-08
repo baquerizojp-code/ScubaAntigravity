@@ -23,6 +23,7 @@ const RegisterCenter = () => {
   const [password, setPassword] = useState('');
   const [centerName, setCenterName] = useState('');
   const [centerWhatsapp, setCenterWhatsapp] = useState('');
+  const [whatsappError, setWhatsappError] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Already logged in with a role → redirect
@@ -136,8 +137,16 @@ const RegisterCenter = () => {
     window.location.href = '/admin';
   };
 
+  const validateWhatsapp = (value: string) => {
+    if (!value) { setWhatsappError(''); return true; }
+    const valid = /^\+[1-9]\d{6,14}$/.test(value.replace(/\s/g, ''));
+    setWhatsappError(valid ? '' : t('validation.whatsapp'));
+    return valid;
+  };
+
   const handleCenterSetup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (centerWhatsapp && !validateWhatsapp(centerWhatsapp)) return;
     await setupCenter();
   };
 
@@ -209,7 +218,12 @@ const RegisterCenter = () => {
               </div>
               <div>
                 <Label>WhatsApp</Label>
-                <Input value={centerWhatsapp} onChange={e => setCenterWhatsapp(e.target.value)} placeholder="+52 998 123 4567" />
+                <Input
+                  value={centerWhatsapp}
+                  onChange={e => { setCenterWhatsapp(e.target.value); validateWhatsapp(e.target.value); }}
+                  placeholder="+593 999 123 456"
+                />
+                {whatsappError && <p className="text-sm text-destructive mt-1">{whatsappError}</p>}
               </div>
               <Button type="submit" className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90" disabled={loading}>
                 {loading ? t('common.loading') : t('registerCenter.button')}

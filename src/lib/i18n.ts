@@ -184,6 +184,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'admin.settings.name': 'Nombre del Centro',
     'admin.settings.description': 'Descripción',
     'admin.settings.saved': 'Configuración guardada',
+    'admin.settings.location': 'Ubicación',
+    'admin.settings.hours': 'Horarios',
+    'admin.settings.website': 'Sitio Web',
+    'admin.settings.locationAndSocial': 'Ubicación y Redes Sociales',
+    'validation.whatsapp': 'Formato inválido. Usa código de país (ej: +593 999 123 456)',
 
     // Notifications
     'notifications.title': 'Notificaciones',
@@ -422,6 +427,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'admin.settings.name': 'Center Name',
     'admin.settings.description': 'Description',
     'admin.settings.saved': 'Settings saved',
+    'admin.settings.location': 'Location',
+    'admin.settings.hours': 'Operating Hours',
+    'admin.settings.website': 'Website',
+    'admin.settings.locationAndSocial': 'Location & Social Media',
+    'validation.whatsapp': 'Invalid format. Use country code (e.g. +593 999 123 456)',
 
     // Notifications
     'notifications.title': 'Notifications',

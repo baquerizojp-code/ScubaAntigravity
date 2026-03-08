@@ -67,30 +67,48 @@ export type Database = {
           created_at: string
           created_by: string | null
           description: string | null
+          facebook: string | null
           id: string
+          instagram: string | null
+          location: string | null
           logo_url: string | null
           name: string
+          operating_hours: string | null
+          tiktok: string | null
           updated_at: string
+          website: string | null
           whatsapp_number: string | null
         }
         Insert: {
           created_at?: string
           created_by?: string | null
           description?: string | null
+          facebook?: string | null
           id?: string
+          instagram?: string | null
+          location?: string | null
           logo_url?: string | null
           name: string
+          operating_hours?: string | null
+          tiktok?: string | null
           updated_at?: string
+          website?: string | null
           whatsapp_number?: string | null
         }
         Update: {
           created_at?: string
           created_by?: string | null
           description?: string | null
+          facebook?: string | null
           id?: string
+          instagram?: string | null
+          location?: string | null
           logo_url?: string | null
           name?: string
+          operating_hours?: string | null
+          tiktok?: string | null
           updated_at?: string
+          website?: string | null
           whatsapp_number?: string | null
         }
         Relationships: []
