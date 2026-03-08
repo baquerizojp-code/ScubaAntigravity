@@ -134,73 +134,82 @@ const PhoneInput = ({ value, onChange, onValidate, placeholder, error }: PhoneIn
       )
     : COUNTRIES;
 
-  return (
-    <div className="relative">
-      <div className="flex">
-        {/* Country selector button */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            type="button"
-            onClick={() => setOpen(!open)}
-            className={cn(
-              'flex items-center gap-1 h-10 px-2.5 rounded-l-md border border-r-0 border-input bg-muted/50 hover:bg-muted text-sm transition-colors',
-              open && 'ring-2 ring-ring ring-offset-2 ring-offset-background'
+    const complete = isPhoneComplete(value);
+
+    return (
+      <div className="relative">
+        <div className="flex items-center">
+          {/* Country selector button */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              className={cn(
+                'flex items-center gap-1 h-10 px-2.5 rounded-l-md border border-r-0 border-input bg-muted/50 hover:bg-muted text-sm transition-colors',
+                open && 'ring-2 ring-ring ring-offset-2 ring-offset-background'
+              )}
+            >
+              <span className="text-lg leading-none">
+                {selectedCountry?.flag || '🌍'}
+              </span>
+              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
+            </button>
+
+            {open && (
+              <div className="absolute top-full left-0 mt-1 z-50 w-64 max-h-60 overflow-hidden rounded-md border border-border bg-popover shadow-md animate-in fade-in-0 zoom-in-95">
+                <div className="p-2 border-b border-border">
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    placeholder="Buscar país..."
+                    className="w-full text-sm bg-transparent outline-none placeholder:text-muted-foreground"
+                    autoFocus
+                  />
+                </div>
+                <div className="max-h-48 overflow-y-auto p-1">
+                  {filtered.map((country) => (
+                    <button
+                      key={country.code}
+                      type="button"
+                      onClick={() => handleCountrySelect(country)}
+                      className={cn(
+                        'flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors text-left',
+                        selectedCountry?.code === country.code && 'bg-accent/50 font-medium'
+                      )}
+                    >
+                      <span className="text-base">{country.flag}</span>
+                      <span className="flex-1 truncate">{country.name}</span>
+                      <span className="text-muted-foreground text-xs">{country.dialCode}</span>
+                    </button>
+                  ))}
+                  {filtered.length === 0 && (
+                    <p className="text-sm text-muted-foreground text-center py-3">Sin resultados</p>
+                  )}
+                </div>
+              </div>
             )}
-          >
-            <span className="text-lg leading-none">
-              {selectedCountry?.flag || '🌍'}
-            </span>
-            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
-          </button>
+          </div>
 
-          {open && (
-            <div className="absolute top-full left-0 mt-1 z-50 w-64 max-h-60 overflow-hidden rounded-md border border-border bg-popover shadow-md animate-in fade-in-0 zoom-in-95">
-              <div className="p-2 border-b border-border">
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Buscar país..."
-                  className="w-full text-sm bg-transparent outline-none placeholder:text-muted-foreground"
-                  autoFocus
-                />
+          {/* Phone number input */}
+          <div className="relative flex-1">
+            <Input
+              ref={inputRef}
+              value={value}
+              onChange={(e) => handleInputChange(e.target.value)}
+              placeholder={placeholder || '+593 993 055 690'}
+              className={cn('rounded-l-none', complete && 'pr-9')}
+            />
+            {complete && (
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                <Check className="h-4 w-4 text-green-500" />
               </div>
-              <div className="max-h-48 overflow-y-auto p-1">
-                {filtered.map((country) => (
-                  <button
-                    key={country.code}
-                    type="button"
-                    onClick={() => handleCountrySelect(country)}
-                    className={cn(
-                      'flex items-center gap-2 w-full px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors text-left',
-                      selectedCountry?.code === country.code && 'bg-accent/50 font-medium'
-                    )}
-                  >
-                    <span className="text-base">{country.flag}</span>
-                    <span className="flex-1 truncate">{country.name}</span>
-                    <span className="text-muted-foreground text-xs">{country.dialCode}</span>
-                  </button>
-                ))}
-                {filtered.length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-3">Sin resultados</p>
-                )}
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-
-        {/* Phone number input */}
-        <Input
-          ref={inputRef}
-          value={value}
-          onChange={(e) => handleInputChange(e.target.value)}
-          placeholder={placeholder || '+593 993 055 690'}
-          className="rounded-l-none"
-        />
+        {error && <p className="text-sm text-destructive mt-1">{error}</p>}
       </div>
-      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
-    </div>
-  );
+    );
 };
 
 export default PhoneInput;
