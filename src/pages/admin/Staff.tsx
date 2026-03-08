@@ -72,7 +72,7 @@ const AdminStaff = () => {
       toast.success(t('admin.staff.invited'));
     },
     onError: (err: any) => {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(err.message || 'Error');
     },
   });
 
