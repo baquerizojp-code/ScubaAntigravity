@@ -184,6 +184,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'admin.settings.name': 'Nombre del Centro',
     'admin.settings.description': 'Descripción',
     'admin.settings.saved': 'Configuración guardada',
+    'admin.settings.location': 'Ubicación',
+    'admin.settings.hours': 'Horarios',
+    'admin.settings.website': 'Sitio Web',
+    'admin.settings.locationAndSocial': 'Ubicación y Redes Sociales',
+    'validation.whatsapp': 'Formato inválido. Usa código de país (ej: +593 999 123 456)',
 
     // Notifications
     'notifications.title': 'Notificaciones',
