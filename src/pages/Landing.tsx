@@ -76,12 +76,6 @@ const Landing = () => {
           <div className="container mx-auto px-5 sm:px-6">
             <div className="max-w-lg sm:max-w-2xl">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 backdrop-blur-sm border border-primary-foreground/20 px-3 py-1.5 mb-5 animate-fade-in">
-                <Anchor className="w-3.5 h-3.5 text-cyan-electric" />
-                <span className="text-xs font-medium text-ocean-200 tracking-wide uppercase">
-                  {t('landing.hero.badge')}
-                </span>
-              </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-primary-foreground leading-[1.1] mb-4 sm:mb-6 animate-fade-in">
                 {t('landing.hero.title')}
