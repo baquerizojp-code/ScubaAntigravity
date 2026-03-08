@@ -9,8 +9,25 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { MapPin, Calendar, Clock, Users, DollarSign, ArrowLeft, Shield, Wrench, ChevronRight } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { MapPin, Calendar, Clock, Users, DollarSign, ArrowLeft, Shield, Wrench, CalendarPlus, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
+import { downloadICSFile, getGoogleCalendarUrl } from '@/lib/calendar';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Trip = Tables<'trips'> & { dive_centers: { name: string } | null };
@@ -27,6 +44,8 @@ const TripDetail = () => {
   const [booking, setBooking] = useState(false);
   const [notes, setNotes] = useState('');
   const [existingBooking, setExistingBooking] = useState<Tables<'bookings'> | null>(null);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -76,7 +95,6 @@ const TripDetail = () => {
       toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
     } else {
       toast({ title: t('diver.trip.booked') });
-      // Refresh
       const { data: bk } = await supabase
         .from('bookings')
         .select('*')
@@ -86,6 +104,57 @@ const TripDetail = () => {
       setExistingBooking(bk);
     }
     setBooking(false);
+  };
+
+  const handleCancelPending = async () => {
+    if (!existingBooking) return;
+    setCancelling(true);
+    const { error } = await supabase
+      .from('bookings')
+      .update({ status: 'cancelled' as any })
+      .eq('id', existingBooking.id);
+    setCancelling(false);
+    setShowCancelDialog(false);
+    if (error) {
+      toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
+    } else {
+      toast({ title: t('diver.bookings.cancelled') });
+      setExistingBooking({ ...existingBooking, status: 'cancelled' });
+    }
+  };
+
+  const handleRequestCancellation = async () => {
+    if (!existingBooking) return;
+    setCancelling(true);
+    const { error } = await supabase
+      .from('bookings')
+      .update({ status: 'cancellation_requested' as any })
+      .eq('id', existingBooking.id);
+    setCancelling(false);
+    setShowCancelDialog(false);
+    if (error) {
+      toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
+    } else {
+      toast({ title: t('diver.trip.cancellationRequested') });
+      setExistingBooking({ ...existingBooking, status: 'cancellation_requested' as any });
+    }
+  };
+
+  const handleAddToCalendar = (type: 'ics' | 'google') => {
+    if (!trip) return;
+    const event = {
+      title: trip.title,
+      description: `${trip.dive_centers?.name || ''}\n${trip.dive_site}\n${trip.departure_point}`,
+      location: `${trip.dive_site}, ${trip.departure_point}`,
+      startDate: trip.trip_date,
+      startTime: trip.trip_time,
+      durationHours: 3,
+    };
+    if (type === 'google') {
+      window.open(getGoogleCalendarUrl(event), '_blank');
+    } else {
+      downloadICSFile(event);
+    }
   };
 
   if (loading) {
@@ -104,7 +173,13 @@ const TripDetail = () => {
     pending: { label: t('diver.trip.statusPending'), className: 'bg-yellow-100 text-yellow-800' },
     confirmed: { label: t('diver.trip.statusConfirmed'), className: 'bg-green-100 text-green-800' },
     rejected: { label: t('diver.trip.statusRejected'), className: 'bg-red-100 text-red-800' },
+    cancelled: { label: t('diver.trip.statusCancelled'), className: 'bg-muted text-muted-foreground' },
+    cancellation_requested: { label: t('diver.trip.statusCancellationRequested'), className: 'bg-orange-100 text-orange-800' },
   };
+
+  const isPending = existingBooking?.status === 'pending';
+  const isConfirmed = existingBooking?.status === 'confirmed';
+  const isCancellationRequested = existingBooking?.status === 'cancellation_requested';
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-2xl">
@@ -170,7 +245,7 @@ const TripDetail = () => {
       {/* Booking section */}
       {existingBooking ? (
         <Card className="shadow-card">
-          <CardContent className="p-5">
+          <CardContent className="p-5 space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-foreground">{t('diver.trip.yourBooking')}</p>
@@ -181,6 +256,55 @@ const TripDetail = () => {
             </div>
             {existingBooking.rejection_reason && (
               <p className="text-sm text-destructive mt-2">{existingBooking.rejection_reason}</p>
+            )}
+
+            {/* Actions for confirmed bookings */}
+            {isConfirmed && (
+              <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <CalendarPlus className="w-4 h-4" />
+                      {t('diver.trip.addToCalendar')}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleAddToCalendar('google')}>
+                      Google Calendar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAddToCalendar('ics')}>
+                      Apple Calendar / iCal
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-destructive hover:text-destructive"
+                  onClick={() => setShowCancelDialog(true)}
+                >
+                  <XCircle className="w-4 h-4" />
+                  {t('diver.trip.requestCancellation')}
+                </Button>
+              </div>
+            )}
+
+            {/* Cancel pending booking */}
+            {isPending && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 text-destructive hover:text-destructive mt-2"
+                onClick={() => setShowCancelDialog(true)}
+              >
+                <XCircle className="w-4 h-4" />
+                {t('diver.bookings.cancelConfirm')}
+              </Button>
+            )}
+
+            {/* Cancellation requested info */}
+            {isCancellationRequested && (
+              <p className="text-sm text-orange-700">{t('diver.trip.cancellationPendingApproval')}</p>
             )}
           </CardContent>
         </Card>
@@ -212,6 +336,30 @@ const TripDetail = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Cancel confirmation dialog */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {isConfirmed ? t('diver.trip.requestCancellationTitle') : t('diver.bookings.cancelTitle')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {isConfirmed ? t('diver.trip.requestCancellationDesc') : t('diver.bookings.cancelDescription')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelling}>{t('common.back')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={isConfirmed ? handleRequestCancellation : handleCancelPending}
+              disabled={cancelling}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isConfirmed ? t('diver.trip.requestCancellation') : t('diver.bookings.cancelConfirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
