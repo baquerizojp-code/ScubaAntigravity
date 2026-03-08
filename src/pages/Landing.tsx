@@ -15,10 +15,9 @@ const features = [
 ];
 
 const steps = [
-  { num: '01', titleKey: 'landing.steps.signup.title', descKey: 'landing.steps.signup.desc', icon: Anchor },
-  { num: '02', titleKey: 'landing.steps.discover.title', descKey: 'landing.steps.discover.desc', icon: MapPin },
-  { num: '03', titleKey: 'landing.steps.book.title', descKey: 'landing.steps.book.desc', icon: CalendarCheck },
-  { num: '04', titleKey: 'landing.steps.dive.title', descKey: 'landing.steps.dive.desc', icon: Fish },
+  { num: '01', titleKey: 'landing.steps.discover.title', descKey: 'landing.steps.discover.desc', icon: MapPin },
+  { num: '02', titleKey: 'landing.steps.book.title', descKey: 'landing.steps.book.desc', icon: CalendarCheck },
+  { num: '03', titleKey: 'landing.steps.dive.title', descKey: 'landing.steps.dive.desc', icon: Fish },
 ];
 
 const Landing = () => {
@@ -154,11 +153,11 @@ const Landing = () => {
               {t('landing.steps.badge')}
             </span>
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
-              {t('landing.steps.title')}
+              {t('landing.steps.title3')}
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {steps.map((s, i) => (
               <div key={s.num} className="relative text-center sm:text-left animate-slide-up" style={{ animationDelay: `${i * 0.1}s` }}>
                 {i < steps.length - 1 && (
