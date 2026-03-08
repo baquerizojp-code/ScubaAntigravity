@@ -85,7 +85,7 @@ const AdminSettings = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dive-center'] });
-      toast({ title: t('admin.settings.saved') });
+      toast.success(t('admin.settings.saved'));
     },
     onError: (err: any) => {
       toast({ title: 'Error', description: err.message, variant: 'destructive' });
