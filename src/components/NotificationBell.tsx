@@ -131,8 +131,8 @@ const NotificationBell = () => {
                       <span className="mt-1.5 w-2 h-2 rounded-full bg-primary shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{n.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{n.body}</p>
+                      <p className="text-sm font-medium text-foreground line-clamp-2">{n.title}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{n.body}</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {formatDistanceToNow(new Date(n.created_at), {
                           addSuffix: true,
