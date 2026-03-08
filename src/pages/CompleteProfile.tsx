@@ -138,6 +138,13 @@ const CompleteProfile = () => {
               {loading ? t('common.loading') : t('completeProfile.button')}
             </Button>
           </form>
+          <button
+            type="button"
+            onClick={async () => { await signOut(); navigate('/login', { replace: true }); }}
+            className="w-full mt-3 text-sm text-muted-foreground hover:text-primary hover:underline"
+          >
+            {t('auth.useAnotherAccount') || 'Usar otra cuenta'}
+          </button>
         </div>
       </div>
     </div>
