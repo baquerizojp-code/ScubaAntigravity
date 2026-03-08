@@ -483,6 +483,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'diver.profile.emergency': 'Emergency Contact',
     'diver.profile.saved': 'Profile updated',
     'diver.profile.error': 'Error saving',
+    'explore.loginRequired': 'You need to create an account to book',
   },
 };
 
