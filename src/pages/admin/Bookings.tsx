@@ -62,7 +62,7 @@ const AdminBookings = () => {
       toast.success(t('admin.bookings.confirmed'));
     },
     onError: (err: any) => {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(err.message || 'Error');
     },
   });
 
