@@ -119,6 +119,11 @@ const translations: Record<Locale, Record<string, string>> = {
     'admin.bookings.rejectPlaceholder': 'Motivo del rechazo (opcional)',
     'admin.bookings.empty': 'No hay reservas en esta categoría',
     'admin.bookings.noSpots': 'No hay lugares disponibles',
+    'admin.bookings.cancellationRequests': 'Cancelaciones',
+    'admin.bookings.approveCancellation': 'Aprobar',
+    'admin.bookings.denyCancellation': 'Rechazar',
+    'admin.bookings.cancellationApproved': 'Cancelación aprobada',
+    'admin.bookings.cancellationDenied': 'Cancelación rechazada, reserva restaurada',
 
     'admin.staff.subtitle': 'Gestiona el equipo de tu centro',
     'admin.staff.invite': 'Invitar',
