@@ -136,9 +136,12 @@ const Login = () => {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            <Link to="/signup" className="text-primary hover:underline">{t('auth.signup.link')}</Link>
-          </p>
+          <div className="flex flex-col items-center gap-2 mt-4">
+            <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-primary hover:underline">
+              {t('auth.forgot')}
+            </Link>
+            <Link to="/signup" className="text-sm text-primary hover:underline">{t('auth.signup.link')}</Link>
+          </div>
         </div>
       </div>
     </div>
