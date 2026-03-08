@@ -407,6 +407,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_cancellation: { Args: { _booking_id: string }; Returns: boolean }
       assign_dive_center_admin_role: {
         Args: { _user_id: string }
         Returns: undefined

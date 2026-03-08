@@ -51,7 +51,7 @@ const TripDetail = () => {
     if (!id) return;
     const fetchData = async () => {
       const [{ data: tripData }, { data: profile }] = await Promise.all([
-        supabase.from('trips').select('*, dive_centers(name)').eq('id', id).single(),
+        supabase.from('trips').select('id, title, dive_site, departure_point, trip_date, trip_time, available_spots, total_spots, price_usd, difficulty, min_certification, gear_rental_available, description, status, dive_center_id, created_at, updated_at, dive_centers(name)').eq('id', id).single(),
         supabase.from('diver_profiles').select('id').eq('user_id', user!.id).maybeSingle(),
       ]);
       setTrip(tripData as Trip);

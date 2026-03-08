@@ -84,23 +84,9 @@ const AdminBookings = () => {
 
   const approveCancellationMutation = useMutation({
     mutationFn: async (bookingId: string) => {
-      // Find the booking to get trip_id for restoring available spots
-      const booking = bookings?.find(b => b.id === bookingId);
-      if (!booking) throw new Error('Booking not found');
-      
-      // Update status to cancelled
-      const { error: updateError } = await supabase
-        .from('bookings')
-        .update({ status: 'cancelled' })
-        .eq('id', bookingId);
-      if (updateError) throw updateError;
-      
-      // Restore available spot
-      const { error: tripError } = await supabase
-        .from('trips')
-        .update({ available_spots: (booking as any).trips?.available_spots + 1 || 1 })
-        .eq('id', booking.trip_id);
-      // Non-critical if this fails
+      const { data, error } = await supabase.rpc('approve_cancellation', { _booking_id: bookingId });
+      if (error) throw error;
+      if (!data) throw new Error('Could not approve cancellation');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });

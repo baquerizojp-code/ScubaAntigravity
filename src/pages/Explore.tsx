@@ -27,7 +27,7 @@ const Explore = () => {
     const fetchTrips = async () => {
       const { data } = await supabase
         .from('trips')
-        .select('*, dive_centers(name, logo_url)')
+        .select('id, title, dive_site, departure_point, trip_date, trip_time, available_spots, total_spots, price_usd, difficulty, min_certification, gear_rental_available, description, status, dive_center_id, created_at, updated_at, dive_centers(name, logo_url)')
         .eq('status', 'published')
         .gte('trip_date', new Date().toISOString().split('T')[0])
         .order('trip_date', { ascending: true });
