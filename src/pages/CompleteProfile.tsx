@@ -19,6 +19,10 @@ const certOptions = [
   { value: 'instructor', labelKey: 'profile.cert.instructor' },
 ] as const;
 
+const isSafeRedirect = (url: string): boolean => {
+  return url.startsWith('/') && !url.startsWith('//');
+};
+
 const CompleteProfile = () => {
   const { user, role } = useAuth();
   const { t } = useI18n();
@@ -28,7 +32,8 @@ const CompleteProfile = () => {
   const [certification, setCertification] = useState('none');
   const [loading, setLoading] = useState(false);
 
-  const pendingRedirect = (location.state as any)?.from || localStorage.getItem('pending_redirect');
+  const rawRedirect = (location.state as any)?.from || localStorage.getItem('pending_redirect');
+  const pendingRedirect = rawRedirect && isSafeRedirect(rawRedirect) ? rawRedirect : null;
 
   // If already has role, redirect
   useEffect(() => {
