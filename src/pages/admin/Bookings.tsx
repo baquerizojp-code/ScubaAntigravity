@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Check, X, CalendarCheck, Clock, Ban, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 const AdminBookings = () => {
@@ -49,6 +49,24 @@ const AdminBookings = () => {
     },
     enabled: !!diveCenterId,
   });
+
+  // Realtime: auto-refresh when bookings change
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-bookings-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'bookings' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const confirmMutation = useMutation({
     mutationFn: async (bookingId: string) => {

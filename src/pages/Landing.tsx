@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
-import heroImage from '@/assets/hero-ocean.jpg';
+import heroImageWebp from '@/assets/hero-ocean.webp';
+import heroImageMobileWebp from '@/assets/hero-ocean-mobile.webp';
+import heroImageFallback from '@/assets/hero-ocean.jpg';
 
 const features = [
   { icon: Search, titleKey: 'landing.features.discover.title', descKey: 'landing.features.discover.desc' },
@@ -43,12 +45,27 @@ const Landing = () => {
       <section className="relative min-h-[100svh] flex items-end sm:items-center overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0">
-          <img
-            src={heroImage}
-            alt="Underwater scuba diving"
-            className="w-full h-full object-cover object-center"
-            loading="eager"
-          />
+          <picture>
+            <source
+              media="(max-width: 640px)"
+              srcSet={heroImageMobileWebp}
+              type="image/webp"
+            />
+            <source
+              srcSet={heroImageWebp}
+              type="image/webp"
+            />
+            <img
+              src={heroImageFallback}
+              alt="Underwater scuba diving"
+              className="w-full h-full object-cover object-center"
+              loading="eager"
+              fetchPriority="high"
+              width={1920}
+              height={1080}
+              decoding="async"
+            />
+          </picture>
         {/* Stronger gradient for text readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-ocean-900 via-ocean-900/70 to-transparent" />
           {/* Top gradient for navbar legibility */}
