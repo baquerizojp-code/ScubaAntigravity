@@ -61,7 +61,7 @@ const certOptions = [
 const TripDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshRole } = useAuth();
   const { t } = useI18n();
   const { toast } = useToast();
 
@@ -182,7 +182,10 @@ const TripDetail = () => {
       return;
     }
 
-    // 3. Auto-book
+    // 3. Refresh auth context role
+    await refreshRole();
+
+    // 4. Auto-book
     await insertBooking(trip.id, newProfile.id);
     setShowProfileDialog(false);
     setCreatingProfile(false);

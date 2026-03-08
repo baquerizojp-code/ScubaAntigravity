@@ -12,6 +12,7 @@ interface AuthContextType {
   diveCenterId: string | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  refreshRole: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -21,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   diveCenterId: null,
   loading: true,
   signOut: async () => {},
+  refreshRole: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -95,8 +97,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setDiveCenterId(null);
   };
 
+  const refreshRole = async () => {
+    if (user) await fetchUserRole(user.id);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, role, diveCenterId, loading, signOut }}>
+    <AuthContext.Provider value={{ user, session, role, diveCenterId, loading, signOut, refreshRole }}>
       {children}
     </AuthContext.Provider>
   );
