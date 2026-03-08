@@ -14,6 +14,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.discover': 'Descubrir',
     'nav.login': 'Iniciar Sesión',
     'nav.signup': 'Crear Cuenta',
+    'nav.getStarted': 'Comenzar',
     'nav.logout': 'Cerrar Sesión',
     'nav.myBookings': 'Mis Reservas',
     'nav.profile': 'Perfil',
