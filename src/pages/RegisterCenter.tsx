@@ -132,11 +132,8 @@ const RegisterCenter = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted px-4 py-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-gradient-ocean flex items-center justify-center">
-              <Waves className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">Scuba Planner</span>
+          <Link to="/" className="inline-flex mb-6">
+            <AppLogo variant="dark" className="h-10 w-10" textClassName="text-xl font-bold text-foreground" />
           </Link>
           <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-6 h-6 text-accent" />
