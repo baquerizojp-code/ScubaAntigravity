@@ -42,6 +42,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'landing.features.manage.desc': 'Panel completo para administrar trips, reservas y equipo de trabajo',
     'landing.steps.badge': 'Cómo funciona',
     'landing.steps.title': 'Empieza en 4 pasos',
+    'landing.steps.title3': 'Así de fácil',
     'landing.steps.signup.title': 'Crea tu cuenta',
     'landing.steps.signup.desc': 'Regístrate gratis en segundos',
     'landing.steps.discover.title': 'Explora trips',
