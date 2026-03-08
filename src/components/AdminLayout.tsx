@@ -4,6 +4,7 @@ import { useI18n } from '@/lib/i18n';
 import { 
   LayoutDashboard, Ship, CalendarCheck, Users, Settings, LogOut, Menu, X 
 } from 'lucide-react';
+import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -45,8 +46,8 @@ const AdminLayout = () => {
       )}>
         <div className="p-6 border-b border-border flex items-center justify-between">
           <Link to="/admin" className="flex items-center gap-2">
-            <Ship className="h-7 w-7 text-primary" />
-            <span className="text-lg font-bold text-foreground">Scuba Planner</span>
+            <ScubaMaskLogo className="h-8 w-6 text-primary" />
+            <span className="text-lg font-bold text-foreground">ScubaTrip</span>
           </Link>
           <div className="hidden lg:block">
             <NotificationBell />
@@ -91,7 +92,8 @@ const AdminLayout = () => {
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
-          <span className="font-bold text-foreground flex-1">Scuba Planner</span>
+          <ScubaMaskLogo className="h-7 w-5 text-primary" />
+          <span className="font-bold text-foreground flex-1">ScubaTrip</span>
           <NotificationBell />
         </header>
 

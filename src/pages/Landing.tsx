@@ -211,7 +211,7 @@ const Landing = () => {
       {/* Footer */}
       <footer className="py-8 sm:py-10 bg-ocean-900">
         <div className="container mx-auto px-5 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-ocean-400 text-sm">© {new Date().getFullYear()} Scuba Planner</p>
+          <p className="text-ocean-400 text-sm">© {new Date().getFullYear()} ScubaTrip</p>
           <div className="flex gap-6">
             <Link to="/explore" className="text-ocean-400 hover:text-ocean-200 text-sm transition-colors">
               {t('nav.getStarted')}

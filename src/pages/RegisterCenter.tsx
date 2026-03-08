@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Waves, Building2, Apple } from 'lucide-react';
+import { Building2, Apple } from 'lucide-react';
+import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -132,10 +133,8 @@ const RegisterCenter = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-gradient-ocean flex items-center justify-center">
-              <Waves className="w-6 h-6 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-foreground">Scuba Planner</span>
+            <ScubaMaskLogo className="h-10 w-8 text-primary" />
+            <span className="text-xl font-bold text-foreground">ScubaTrip</span>
           </Link>
           <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <Building2 className="w-6 h-6 text-accent" />

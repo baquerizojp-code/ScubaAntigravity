@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import NotificationBell from '@/components/NotificationBell';
+import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 
 const DiverLayout = () => {
   const { pathname } = useLocation();
@@ -21,7 +22,10 @@ const DiverLayout = () => {
       {/* Top bar */}
       <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border px-4">
         <div className="container mx-auto h-14 flex items-center justify-between">
-          <span className="text-lg font-bold text-foreground">Scuba Planner</span>
+          <div className="flex items-center gap-2">
+            <ScubaMaskLogo className="h-7 w-5 text-primary" />
+            <span className="text-lg font-bold text-foreground">ScubaTrip</span>
+          </div>
           <div className="flex items-center gap-1">
             <NotificationBell />
             <Button variant="ghost" size="icon" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}>
