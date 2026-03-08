@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    sourcemap: true,
+    sourcemap: 'hidden',
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
