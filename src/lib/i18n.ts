@@ -51,8 +51,34 @@ const translations: Record<Locale, Record<string, string>> = {
     'landing.steps.dive.desc': 'Disfruta tu aventura submarina',
     'landing.cta.title': '¿Listo para sumergirte?',
     'landing.cta.subtitle': 'Únete a cientos de buzos que ya planifican sus inmersiones con nosotros',
-    'landing.cta.diver': 'Crear Cuenta de Buzo',
+    'landing.cta.diver': 'Crear Cuenta Gratis',
     'landing.cta.center': 'Registrar mi Centro',
+
+    // Complete Profile
+    'completeProfile.title': 'Completa tu perfil',
+    'completeProfile.subtitle': 'Cuéntanos sobre ti para personalizar tu experiencia',
+    'completeProfile.button': 'Comenzar a Explorar',
+    'completeProfile.success': '¡Perfil creado! Bienvenido a Scuba Planner',
+
+    // Register Center
+    'registerCenter.title': 'Registra tu Centro de Buceo',
+    'registerCenter.subtitle': 'Gestiona trips, reservas y conecta con buzos',
+    'registerCenter.centerInfo': 'Datos del centro',
+    'registerCenter.descPlaceholder': 'Explora el Caribe con nosotros...',
+    'registerCenter.button': 'Registrar Centro',
+    'registerCenter.success': '¡Centro creado exitosamente!',
+    'registerCenter.checkEmail': 'Revisa tu correo para confirmar tu cuenta',
+    'registerCenter.diverLink': '¿Eres buzo? Crea una cuenta de buzo',
+
+    // Certification labels
+    'profile.cert.none': 'Sin certificación',
+    'profile.cert.openWater': 'Open Water',
+    'profile.cert.advanced': 'Advanced Open Water',
+    'profile.cert.rescue': 'Rescue Diver',
+    'profile.cert.divemaster': 'Divemaster',
+    'profile.cert.instructor': 'Instructor',
+
+    'common.optional': 'opcional',
 
     // Auth
     'auth.login.title': 'Bienvenido de vuelta',
