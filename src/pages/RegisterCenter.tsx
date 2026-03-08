@@ -23,6 +23,7 @@ const RegisterCenter = () => {
   const [password, setPassword] = useState('');
   const [centerName, setCenterName] = useState('');
   const [centerWhatsapp, setCenterWhatsapp] = useState('');
+  const [whatsappError, setWhatsappError] = useState('');
   const [loading, setLoading] = useState(false);
 
   // Already logged in with a role → redirect
