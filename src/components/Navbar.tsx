@@ -38,16 +38,11 @@ const Navbar = () => {
               </Button>
             </Link> :
 
-          <>
-              <Link to="/login">
-                <Button variant="ghost" size="sm" className="px-2 sm:px-3">{t('nav.login')}</Button>
-              </Link>
-              <Link to="/signup">
-                <Button size="sm" className="bg-gradient-ocean text-primary-foreground hover:opacity-90 shadow-ocean text-xs sm:text-sm px-3 sm:px-4">
-                  {t('nav.signup')}
-                </Button>
-              </Link>
-            </>
+          <Link to="/signup">
+              <Button size="sm" className="bg-gradient-ocean text-primary-foreground hover:opacity-90 shadow-ocean text-xs sm:text-sm px-3 sm:px-4">
+                {t('nav.getStarted')}
+              </Button>
+            </Link>
           }
         </div>
       </div>

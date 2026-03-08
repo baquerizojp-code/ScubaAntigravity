@@ -251,6 +251,7 @@ const translations: Record<Locale, Record<string, string>> = {
     'nav.discover': 'Discover',
     'nav.login': 'Log In',
     'nav.signup': 'Sign Up',
+    'nav.getStarted': 'Get Started',
     'nav.logout': 'Log Out',
     'nav.myBookings': 'My Bookings',
     'nav.profile': 'Profile',
