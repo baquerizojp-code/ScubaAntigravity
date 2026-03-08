@@ -33,6 +33,13 @@ const CompleteProfile = () => {
     else if (role === 'dive_center_admin' || role === 'dive_center_staff') navigate('/admin', { replace: true });
   }, [role, navigate]);
 
+  // If pending center signup flag, redirect to center registration
+  useEffect(() => {
+    if (user && !role && localStorage.getItem('pending_center_signup')) {
+      navigate('/register-center', { replace: true });
+    }
+  }, [user, role, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
