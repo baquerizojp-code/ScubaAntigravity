@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -63,7 +63,7 @@ const TripDetail = () => {
   const navigate = useNavigate();
   const { user, refreshRole } = useAuth();
   const { t } = useI18n();
-  const { toast } = useToast();
+  
 
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
@@ -118,9 +118,9 @@ const TripDetail = () => {
     });
 
     if (error) {
-      toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
+      toast.error(t('diver.trip.bookError'));
     } else {
-      toast({ title: t('diver.trip.booked') });
+      toast.success(t('diver.trip.booked'));
       const { data: bk } = await supabase
         .from('bookings')
         .select('*')
@@ -160,7 +160,7 @@ const TripDetail = () => {
       role: 'diver',
     });
     if (roleError && !roleError.message.includes('duplicate')) {
-      toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
+      toast.error(t('diver.trip.bookError'));
       setCreatingProfile(false);
       return;
     }
@@ -177,7 +177,7 @@ const TripDetail = () => {
       .single();
 
     if (profileError || !newProfile) {
-      toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
+      toast.error(t('diver.trip.bookError'));
       setCreatingProfile(false);
       return;
     }
@@ -201,9 +201,9 @@ const TripDetail = () => {
     setCancelling(false);
     setShowCancelDialog(false);
     if (error) {
-      toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
+      toast.error(t('diver.trip.bookError'));
     } else {
-      toast({ title: t('diver.bookings.cancelled') });
+      toast.success(t('diver.bookings.cancelled'));
       setExistingBooking({ ...existingBooking, status: 'cancelled' });
     }
   };
@@ -218,9 +218,9 @@ const TripDetail = () => {
     setCancelling(false);
     setShowCancelDialog(false);
     if (error) {
-      toast({ title: t('diver.trip.bookError'), variant: 'destructive' });
+      toast.error(t('diver.trip.bookError'));
     } else {
-      toast({ title: t('diver.trip.cancellationRequested') });
+      toast.success(t('diver.trip.cancellationRequested'));
       setExistingBooking({ ...existingBooking, status: 'cancellation_requested' as any });
     }
   };

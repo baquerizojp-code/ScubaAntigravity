@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Constants } from '@/integrations/supabase/types';
 
 const certLevels = Constants.public.Enums.certification_level;
@@ -15,7 +15,7 @@ const certLevels = Constants.public.Enums.certification_level;
 const DiverProfile = () => {
   const { user } = useAuth();
   const { t } = useI18n();
-  const { toast } = useToast();
+  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -58,7 +58,8 @@ const DiverProfile = () => {
       })
       .eq('user_id', user.id);
 
-    toast({ title: error ? t('diver.profile.error') : t('diver.profile.saved') });
+    if (error) toast.error(t('diver.profile.error'));
+    else toast.success(t('diver.profile.saved'));
     setSaving(false);
   };
 

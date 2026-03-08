@@ -38,20 +38,10 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // If not "remember me", use sessionStorage so session expires on tab close
-    if (!rememberMe) {
-      await supabase.auth.setSession({ access_token: '', refresh_token: '' }).catch(() => {});
-    }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       toast.error(error.message);
-    } else if (!rememberMe) {
-      // Move session to sessionStorage so it doesn't persist
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        sessionStorage.setItem('sb-session', JSON.stringify(data.session));
-      }
     }
   };
 

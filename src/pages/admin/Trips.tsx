@@ -13,7 +13,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { toast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Eye, Ship } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Database } from '@/integrations/supabase/types';
@@ -53,6 +63,7 @@ const AdminTrips = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<TripFormData>(emptyForm);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (searchParams.get('new') === '1') {
@@ -116,10 +127,10 @@ const AdminTrips = () => {
       setDialogOpen(false);
       setEditingId(null);
       setForm(emptyForm);
-      toast({ title: editingId ? t('admin.trips.updated') : t('admin.trips.created') });
+      toast.success(editingId ? t('admin.trips.updated') : t('admin.trips.created'));
     },
     onError: (err: any) => {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(err.message || 'Error');
     },
   });
 
@@ -130,7 +141,7 @@ const AdminTrips = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-trips'] });
-      toast({ title: t('admin.trips.deleted') });
+      toast.success(t('admin.trips.deleted'));
     },
   });
 
@@ -211,14 +222,13 @@ const AdminTrips = () => {
                 </p>
               </div>
               <div className="flex gap-2 shrink-0">
-                <Button variant="ghost" size="icon" onClick={() => openEdit(trip)}>
+                <Button variant="ghost" size="icon" onClick={() => openEdit(trip)} aria-label={t('admin.trips.edit')}>
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="ghost" size="icon" 
-                  onClick={() => {
-                    if (confirm(t('admin.trips.confirmDelete'))) deleteMutation.mutate(trip.id);
-                  }}
+                  aria-label={t('admin.trips.confirmDelete')}
+                  onClick={() => setDeleteId(trip.id)}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
@@ -323,6 +333,25 @@ const AdminTrips = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('admin.trips.confirmDelete')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('admin.trips.confirmDeleteDesc') || 'This action cannot be undone.'}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (deleteId) { deleteMutation.mutate(deleteId); setDeleteId(null); } }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t('common.delete') || 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

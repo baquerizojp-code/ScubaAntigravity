@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { UserPlus, Trash2, Users, Mail, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import type { Database } from '@/integrations/supabase/types';
@@ -69,10 +69,10 @@ const AdminStaff = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-invites'] });
       setInviteOpen(false);
       setInviteEmail('');
-      toast({ title: t('admin.staff.invited') });
+      toast.success(t('admin.staff.invited'));
     },
     onError: (err: any) => {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(err.message || 'Error');
     },
   });
 
@@ -83,7 +83,7 @@ const AdminStaff = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-staff'] });
-      toast({ title: t('admin.staff.removed') });
+      toast.success(t('admin.staff.removed'));
     },
   });
 

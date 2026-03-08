@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Check, X, CalendarCheck, Clock, Ban, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -59,10 +59,10 @@ const AdminBookings = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
-      toast({ title: t('admin.bookings.confirmed') });
+      toast.success(t('admin.bookings.confirmed'));
     },
     onError: (err: any) => {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(err.message || 'Error');
     },
   });
 
@@ -78,7 +78,7 @@ const AdminBookings = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
       setRejectDialog(null);
       setRejectReason('');
-      toast({ title: t('admin.bookings.rejected') });
+      toast.success(t('admin.bookings.rejected'));
     },
   });
 
@@ -90,10 +90,10 @@ const AdminBookings = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
-      toast({ title: t('admin.bookings.cancellationApproved') });
+      toast.success(t('admin.bookings.cancellationApproved'));
     },
     onError: (err: any) => {
-      toast({ title: 'Error', description: err.message, variant: 'destructive' });
+      toast.error(err.message || 'Error');
     },
   });
 
@@ -107,7 +107,7 @@ const AdminBookings = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
-      toast({ title: t('admin.bookings.cancellationDenied') });
+      toast.success(t('admin.bookings.cancellationDenied'));
     },
   });
 

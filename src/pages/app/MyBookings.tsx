@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -49,33 +50,33 @@ const statusBadge: Record<string, string> = {
 const MyBookings = () => {
   const { user } = useAuth();
   const { t } = useI18n();
-  const [bookings, setBookings] = useState<BookingWithTrip[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
 
-  const fetchBookings = async () => {
-    if (!user) return;
-    const { data: profile } = await supabase
-      .from('diver_profiles')
-      .select('id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-    if (!profile) { setLoading(false); return; }
+  const { data: bookings = [], isLoading } = useQuery({
+    queryKey: ['my-bookings', user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      const { data: profile } = await supabase
+        .from('diver_profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!profile) return [];
 
-    const { data } = await supabase
-      .from('bookings')
-      .select('id, status, notes, rejection_reason, created_at, trips(id, title, dive_site, trip_date, trip_time, dive_centers(name))')
-      .eq('diver_id', profile.id)
-      .order('created_at', { ascending: false });
+      const { data, error } = await supabase
+        .from('bookings')
+        .select('id, status, notes, rejection_reason, created_at, trips(id, title, dive_site, trip_date, trip_time, dive_centers(name))')
+        .eq('diver_id', profile.id)
+        .order('created_at', { ascending: false });
 
-    setBookings((data as BookingWithTrip[]) || []);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchBookings();
-  }, [user]);
+      if (error) throw error;
+      return (data as BookingWithTrip[]) || [];
+    },
+    enabled: !!user,
+    refetchInterval: 30000,
+  });
 
   const handleCancel = async () => {
     if (!cancelId) return;
@@ -90,7 +91,7 @@ const MyBookings = () => {
       toast.error(t('diver.trip.bookError'));
     } else {
       toast.success(t('diver.bookings.cancelled'));
-      fetchBookings();
+      queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
     }
   };
 
@@ -124,6 +125,7 @@ const MyBookings = () => {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                        aria-label={t('diver.bookings.cancelConfirm')}
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
@@ -149,7 +151,7 @@ const MyBookings = () => {
       <h1 className="text-2xl font-bold text-foreground mb-1">{t('nav.myBookings')}</h1>
       <p className="text-muted-foreground text-sm mb-6">{t('diver.bookings.subtitle')}</p>
 
-      {loading ? (
+      {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map(i => <Skeleton key={i} className="h-24 rounded-xl" />)}
         </div>

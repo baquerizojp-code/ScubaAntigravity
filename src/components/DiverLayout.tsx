@@ -28,10 +28,10 @@ const DiverLayout = () => {
           </div>
           <div className="flex items-center gap-1">
             <NotificationBell />
-            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}>
+            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')} aria-label={t('nav.language')}>
               <Globe className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={signOut}>
+            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={signOut} aria-label={t('nav.logout')}>
               <LogOut className="w-5 h-5" />
             </Button>
           </div>
