@@ -68,6 +68,11 @@ const Login = () => {
       toast.error(error.message);
     } else if (data.session) {
       toast.success('¡Cuenta creada!');
+    } else if (data.user && !data.session) {
+      // User created but no session — could mean email confirmation needed
+      // or user already exists (Supabase hides this for security)
+      toast.info(t('registerCenter.checkEmail'));
+      setIsSignup(false);
     } else {
       toast.success(t('registerCenter.checkEmail'));
       setIsSignup(false);
