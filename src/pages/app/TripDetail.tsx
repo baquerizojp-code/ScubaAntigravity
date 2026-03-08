@@ -61,7 +61,7 @@ const certOptions = [
 const TripDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshRole } = useAuth();
   const { t } = useI18n();
   const { toast } = useToast();
 
