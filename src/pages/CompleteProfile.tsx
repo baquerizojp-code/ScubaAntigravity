@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Waves } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,14 +23,22 @@ const CompleteProfile = () => {
   const { user, role } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
+  const location = useLocation();
   const [fullName, setFullName] = useState('');
   const [certification, setCertification] = useState('none');
   const [loading, setLoading] = useState(false);
 
+  const pendingRedirect = (location.state as any)?.from || localStorage.getItem('pending_redirect');
+
   // If already has role, redirect
   useEffect(() => {
-    if (role === 'diver') navigate('/app/discover', { replace: true });
-    else if (role === 'dive_center_admin' || role === 'dive_center_staff') navigate('/admin', { replace: true });
+    if (role === 'diver') {
+      const dest = pendingRedirect || '/app/discover';
+      localStorage.removeItem('pending_redirect');
+      navigate(dest, { replace: true });
+    } else if (role === 'dive_center_admin' || role === 'dive_center_staff') {
+      navigate('/admin', { replace: true });
+    }
   }, [role, navigate]);
 
   // If pending center signup flag, redirect to center registration
@@ -45,7 +53,6 @@ const CompleteProfile = () => {
     if (!user) return;
     setLoading(true);
 
-    // Create diver role
     const { error: roleError } = await supabase
       .from('user_roles')
       .insert({ user_id: user.id, role: 'diver' as const });
@@ -56,7 +63,6 @@ const CompleteProfile = () => {
       return;
     }
 
-    // Create diver profile
     const { error: profileError } = await supabase
       .from('diver_profiles')
       .insert({
@@ -72,7 +78,9 @@ const CompleteProfile = () => {
     }
 
     toast.success(t('completeProfile.success'));
-    window.location.href = '/app/discover';
+    const dest = pendingRedirect || '/app/discover';
+    localStorage.removeItem('pending_redirect');
+    window.location.href = dest;
   };
 
   if (!user) return null;

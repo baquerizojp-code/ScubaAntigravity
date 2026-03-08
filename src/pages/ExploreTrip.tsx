@@ -44,11 +44,11 @@ const ExploreTrip = () => {
 
   const handleBook = () => {
     if (user) {
-      // Authenticated — go to the diver trip detail to complete booking
       navigate(`/app/trip/${id}`);
     } else {
-      // Not authenticated — redirect to signup with return URL
-      navigate(`/signup?redirect=/app/trip/${id}`);
+      const redirectUrl = `/app/trip/${id}`;
+      localStorage.setItem('pending_redirect', redirectUrl);
+      navigate(`/signup?redirect=${redirectUrl}`);
     }
   };
 
