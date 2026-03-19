@@ -49,22 +49,14 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
-    // If "Remember Me" is unchecked, temporarily disable session persistence
-    if (!rememberMe) {
-      // Store session in sessionStorage instead of localStorage so it clears on tab close
-      await supabase.auth.setSession({ access_token: '', refresh_token: '' }).catch(() => {});
-    }
+    // Set the remember me preference in localStorage for the customStorage proxy
+    localStorage.setItem('scubatrip-remember-me', rememberMe ? 'true' : 'false');
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
+    
     if (error) {
       toast.error(error.message);
-    } else if (!rememberMe) {
-      // Move session to sessionStorage so it's cleared when the browser closes
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        sessionStorage.setItem('sb-session', JSON.stringify(session));
-      }
     }
   };
 
@@ -74,7 +66,10 @@ const Login = () => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: window.location.origin },
+      options: { 
+        emailRedirectTo: window.location.origin,
+        data: { role: 'diver' } // Explicitly signal 'diver' role for the trigger
+      },
     });
     setLoading(false);
     if (error) {

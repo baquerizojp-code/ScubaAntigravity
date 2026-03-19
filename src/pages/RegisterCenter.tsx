@@ -72,7 +72,10 @@ const RegisterCenter = () => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { emailRedirectTo: window.location.origin + '/register-center' },
+      options: { 
+        emailRedirectTo: window.location.origin + '/register-center',
+        data: { role: 'dive_center' } // Explicitly signal 'dive_center' role for the trigger
+      },
     });
     setLoading(false);
 

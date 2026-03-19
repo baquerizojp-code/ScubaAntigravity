@@ -5,12 +5,12 @@ description: Test account credentials for ScubaTrip QA testing
 # Test Accounts
 
 ## Diver Account
-- **Email:** testdiver@example.com
+- **Email:** diver@test.com
 - **Password:** Test1234!
 - **Role:** diver
 
 ## Dive Center Account
-- **Email:** divecentertest@example.com
+- **Email:** divecenter@test.com
 - **Password:** Test1234!
 - **Role:** dive_center_admin
 

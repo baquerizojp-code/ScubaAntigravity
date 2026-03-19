@@ -68,6 +68,7 @@
   "common.optional": "opcional",
   "common.loading": "Cargando...",
   "common.save": "Guardar",
+  "common.error": "Ocurrió un error. Por favor intenta de nuevo.",
   "common.fixErrors": "Por favor corrige los errores",
   "common.cancel": "Cancelar",
   "common.confirm": "Confirmar",
