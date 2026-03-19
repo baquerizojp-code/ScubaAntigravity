@@ -68,7 +68,7 @@ const MyBookings = () => {
 
       const { data, error } = await supabase
         .from('bookings')
-        .select('id, status, notes, rejection_reason, created_at, trips(id, title, dive_site, trip_date, trip_time, dive_centers(name))')
+        .select('id, status, notes, rejection_reason, created_at, trips(id, title, dive_site, trip_date, trip_time, whatsapp_group_url, dive_centers(name))')
         .eq('diver_id', profile.id)
         .order('created_at', { ascending: false });
 
