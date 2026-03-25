@@ -44,7 +44,7 @@ const AdminDashboard = () => {
 
   const cards = [
     { icon: Ship, label: t('admin.dashboard.upcomingTrips'), value: stats?.trips ?? 0, to: '/admin/trips?filter=upcoming' },
-    { icon: Users, label: t('admin.dashboard.confirmedMonth'), value: stats?.confirmedThisMonth ?? 0, to: '/admin/bookings?tab=confirmed-month' },
+    { icon: Users, label: 'Confirmed Divers', value: stats?.confirmedThisMonth ?? 0, to: '/admin/bookings?tab=confirmed-month' },
     { icon: CalendarCheck, label: t('admin.dashboard.pendingBookings'), value: stats?.pendingBookings ?? 0, to: '/admin/bookings?tab=pending' },
   ];
 
@@ -82,7 +82,7 @@ const AdminDashboard = () => {
       {/* Two Column Layout */}
       <div className="grid lg:grid-cols-12 gap-8">
          {/* Active Expeditions Table */}
-         <div className="lg:col-span-8">
+         <div className="lg:col-span-12">
             <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
                <div className="p-6 border-b border-border flex justify-between items-center bg-muted/20">
                   <h3 className="font-headline font-bold text-xl text-foreground flex items-center gap-2">
@@ -137,60 +137,6 @@ const AdminDashboard = () => {
                      </tbody>
                   </table>
                </div>
-            </div>
-         </div>
-
-         {/* Activity feed */}
-         <div className="lg:col-span-4">
-            <div className="bg-card rounded-3xl border border-border shadow-sm p-6 sticky top-24">
-               <h3 className="font-headline font-bold text-xl text-foreground mb-6 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-primary" /> Recent Activity
-               </h3>
-               
-               <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
-                  <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                     <div className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-background shrink-0 text-green-500 shadow-sm relative z-10 transition-transform group-hover:scale-110">
-                        <Users className="w-4 h-4" />
-                     </div>
-                     <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-border bg-muted/20 shadow-sm">
-                        <div className="flex items-center justify-between space-x-2 mb-1">
-                           <div className="font-bold text-sm text-foreground">New Booking</div>
-                           <time className="text-[10px] uppercase font-bold text-muted-foreground">10m ago</time>
-                        </div>
-                        <div className="text-xs text-muted-foreground">Sarah M. booked Cenote Expedition.</div>
-                     </div>
-                  </div>
-
-                  <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                     <div className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-background shrink-0 text-blue-500 shadow-sm relative z-10 transition-transform group-hover:scale-110">
-                        <FileText className="w-4 h-4" />
-                     </div>
-                     <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-border bg-muted/20 shadow-sm">
-                        <div className="flex items-center justify-between space-x-2 mb-1">
-                           <div className="font-bold text-sm text-foreground">Trip Published</div>
-                           <time className="text-[10px] uppercase font-bold text-muted-foreground">2h ago</time>
-                        </div>
-                        <div className="text-xs text-muted-foreground">Night Dive at Palancar Reef went live.</div>
-                     </div>
-                  </div>
-
-                  <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                     <div className="flex items-center justify-center w-10 h-10 rounded-full border border-border bg-background shrink-0 text-orange-500 shadow-sm relative z-10 transition-transform group-hover:scale-110">
-                        <AlertCircle className="w-4 h-4" />
-                     </div>
-                     <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-2xl border border-border bg-muted/20 shadow-sm">
-                        <div className="flex items-center justify-between space-x-2 mb-1">
-                           <div className="font-bold text-sm text-foreground">Cancel Request</div>
-                           <time className="text-[10px] uppercase font-bold text-muted-foreground">5h ago</time>
-                        </div>
-                        <div className="text-xs text-muted-foreground">John D. requested cancel for Cozumel.</div>
-                     </div>
-                  </div>
-               </div>
-               
-               <Button variant="ghost" className="w-full mt-6 text-xs uppercase tracking-widest font-bold text-muted-foreground hover:text-foreground">
-                  View All Activity
-               </Button>
             </div>
          </div>
       </div>

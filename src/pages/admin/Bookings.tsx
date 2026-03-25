@@ -32,7 +32,7 @@ const AdminBookings = () => {
 
   // Determine default tab from query params
   const tabParam = searchParams.get('tab');
-  const defaultTab = tabParam === 'confirmed-month' ? 'confirmed-month' : tabParam === 'confirmed' ? 'confirmed' : tabParam === 'rejected' ? 'rejected' : 'pending';
+  const defaultTab = tabParam === 'confirmed' ? 'confirmed' : tabParam === 'rejected' ? 'rejected' : 'pending';
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ['admin-bookings', diveCenterId],
@@ -113,15 +113,20 @@ const AdminBookings = () => {
 
   const filterBookings = (status: string) => {
     if (!bookings) return [];
-    if (status === 'confirmed-month') {
-      const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-      return bookings.filter(b => b.status === 'confirmed' && new Date(b.updated_at) >= monthStart)
-        .sort((a, b) => {
-          const dateA = (a as any).trips?.trip_date || '';
-          const dateB = (b as any).trips?.trip_date || '';
-          return dateA.localeCompare(dateB);
-        });
+    
+    if (status === 'confirmed') {
+      const today = new Date().toISOString().split('T')[0];
+      return bookings.filter(b => 
+        b.status === 'confirmed' && 
+        (b as any).trips?.status === 'published' && 
+        (b as any).trips?.trip_date >= today
+      ).sort((a, b) => {
+        const dateA = (a as any).trips?.trip_date || '';
+        const dateB = (b as any).trips?.trip_date || '';
+        return dateA.localeCompare(dateB);
+      });
     }
+
     const filtered = bookings.filter(b => b.status === status);
     if (status === 'pending') {
       return filtered.sort((a, b) => {
@@ -221,14 +226,11 @@ const AdminBookings = () => {
           <TabsTrigger value="pending" className="gap-1">
             <Clock className="h-3.5 w-3.5" /> {t('admin.bookings.pending')} ({filterBookings('pending').length})
           </TabsTrigger>
-          <TabsTrigger value="cancellation_requested" className="gap-1">
-            <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.bookings.cancellationRequests')} ({filterBookings('cancellation_requested').length})
-          </TabsTrigger>
           <TabsTrigger value="confirmed" className="gap-1">
             <Check className="h-3.5 w-3.5" /> {t('admin.bookings.confirmedTab')} ({filterBookings('confirmed').length})
           </TabsTrigger>
-          <TabsTrigger value="confirmed-month" className="gap-1">
-            <CalendarCheck className="h-3.5 w-3.5" /> {t('admin.dashboard.confirmedMonth')} ({filterBookings('confirmed-month').length})
+          <TabsTrigger value="cancellation_requested" className="gap-1">
+            <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.bookings.cancellationRequests')} ({filterBookings('cancellation_requested').length})
           </TabsTrigger>
           <TabsTrigger value="rejected" className="gap-1">
             <Ban className="h-3.5 w-3.5" /> {t('admin.bookings.rejectedTab')} ({filterBookings('rejected').length})
@@ -236,9 +238,8 @@ const AdminBookings = () => {
         </TabsList>
 
         <TabsContent value="pending">{renderTabContent('pending', true)}</TabsContent>
-        <TabsContent value="cancellation_requested">{renderTabContent('cancellation_requested', false, true)}</TabsContent>
         <TabsContent value="confirmed">{renderTabContent('confirmed', false)}</TabsContent>
-        <TabsContent value="confirmed-month">{renderTabContent('confirmed-month', false)}</TabsContent>
+        <TabsContent value="cancellation_requested">{renderTabContent('cancellation_requested', false, true)}</TabsContent>
         <TabsContent value="rejected">{renderTabContent('rejected', false)}</TabsContent>
       </Tabs>
 

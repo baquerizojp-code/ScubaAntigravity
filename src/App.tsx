@@ -19,6 +19,7 @@ const RegisterCenter = lazy(() => import("./pages/RegisterCenter"));
 const AdminLayout = lazy(() => import("@/components/AdminLayout"));
 const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminTrips = lazy(() => import("./pages/admin/Trips"));
+const AdminTripDetail = lazy(() => import("./pages/admin/TripDetail"));
 const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
 const AdminStaff = lazy(() => import("./pages/admin/Staff"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
@@ -74,6 +75,7 @@ const App = () => (
               }>
                 <Route index element={<AdminDashboard />} />
                 <Route path="trips" element={<AdminTrips />} />
+                <Route path="trips/:id" element={<AdminTripDetail />} />
                 <Route path="bookings" element={<AdminBookings />} />
                 <Route path="staff" element={<AdminStaff />} />
                 <Route path="settings" element={<AdminSettings />} />

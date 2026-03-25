@@ -96,7 +96,7 @@ export async function fetchDashboardStats(diveCenterId: string) {
     1
   ).toISOString().split('T')[0];
 
-  const [tripsRes, tripsAll] = await Promise.all([
+  const [tripsRes, tripsUpcoming] = await Promise.all([
     supabase
       .from('trips')
       .select('id', { count: 'exact', head: true })
@@ -106,10 +106,11 @@ export async function fetchDashboardStats(diveCenterId: string) {
     supabase
       .from('trips')
       .select('id')
-      .eq('dive_center_id', diveCenterId),
+      .eq('dive_center_id', diveCenterId)
+      .gte('trip_date', today),
   ]);
 
-  const tripIds = tripsAll.data?.map((t) => t.id) || [];
+  const tripIds = tripsUpcoming.data?.map((t) => t.id) || [];
   let pendingBookings = 0;
   let confirmedThisMonth = 0;
 
@@ -124,8 +125,7 @@ export async function fetchDashboardStats(diveCenterId: string) {
         .from('bookings')
         .select('id', { count: 'exact', head: true })
         .in('trip_id', tripIds)
-        .eq('status', 'confirmed')
-        .gte('updated_at', monthStart),
+        .eq('status', 'confirmed'),
     ]);
     pendingBookings = pendingRes.count || 0;
     confirmedThisMonth = confirmedRes.count || 0;

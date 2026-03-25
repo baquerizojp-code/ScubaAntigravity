@@ -21,6 +21,7 @@ export interface AdminBookingWithDetails extends Booking {
     trip_date: string;
     trip_time: string;
     dive_site: string;
+    status: string;
   } | null;
   diver_profiles: {
     full_name: string;
@@ -67,9 +68,25 @@ export async function fetchBookingsForCenter(diveCenterId: string) {
   const { data, error } = await supabase
     .from('bookings')
     .select(
-      '*, trips(title, trip_date, trip_time, dive_site), diver_profiles(full_name, certification, logged_dives)'
+      '*, trips(title, trip_date, trip_time, dive_site, status), diver_profiles(full_name, certification, logged_dives)'
     )
     .in('trip_id', tripIds)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return (data as unknown as AdminBookingWithDetails[]) || [];
+}
+
+/**
+ * Fetch all bookings for a specific trip (admin view).
+ */
+export async function fetchBookingsByTripId(tripId: string) {
+  const { data, error } = await supabase
+    .from('bookings')
+    .select(
+      '*, trips(title, trip_date, trip_time, dive_site, status), diver_profiles(full_name, certification, logged_dives)'
+    )
+    .eq('trip_id', tripId)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -166,5 +183,16 @@ export async function denyCancellation(bookingId: string) {
     .from('bookings')
     .update({ status: 'confirmed' })
     .eq('id', bookingId);
+  if (error) throw error;
+}
+
+/**
+ * Force-remove a confirmed booking (admin).
+ * We can reuse approve_cancellation RPC since it handles the spot incrementing logic.
+ */
+export async function removeConfirmedBooking(bookingId: string) {
+  const { data, error } = await supabase.rpc('approve_cancellation', {
+    _booking_id: bookingId,
+  });
   if (error) throw error;
 }

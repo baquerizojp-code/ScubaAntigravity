@@ -8,13 +8,9 @@ import ImageUpload from '@/components/ImageUpload';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { TripFormModal } from '@/components/Admin/TripFormModal';
+import { useNavigate } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -61,30 +57,37 @@ const AdminTrips = () => {
   const { diveCenterId } = useAuth();
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [editingStatus, setEditingStatus] = useState<TripStatus>('draft');
-  const [form, setForm] = useState<TripFormData>(emptyForm);
+  const [editingTrip, setEditingTrip] = useState<any | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (searchParams.get('new') === '1') {
-      setEditingId(null);
-      setForm(emptyForm);
-      setDialogOpen(true);
-      setSearchParams({}, { replace: true });
-    }
-  }, [searchParams, setSearchParams]);
-
-  const filterParam = searchParams.get('filter');
 
   const { data: trips, isLoading } = useQuery({
     queryKey: ['admin-trips', diveCenterId],
     queryFn: () => fetchTripsByCenter(diveCenterId!),
     enabled: !!diveCenterId,
   });
+
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setEditingTrip(null);
+      setDialogOpen(true);
+      setSearchParams({}, { replace: true });
+    }
+    
+    const editId = searchParams.get('edit');
+    if (editId && trips?.length) {
+      const tripToEdit = trips.find(t => t.id === editId);
+      if (tripToEdit) {
+        setEditingTrip(tripToEdit);
+        setDialogOpen(true);
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [searchParams, setSearchParams, trips]);
+
+  const filterParam = searchParams.get('filter');
 
   // Apply filter if coming from dashboard
   const filteredTrips = (() => {
@@ -98,63 +101,6 @@ const AdminTrips = () => {
     return trips;
   })();
 
-  const saveMutation = useMutation({
-    mutationFn: async ({ formData, targetStatus }: { formData: TripFormData; targetStatus: TripStatus }) => {
-      const payload = {
-        dive_center_id: diveCenterId!,
-        title: formData.title,
-        description: formData.description || null,
-        dive_site: formData.dive_site,
-        departure_point: formData.departure_point,
-        trip_date: formData.trip_date,
-        trip_time: formData.trip_time,
-        total_spots: formData.total_spots,
-        price_usd: formData.price_usd,
-        difficulty: formData.difficulty || null,
-        min_certification: formData.min_certification || null,
-        gear_rental_available: formData.gear_rental_available,
-        whatsapp_group_url: formData.whatsapp_group_url || null,
-        image_url: formData.image_url || null,
-        status: targetStatus,
-      };
-
-      if (editingId) {
-        const { dive_center_id, ...updatePayload } = payload;
-        await updateTrip(editingId, updatePayload);
-      } else {
-        await createTrip({ ...payload, available_spots: formData.total_spots });
-      }
-      return targetStatus;
-    },
-    onSuccess: (targetStatus) => {
-      queryClient.invalidateQueries({ queryKey: ['admin-trips'] });
-      setDialogOpen(false);
-      setEditingId(null);
-      setEditingStatus('draft');
-      setForm(emptyForm);
-      toast.success(targetStatus === 'published' ? t('admin.trips.published') : t('admin.trips.savedDraft'));
-    },
-    onError: (err: any) => {
-      toast.error(err.message || 'Error');
-    },
-  });
-
-  const handleSave = (targetStatus: TripStatus) => {
-    const result = tripSchema.safeParse(form);
-    if (!result.success) {
-      const errors: Record<string, string> = {};
-      result.error.issues.forEach((issue) => {
-        const key = issue.path[0] as string;
-        errors[key] = issue.message;
-      });
-      setFormErrors(errors);
-      toast.error(t('common.fixErrors'));
-      return;
-    }
-    setFormErrors({});
-    saveMutation.mutate({ formData: form, targetStatus });
-  };
-
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteTrip(id),
     onSuccess: () => {
@@ -164,28 +110,14 @@ const AdminTrips = () => {
   });
 
   const openEdit = (trip: any) => {
-    setEditingId(trip.id);
-    setEditingStatus(trip.status);
-    setForm({
-      title: trip.title, description: trip.description || '', dive_site: trip.dive_site,
-      departure_point: trip.departure_point, trip_date: trip.trip_date, trip_time: trip.trip_time,
-      total_spots: trip.total_spots, price_usd: Number(trip.price_usd),
-      difficulty: trip.difficulty || '', min_certification: trip.min_certification || '',
-      gear_rental_available: trip.gear_rental_available || false,
-      whatsapp_group_url: trip.whatsapp_group_url || '', 
-      image_url: trip.image_url || '',
-    });
+    setEditingTrip(trip);
     setDialogOpen(true);
   };
 
   const openCreate = () => {
-    setEditingId(null);
-    setEditingStatus('draft');
-    setForm(emptyForm);
+    setEditingTrip(null);
     setDialogOpen(true);
   };
-
-  const isEditingPublished = editingId && editingStatus === 'published';
 
   const statusColor = (s: TripStatus) => {
     const map: Record<TripStatus, string> = {
@@ -231,7 +163,11 @@ const AdminTrips = () => {
       ) : (
         <div className="grid gap-4">
           {filteredTrips.map((trip) => (
-            <Card key={trip.id} className="flex flex-col sm:flex-row sm:items-center gap-4 p-4">
+            <Card 
+              key={trip.id} 
+              className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 cursor-pointer hover:border-primary/50 transition-colors"
+              onClick={() => navigate(`/admin/trips/${trip.id}`)}
+            >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-semibold text-foreground truncate">{trip.title}</h3>
@@ -245,13 +181,17 @@ const AdminTrips = () => {
                 </p>
               </div>
               <div className="flex gap-2 shrink-0">
-                <Button variant="ghost" size="icon" onClick={() => openEdit(trip)} aria-label={t('admin.trips.edit')}>
+                <Button 
+                  variant="ghost" size="icon" 
+                  onClick={(e) => { e.stopPropagation(); openEdit(trip); }} 
+                  aria-label={t('admin.trips.edit')}
+                >
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button 
                   variant="ghost" size="icon" 
                   aria-label={t('admin.trips.confirmDelete')}
-                  onClick={() => setDeleteId(trip.id)}
+                  onClick={(e) => { e.stopPropagation(); setDeleteId(trip.id); }}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
@@ -261,138 +201,11 @@ const AdminTrips = () => {
         </div>
       )}
 
-      {/* Create/Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{editingId ? t('admin.trips.edit') : t('admin.trips.create')}</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <Label>{t('admin.trips.field.image') || 'Imagen del Viaje'}</Label>
-                <ImageUpload 
-                  value={form.image_url} 
-                  onChange={(url) => setForm({ ...form, image_url: url })} 
-                  bucket="trip-images"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <Label>{t('admin.trips.field.title')}</Label>
-                <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-              </div>
-              <div className="md:col-span-2">
-                <Label>{t('admin.trips.field.description')}</Label>
-                <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} />
-              </div>
-              <div>
-                <Label>{t('admin.trips.field.diveSite')}</Label>
-                <Input value={form.dive_site} onChange={(e) => setForm({ ...form, dive_site: e.target.value })} required />
-              </div>
-              <div>
-                <Label>{t('admin.trips.field.departure')}</Label>
-                <Input value={form.departure_point} onChange={(e) => setForm({ ...form, departure_point: e.target.value })} required />
-              </div>
-              <div>
-                <Label>{t('common.date')}</Label>
-                <Input type="date" value={form.trip_date} onChange={(e) => setForm({ ...form, trip_date: e.target.value })} required />
-              </div>
-              <div>
-                <Label>{t('common.time')}</Label>
-                <Input type="time" value={form.trip_time} onChange={(e) => setForm({ ...form, trip_time: e.target.value })} required />
-              </div>
-              <div>
-                <Label>{t('common.price')} (USD)</Label>
-                <Input type="number" min={0} step={0.01} value={form.price_usd || ''} onChange={(e) => setForm({ ...form, price_usd: Number(e.target.value) })} onFocus={(e) => e.target.select()} required />
-              </div>
-              <div>
-                <Label>{t('admin.trips.field.spots')}</Label>
-                <Input type="number" min={1} value={form.total_spots || ''} onChange={(e) => setForm({ ...form, total_spots: Number(e.target.value) })} onFocus={(e) => e.target.select()} required />
-              </div>
-              <div>
-                <Label>{t('admin.trips.field.difficulty')}</Label>
-                <Select value={form.difficulty} onValueChange={(v) => setForm({ ...form, difficulty: v as TripDifficulty })}>
-                  <SelectTrigger><SelectValue placeholder="-" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="beginner">{t('admin.trips.difficulty.beginner')}</SelectItem>
-                    <SelectItem value="intermediate">{t('admin.trips.difficulty.intermediate')}</SelectItem>
-                    <SelectItem value="advanced">{t('admin.trips.difficulty.advanced')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>{t('admin.trips.field.minCert')}</Label>
-                <Select value={form.min_certification} onValueChange={(v) => setForm({ ...form, min_certification: v as CertLevel })}>
-                  <SelectTrigger><SelectValue placeholder="-" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">{t('profile.cert.none')}</SelectItem>
-                    <SelectItem value="open_water">{t('profile.cert.openWater')}</SelectItem>
-                    <SelectItem value="advanced_open_water">{t('profile.cert.advanced')}</SelectItem>
-                    <SelectItem value="rescue_diver">{t('profile.cert.rescue')}</SelectItem>
-                    <SelectItem value="divemaster">{t('profile.cert.divemaster')}</SelectItem>
-                    <SelectItem value="instructor">{t('profile.cert.instructor')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-center gap-3 pt-6">
-                <Switch checked={form.gear_rental_available} onCheckedChange={(v) => setForm({ ...form, gear_rental_available: v })} />
-                <Label>{t('admin.trips.field.gearRental')}</Label>
-              </div>
-              <div className="md:col-span-2">
-                <Label>WhatsApp Group URL</Label>
-                <Input value={form.whatsapp_group_url} onChange={(e) => setForm({ ...form, whatsapp_group_url: e.target.value })} placeholder="https://chat.whatsapp.com/..." />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-4 border-t border-border mt-2">
-              <Button type="button" variant="ghost" onClick={() => setDialogOpen(false)}>{t('common.cancel')}</Button>
-              {isEditingPublished ? (
-                <>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={saveMutation.isPending}
-                    onClick={() => handleSave('draft')}
-                    className="gap-2"
-                  >
-                    <FileText className="h-4 w-4" />
-                    {saveMutation.isPending ? t('common.loading') : t('admin.trips.unpublish')}
-                  </Button>
-                  <Button
-                    type="button"
-                    disabled={saveMutation.isPending}
-                    onClick={() => handleSave('published')}
-                    className="gap-2 bg-gradient-ocean text-primary-foreground hover:opacity-90"
-                  >
-                    {saveMutation.isPending ? t('common.loading') : t('admin.trips.saveChanges')}
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={saveMutation.isPending}
-                    onClick={() => handleSave('draft')}
-                    className="gap-2"
-                  >
-                    <FileText className="h-4 w-4" />
-                    {saveMutation.isPending ? t('common.loading') : t('admin.trips.saveDraft')}
-                  </Button>
-                  <Button
-                    type="button"
-                    disabled={saveMutation.isPending}
-                    onClick={() => handleSave('published')}
-                    className="gap-2 bg-gradient-ocean text-primary-foreground hover:opacity-90"
-                  >
-                    <Send className="h-4 w-4" />
-                    {saveMutation.isPending ? t('common.loading') : t('admin.trips.publish')}
-                  </Button>
-                </>
-              )}
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <TripFormModal 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen} 
+        trip={editingTrip} 
+      />
 
       {/* Delete confirmation dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
