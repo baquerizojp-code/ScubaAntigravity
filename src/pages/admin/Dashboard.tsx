@@ -44,7 +44,7 @@ const AdminDashboard = () => {
 
   const cards = [
     { icon: Ship, label: t('admin.dashboard.upcomingTrips'), value: stats?.trips ?? 0, to: '/admin/trips?filter=upcoming' },
-    { icon: Users, label: 'Confirmed Divers', value: stats?.confirmedThisMonth ?? 0, to: '/admin/bookings?tab=confirmed-month' },
+    { icon: Users, label: 'Confirmed Divers', value: stats?.confirmedThisMonth ?? 0, to: '/admin/bookings?tab=confirmed' },
     { icon: CalendarCheck, label: t('admin.dashboard.pendingBookings'), value: stats?.pendingBookings ?? 0, to: '/admin/bookings?tab=pending' },
   ];
 

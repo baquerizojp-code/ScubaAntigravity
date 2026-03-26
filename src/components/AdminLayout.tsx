@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import NotificationBell from '@/components/NotificationBell';
 
 const AdminLayout = () => {
+  // Vite HMR flush
   const { signOut } = useAuth();
   const { t } = useI18n();
   const location = useLocation();

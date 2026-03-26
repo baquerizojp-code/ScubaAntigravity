@@ -163,7 +163,10 @@ const AdminTripDetail = () => {
                 <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Capacity</span>
                 <div className="font-medium flex items-center justify-between">
                   <span>{trip.total_spots - trip.available_spots} Confirmed / {trip.total_spots} Total Spots</span>
-                  <Badge variant="secondary">{trip.available_spots} Available</Badge>
+                  <div className="bg-secondary text-secondary-foreground rounded-full px-4 py-1.5 flex flex-col items-center justify-center shrink-0 min-w-[5.5rem] shadow-sm">
+                    <span className="text-lg font-bold leading-none">{trip.available_spots}</span>
+                    <span className="text-[10px] uppercase tracking-wide opacity-90 mt-0.5">Available</span>
+                  </div>
                 </div>
               </div>
               <div>
