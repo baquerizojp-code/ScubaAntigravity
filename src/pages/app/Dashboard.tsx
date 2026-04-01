@@ -12,7 +12,9 @@ import { format } from 'date-fns';
 const Dashboard = () => {
   const { user } = useAuth();
   const { t } = useI18n();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [profile, setProfile] = useState<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [bookings, setBookings] = useState<any[]>([]);
 
   useEffect(() => {

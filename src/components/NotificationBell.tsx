@@ -28,18 +28,18 @@ const NotificationBell = () => {
 
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
-  const fetchNotifications = async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(20);
-    if (data) setNotifications(data);
-  };
-
   useEffect(() => {
+    const fetchNotifications = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (data) setNotifications(data);
+    };
+
     fetchNotifications();
 
     // Realtime subscription

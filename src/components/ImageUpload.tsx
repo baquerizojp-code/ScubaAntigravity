@@ -40,8 +40,9 @@ const ImageUpload = ({ value, onChange, bucket, path = '', className = '' }: Ima
 
       onChange(publicUrl);
       toast.success(t('image.uploaded'));
-    } catch (error: any) {
-      toast.error(t('image.uploadError') + ': ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      toast.error(t('image.uploadError') + ': ' + errorMessage);
     } finally {
       setUploading(false);
     }
@@ -115,7 +116,7 @@ const ImageUpload = ({ value, onChange, bucket, path = '', className = '' }: Ima
 };
 
 // Helper for Label if not imported
-const Label = ({ children, htmlFor, className }: any) => (
+const Label = ({ children, htmlFor, className }: { children: React.ReactNode; htmlFor?: string; className?: string }) => (
   <label htmlFor={htmlFor} className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${className}`}>
     {children}
   </label>

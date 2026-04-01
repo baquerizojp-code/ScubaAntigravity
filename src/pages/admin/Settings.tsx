@@ -76,7 +76,7 @@ const AdminSettings = () => {
       queryClient.invalidateQueries({ queryKey: ['dive-center'] });
       toast.success(t('admin.settings.saved'));
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error(err.message || 'Error');
     },
   });

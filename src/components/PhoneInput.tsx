@@ -96,7 +96,7 @@ const PhoneInput = ({ value, onChange, onValidate, placeholder, error }: PhoneIn
     };
     if (open) document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [open]);
+  }, [open, dropdownRef]);
 
   const handleCountrySelect = (country: Country) => {
     const currentDigits = value.replace(/\D/g, '');

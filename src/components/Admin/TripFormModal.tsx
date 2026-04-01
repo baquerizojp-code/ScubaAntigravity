@@ -36,6 +36,7 @@ export interface TripFormData {
   image_url: string;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const emptyForm: TripFormData = {
   title: '', description: '', dive_site: '', departure_point: '',
   trip_date: '', trip_time: '08:00', total_spots: 10, price_usd: 0,
@@ -46,7 +47,7 @@ export const emptyForm: TripFormData = {
 interface TripFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  trip: any | null; // Pass null to create new trip, or trip object to edit.
+  trip: (TripFormData & { id?: string; status?: TripStatus }) | null; // Pass null to create new trip, or trip object to edit.
   onSuccess?: () => void;
 }
 
@@ -111,7 +112,7 @@ export const TripFormModal = ({ open, onOpenChange, trip, onSuccess }: TripFormM
       toast.success(targetStatus === 'published' ? t('admin.trips.published') : t('admin.trips.savedDraft'));
       if (onSuccess) onSuccess();
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error(err.message || 'Error');
     },
   });

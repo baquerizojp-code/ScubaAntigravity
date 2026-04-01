@@ -71,7 +71,7 @@ const AdminStaff = () => {
       setInviteEmail('');
       toast.success(t('admin.staff.invited'));
     },
-    onError: (err: any) => {
+    onError: (err: Error) => {
       toast.error(err.message || 'Error');
     },
   });

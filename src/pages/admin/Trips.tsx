@@ -60,7 +60,7 @@ const AdminTrips = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTrip, setEditingTrip] = useState<any | null>(null);
+  const [editingTrip, setEditingTrip] = useState<TripFormData & { id: string; status: TripStatus } | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: trips, isLoading } = useQuery({
@@ -109,7 +109,7 @@ const AdminTrips = () => {
     },
   });
 
-  const openEdit = (trip: any) => {
+  const openEdit = (trip: TripFormData & { id: string; status: TripStatus }) => {
     setEditingTrip(trip);
     setDialogOpen(true);
   };

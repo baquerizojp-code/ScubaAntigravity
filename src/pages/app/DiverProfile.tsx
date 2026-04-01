@@ -52,6 +52,7 @@ const DiverProfile = () => {
       .from('diver_profiles')
       .update({
         full_name: form.full_name,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         certification: form.certification as any,
         logged_dives: form.logged_dives,
         emergency_contact: form.emergency_contact || null,

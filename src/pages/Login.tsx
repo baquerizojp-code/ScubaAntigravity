@@ -25,7 +25,7 @@ const Login = () => {
 
   const searchParams = new URLSearchParams(location.search);
   const redirectParam = searchParams.get('redirect');
-  const rawFrom = (location.state as any)?.from || redirectParam || null;
+  const rawFrom = (location.state as { from?: string })?.from || redirectParam || null;
   const from = rawFrom && isSafeRedirect(rawFrom) ? rawFrom : null;
 
   // Determine initial mode from URL search param or path
@@ -42,7 +42,7 @@ const Login = () => {
       if (from) localStorage.setItem('pending_redirect', from);
       navigate('/complete-profile', { replace: true, state: { from } });
     }
-  }, [user, role]);
+  }, [user, role, from, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

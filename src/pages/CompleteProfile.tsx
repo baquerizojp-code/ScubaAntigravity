@@ -32,7 +32,7 @@ const CompleteProfile = () => {
   const [certification, setCertification] = useState('none');
   const [loading, setLoading] = useState(false);
 
-  const rawRedirect = (location.state as any)?.from || localStorage.getItem('pending_redirect');
+  const rawRedirect = (location.state as { from?: string })?.from || localStorage.getItem('pending_redirect');
   const pendingRedirect = rawRedirect && isSafeRedirect(rawRedirect) ? rawRedirect : null;
 
   // If already has role, redirect
@@ -44,7 +44,7 @@ const CompleteProfile = () => {
     } else if (role === 'dive_center_admin' || role === 'dive_center_staff') {
       navigate('/admin', { replace: true });
     }
-  }, [role, navigate]);
+  }, [role, navigate, pendingRedirect]);
 
   // If pending center signup flag, redirect to center registration
   useEffect(() => {
@@ -75,7 +75,7 @@ const CompleteProfile = () => {
       .upsert({
         user_id: user.id,
         full_name: fullName,
-        certification: certification as any,
+        certification: certification as "none" | "open_water" | "advanced_open_water" | "rescue_diver" | "divemaster" | "instructor",
       }, { onConflict: 'user_id' });
 
     if (profileError) {

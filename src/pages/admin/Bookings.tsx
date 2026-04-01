@@ -118,11 +118,11 @@ const AdminBookings = () => {
       const today = new Date().toISOString().split('T')[0];
       return bookings.filter(b => 
         b.status === 'confirmed' && 
-        (b as any).trips?.status === 'published' && 
-        (b as any).trips?.trip_date >= today
+        b.trips?.status === 'published' && 
+        b.trips?.trip_date && b.trips.trip_date >= today
       ).sort((a, b) => {
-        const dateA = (a as any).trips?.trip_date || '';
-        const dateB = (b as any).trips?.trip_date || '';
+        const dateA = a.trips?.trip_date || '';
+        const dateB = b.trips?.trip_date || '';
         return dateA.localeCompare(dateB);
       });
     }
@@ -130,15 +130,15 @@ const AdminBookings = () => {
     const filtered = bookings.filter(b => b.status === status);
     if (status === 'pending') {
       return filtered.sort((a, b) => {
-        const dateA = (a as any).trips?.trip_date || '';
-        const dateB = (b as any).trips?.trip_date || '';
+        const dateA = a.trips?.trip_date || '';
+        const dateB = b.trips?.trip_date || '';
         return dateA.localeCompare(dateB);
       });
     }
     return filtered;
   };
 
-  const renderBookingCard = (booking: any, showActions: boolean, showCancellationActions?: boolean) => (
+  const renderBookingCard = (booking: AdminBookingWithDetails, showActions: boolean, showCancellationActions?: boolean) => (
     <Card key={booking.id} className="p-4">
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex-1 min-w-0">
@@ -209,7 +209,7 @@ const AdminBookings = () => {
       </Card>
     ) : (
       <div className="grid gap-3 mt-4">
-        {filtered.map((booking: any) => renderBookingCard(booking, showActions, showCancellationActions))}
+        {filtered.map((booking: AdminBookingWithDetails) => renderBookingCard(booking, showActions, showCancellationActions))}
       </div>
     );
   };

@@ -151,6 +151,7 @@ const TripDetail = () => {
       const newProfile = await createDiverProfile({
         user_id: user.id,
         full_name: dialogFullName.trim(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         certification: dialogCertification as any,
       });
 

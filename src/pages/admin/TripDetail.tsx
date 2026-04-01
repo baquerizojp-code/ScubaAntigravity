@@ -9,7 +9,8 @@ import {
   fetchBookingsByTripId, 
   confirmBooking, 
   rejectBooking, 
-  removeConfirmedBooking 
+  removeConfirmedBooking,
+  type AdminBookingWithDetails
 } from '@/services/bookings';
 import { TripFormModal } from '@/components/Admin/TripFormModal';
 import { Button } from '@/components/ui/button';
@@ -77,7 +78,7 @@ const AdminTripDetail = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-trip', id] });
       toast.success(t('admin.bookings.confirmed'));
     },
-    onError: (err: any) => toast.error(err.message || 'Error confirming booking'),
+    onError: (err: Error) => toast.error(err.message || 'Error confirming booking'),
   });
 
   const rejectMutation = useMutation({
@@ -88,7 +89,7 @@ const AdminTripDetail = () => {
       setRejectReason('');
       toast.success(t('admin.bookings.rejected'));
     },
-    onError: (err: any) => toast.error(err.message || 'Error rejecting booking'),
+    onError: (err: Error) => toast.error(err.message || 'Error rejecting booking'),
   });
 
   const removeConfirmedMutation = useMutation({
@@ -98,7 +99,7 @@ const AdminTripDetail = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-trip', id] });
       toast.success('Diver successfully removed from trip');
     },
-    onError: (err: any) => toast.error(err.message || 'Error removing diver'),
+    onError: (err: Error) => toast.error(err.message || 'Error removing diver'),
   });
 
   if (isLoadingTrip) {
@@ -218,7 +219,7 @@ const AdminTripDetail = () => {
                       <p>No confirmed divers yet.</p>
                     </div>
                   ) : (
-                    confirmedBookings.map((b: any) => (
+                    confirmedBookings.map((b: AdminBookingWithDetails) => (
                       <div key={b.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
                         <div>
                           <p className="font-semibold">{b.diver_profiles?.full_name || 'Unknown Diver'}</p>
@@ -253,7 +254,7 @@ const AdminTripDetail = () => {
                       <p>No pending booking requests.</p>
                     </div>
                   ) : (
-                    pendingBookings.map((b: any) => (
+                    pendingBookings.map((b: AdminBookingWithDetails) => (
                       <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-orange-50/50 border-orange-100 gap-4">
                         <div>
                           <p className="font-semibold">{b.diver_profiles?.full_name || 'Unknown Diver'}</p>
