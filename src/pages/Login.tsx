@@ -193,7 +193,7 @@ const Login = () => {
                 </Label>
               </div>
             )}
-            <Button type="submit" className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90" disabled={loading}>
+            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:brightness-110" disabled={loading}>
               {loading ? t('common.loading') : isSignup ? t('auth.signup.button') : t('auth.login.button')}
             </Button>
           </form>

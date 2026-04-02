@@ -271,7 +271,7 @@ Comparing the Stitch Abyssal Coral mockups against the live implementation:
 ### Resolved Alignments
 - Font families match: Plus Jakarta Sans (headlines) + Work Sans (body)
 - Dark navy backgrounds are consistent
-- Coral/orange CTA color intent is shared
+- Coral/orange CTA color is consistent across Landing, Login, and key pages
 - Card-based layouts with rounded corners match
 - Ocean gradient usage is present in both
 
@@ -280,7 +280,6 @@ Comparing the Stitch Abyssal Coral mockups against the live implementation:
 | Area | Stitch Mockup (Abyssal Coral) | Live Code | Action Needed |
 |------|------------------------------|-----------|---------------|
 | **Dark mode primary** | Coral `#FE7E4F` is the primary CTA | Primary maps to teal-cyan `hsl(193 100% 42%)` in dark mode | Remap `--primary` in `.dark` to coral, use cyan-electric as a distinct data/accent token |
-| **CTA color in dark** | Coral buttons throughout | CTAs render as teal in dark mode | Primary CTA buttons should explicitly use coral, not the `primary` token |
 | **Hardcoded colors** | Token-based design system | `TripCard.tsx` uses hardcoded `bg-yellow-500/20`, `text-green-300`, `text-[#00f0ff]` | Replace with semantic tokens (`warning/10`, `success`, `cyan-electric`) |
 | **Body font weight** | Light (300) for body text | Normal (400) default | Consider `font-light` for body text per Abyssal Coral spec |
 | **Border usage** | "No-Line Rule" — no 1px borders | Cards use `border` class with `border-border` | Evaluate removing card borders in favor of tonal stacking |
