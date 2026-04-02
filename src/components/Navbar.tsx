@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/contexts/AuthContext';
 import ScubaMaskLogo from '@/components/ScubaMaskLogo';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface NavbarProps {
   transparent?: boolean;
@@ -42,7 +43,8 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
           <span className="text-2xl font-black text-white tracking-tighter font-headline">ScubaTrip</span>
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <ThemeToggle className="text-ocean-200 hover:text-white hover:bg-white/10" />
           <div className="hidden sm:block">
             <Button
               variant="ghost"

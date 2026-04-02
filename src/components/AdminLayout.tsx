@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import NotificationBell from '@/components/NotificationBell';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const AdminLayout = () => {
   // Vite HMR flush
@@ -40,17 +41,18 @@ const AdminLayout = () => {
         />
       )}
 
-      {/* Sidebar */}
+      {/* AUDIT FIX: Sidebar uses tonal background shift instead of border-r per No-Line Rule */}
       <aside className={cn(
-        "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border flex flex-col transition-transform lg:translate-x-0",
+        "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-muted flex flex-col transition-transform lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="p-6 border-b border-border flex items-center justify-between">
+        <div className="p-6 flex items-center justify-between">
           <Link to="/admin" className="flex items-center gap-2">
             <ScubaMaskLogo className="h-8 w-6 text-primary" />
             <span className="text-lg font-bold text-foreground">ScubaTrip</span>
           </Link>
-          <div className="hidden lg:block">
+          <div className="hidden lg:flex items-center gap-2">
+            <ThemeToggle />
             <NotificationBell />
           </div>
         </div>
@@ -74,7 +76,7 @@ const AdminLayout = () => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-border">
+        <div className="p-4">
           <Button 
             variant="ghost" 
             className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive"
@@ -89,12 +91,15 @@ const AdminLayout = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <header className="lg:hidden flex items-center gap-4 px-4 py-3 border-b border-border bg-card min-h-[56px]">
+        <header className="lg:hidden flex items-center gap-2 px-4 py-3 border-b border-border bg-card min-h-[56px]">
           <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </Button>
-          <ScubaMaskLogo className="h-9 w-7 text-primary" />
-          <span className="font-bold text-foreground flex-1">ScubaTrip</span>
+          <div className="flex items-center flex-1">
+            <ScubaMaskLogo className="h-8 w-6 text-primary" />
+            <span className="font-bold text-foreground ml-2">ScubaTrip</span>
+          </div>
+          <ThemeToggle />
           <NotificationBell />
         </header>
 

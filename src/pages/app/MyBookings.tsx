@@ -31,12 +31,13 @@ import { toast } from 'sonner';
 
 
 
+/* AUDIT FIX: Replaced hardcoded Tailwind colors with semantic tokens for dark-mode compat */
 const statusBadge: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  confirmed: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
+  pending: 'bg-warning/10 text-warning',
+  confirmed: 'bg-success/10 text-success',
+  rejected: 'bg-destructive/10 text-destructive',
   cancelled: 'bg-muted text-muted-foreground',
-  cancellation_requested: 'bg-orange-100 text-orange-800',
+  cancellation_requested: 'bg-warning/10 text-warning',
 };
 
 const MyBookings = () => {
@@ -114,7 +115,8 @@ const MyBookings = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            className="gap-1.5 text-green-600 border-green-300 hover:bg-green-50 hover:text-green-700 h-7 text-xs"
+                            /* AUDIT FIX: Replaced hardcoded green with semantic success tokens */
+                            className="gap-1.5 text-success border-success/30 hover:bg-success/5 hover:text-success h-7 text-xs"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();

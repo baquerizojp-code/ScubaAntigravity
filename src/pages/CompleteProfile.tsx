@@ -35,7 +35,6 @@ const CompleteProfile = () => {
   const rawRedirect = (location.state as { from?: string })?.from || localStorage.getItem('pending_redirect');
   const pendingRedirect = rawRedirect && isSafeRedirect(rawRedirect) ? rawRedirect : null;
 
-  // If already has role, redirect
   useEffect(() => {
     if (role === 'diver') {
       const dest = pendingRedirect || '/app/discover';
@@ -46,7 +45,6 @@ const CompleteProfile = () => {
     }
   }, [role, navigate, pendingRedirect]);
 
-  // If pending center signup flag, redirect to center registration
   useEffect(() => {
     if (user && !role && localStorage.getItem('pending_center_signup')) {
       navigate('/register-center', { replace: true });
@@ -58,7 +56,6 @@ const CompleteProfile = () => {
     if (!user) return;
     setLoading(true);
 
-    // Upsert role — trigger may have already created it
     const { error: roleError } = await supabase
       .from('user_roles')
       .upsert({ user_id: user.id, role: 'diver' as const }, { onConflict: 'user_id' });
@@ -69,7 +66,6 @@ const CompleteProfile = () => {
       return;
     }
 
-    // Upsert profile — trigger creates a skeleton, we fill in the details
     const { error: profileError } = await supabase
       .from('diver_profiles')
       .upsert({
@@ -132,9 +128,10 @@ const CompleteProfile = () => {
                 </SelectContent>
               </Select>
             </div>
+            {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
             <Button
               type="submit"
-              className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90"
+              className="w-full bg-primary text-primary-foreground hover:brightness-110"
               disabled={loading}
             >
               {loading ? t('common.loading') : t('completeProfile.button')}

@@ -15,7 +15,7 @@ const Explore = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trips')
-        .select('id, title, dive_site, departure_point, trip_date, trip_time, available_spots, total_spots, price_usd, difficulty, min_certification, gear_rental_available, description, status, dive_center_id, created_at, updated_at, dive_centers(name, logo_url)')
+        .select('id, title, dive_site, departure_point, trip_date, trip_time, available_spots, total_spots, price_usd, difficulty, min_certification, gear_rental_available, description, status, dive_center_id, created_at, updated_at, image_url, dive_centers(name, logo_url)')
         .eq('status', 'published')
         .gte('trip_date', new Date().toISOString().split('T')[0])
         .order('trip_date', { ascending: true });
@@ -51,10 +51,11 @@ const Explore = () => {
             <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
               <MapPin className="w-5 h-5 text-secondary" />
               <div className="flex flex-col w-full">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Location</label>
+                {/* AUDIT FIX: Internationalized search bar labels */}
+                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.location')}</label>
                 <input 
                   type="text" 
-                  placeholder="Where to dive?" 
+                  placeholder={t('explore.locationPlaceholder')}
                   className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 placeholder:text-muted-foreground text-sm w-full"
                 />
               </div>
@@ -65,10 +66,10 @@ const Explore = () => {
             <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
               <Calendar className="w-5 h-5 text-secondary" />
               <div className="flex flex-col w-full">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Date Range</label>
+                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.dateRange')}</label>
                 <input 
                   type="text" 
-                  placeholder="Flexible" 
+                  placeholder={t('explore.datePlaceholder')}
                   className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 placeholder:text-muted-foreground text-sm w-full"
                 />
               </div>
@@ -79,20 +80,21 @@ const Explore = () => {
             <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
               <Compass className="w-5 h-5 text-secondary" />
               <div className="flex flex-col w-full">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Diver Level</label>
+                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.diverLevel')}</label>
                 <select className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 text-sm appearance-none flex-1 w-full outline-none ring-0 focus:border-none focus:outline-none">
-                  <option value="">Any Level</option>
-                  <option value="open_water">Open Water</option>
-                  <option value="advanced">Advanced Open Water</option>
-                  <option value="rescue">Rescue Diver</option>
-                  <option value="divemaster">Divemaster</option>
+                  {/* AUDIT FIX: Internationalized select options */}
+                  <option value="">{t('explore.anyLevel')}</option>
+                  <option value="open_water">{t('profile.cert.openWater')}</option>
+                  <option value="advanced">{t('profile.cert.advanced')}</option>
+                  <option value="rescue">{t('profile.cert.rescue')}</option>
+                  <option value="divemaster">{t('profile.cert.divemaster')}</option>
                 </select>
               </div>
             </div>
             
             <button className="bg-primary text-primary-foreground h-12 w-12 md:h-14 md:w-40 rounded-full flex items-center justify-center gap-2 hover:bg-primary-container transition-all active:scale-95 shrink-0">
               <Compass className="w-5 h-5 md:hidden" />
-              <span className="hidden md:block font-bold">Search</span>
+              <span className="hidden md:block font-bold">{t('explore.search')}</span>
             </button>
           </div>
         </section>

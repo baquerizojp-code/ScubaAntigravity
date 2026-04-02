@@ -97,7 +97,8 @@ const DiverProfile = () => {
             <Label>{t('diver.profile.emergency')}</Label>
             <Input value={form.emergency_contact} onChange={e => setForm(f => ({ ...f, emergency_contact: e.target.value }))} />
           </div>
-          <Button onClick={handleSave} disabled={saving} className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90">
+          {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
+          <Button onClick={handleSave} disabled={saving} className="w-full bg-primary text-primary-foreground hover:brightness-110">
             {saving ? t('common.loading') : t('common.save')}
           </Button>
         </CardContent>

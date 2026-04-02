@@ -204,7 +204,8 @@ const AdminTripDetail = () => {
                   <TabsTrigger value="pending" className="gap-2">
                     <Clock className="h-4 w-4" /> Pending Requests
                     {pendingBookings.length > 0 && (
-                      <Badge variant="default" className="px-1.5 min-w-[1.25rem] bg-orange-500 hover:bg-orange-600 border-none text-white">
+                      /* AUDIT FIX: Replaced hardcoded bg-orange-500 with semantic warning token */
+                      <Badge variant="default" className="px-1.5 min-w-[1.25rem] bg-warning hover:bg-warning/90 border-none text-warning-foreground">
                         {pendingBookings.length}
                       </Badge>
                     )}
@@ -256,7 +257,8 @@ const AdminTripDetail = () => {
                     </div>
                   ) : (
                     pendingBookings.map((b: AdminBookingWithDetails) => (
-                      <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-orange-50/50 border-orange-100 gap-4">
+                      /* AUDIT FIX: Replaced hardcoded bg-orange-50/50 border-orange-100 with semantic warning tokens */
+                      <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-warning/5 border-warning/20 gap-4">
                         <div>
                           <p className="font-semibold">{b.diver_profiles?.full_name || 'Unknown Diver'}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">
@@ -265,9 +267,10 @@ const AdminTripDetail = () => {
                           {b.notes && <p className="text-xs text-muted-foreground mt-1 italic">"{b.notes}"</p>}
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
+                          {/* AUDIT FIX: Replaced hardcoded bg-green-600 with semantic success token */}
                           <Button 
                             size="sm" 
-                            className="bg-green-600 hover:bg-green-700 text-white"
+                            className="bg-success hover:bg-success/90 text-success-foreground"
                             onClick={() => confirmMutation.mutate(b.id)}
                             disabled={confirmMutation.isPending || (trip.available_spots <= 0)}
                           >

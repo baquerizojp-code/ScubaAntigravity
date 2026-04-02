@@ -18,7 +18,6 @@ const RegisterCenter = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
 
-  // Step 1 = account creation, Step 2 = center setup
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,7 +26,6 @@ const RegisterCenter = () => {
   const [whatsappError, setWhatsappError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Already logged in with a role → redirect
   useEffect(() => {
     if (user && role) {
       if (role === 'diver') navigate('/app/discover', { replace: true });
@@ -35,7 +33,6 @@ const RegisterCenter = () => {
     }
   }, [user, role, navigate]);
 
-  // User is logged in but has no role → go to step 2
   useEffect(() => {
     if (user && !role) {
       localStorage.removeItem(PENDING_CENTER_KEY);
@@ -73,7 +70,7 @@ const RegisterCenter = () => {
       password,
       options: { 
         emailRedirectTo: window.location.origin + '/register-center',
-        data: { role: 'dive_center' } // Explicitly signal 'dive_center' role for the trigger
+        data: { role: 'dive_center' }
       },
     });
     setLoading(false);
@@ -84,7 +81,6 @@ const RegisterCenter = () => {
     }
 
     if (data.session && data.user) {
-      // Auto-confirmed — useEffect will move to step 2
       localStorage.setItem(PENDING_CENTER_KEY, 'true');
       toast.success('¡Cuenta creada!');
     } else {
@@ -97,7 +93,6 @@ const RegisterCenter = () => {
     if (!user) return;
     setLoading(true);
 
-    // Create role via secure RPC (prevents privilege escalation)
     const { error: roleError } = await supabase
       .rpc('assign_dive_center_admin_role', { _user_id: user.id });
 
@@ -107,7 +102,6 @@ const RegisterCenter = () => {
       return;
     }
 
-    // Create dive center
     const { data: center, error: centerError } = await supabase
       .from('dive_centers')
       .insert({
@@ -124,7 +118,6 @@ const RegisterCenter = () => {
       return;
     }
 
-    // Add user as admin staff
     const { error: staffError } = await supabase
       .from('staff_members')
       .insert({
@@ -174,7 +167,6 @@ const RegisterCenter = () => {
         <div className="bg-card rounded-xl shadow-card p-6 border border-border">
           {step === 1 ? (
             <>
-              {/* OAuth buttons */}
               <Button variant="outline" className="w-full mb-4" onClick={handleGoogleSignup}>
                 <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -190,7 +182,6 @@ const RegisterCenter = () => {
                 <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">o</span></div>
               </div>
 
-              {/* Email/password form */}
               <form onSubmit={handleEmailSignup} className="space-y-4">
                 <div>
                   <Label htmlFor="email">{t('auth.email')}</Label>
@@ -200,7 +191,8 @@ const RegisterCenter = () => {
                   <Label htmlFor="password">{t('auth.password')}</Label>
                   <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
                 </div>
-                <Button type="submit" className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90" disabled={loading}>
+                {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
+                <Button type="submit" className="w-full bg-primary text-primary-foreground hover:brightness-110" disabled={loading}>
                   {loading ? t('common.loading') : t('auth.signup.button')}
                 </Button>
               </form>
@@ -210,7 +202,6 @@ const RegisterCenter = () => {
               </p>
             </>
           ) : (
-            /* Step 2: Center setup */
             <form onSubmit={handleCenterSetup} className="space-y-4">
               <div>
                 <Label>{t('admin.settings.name')}</Label>
@@ -226,14 +217,14 @@ const RegisterCenter = () => {
                   error={whatsappError}
                 />
               </div>
-              <Button type="submit" className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90" disabled={loading}>
+              {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:brightness-110" disabled={loading}>
                 {loading ? t('common.loading') : t('registerCenter.button')}
               </Button>
             </form>
           )}
         </div>
 
-        {/* Link to diver signup */}
         <p className="text-center text-sm text-muted-foreground mt-4">
           <Link to="/login?mode=signup" className="hover:underline">{t('registerCenter.diverLink')}</Link>
         </p>

@@ -17,14 +17,12 @@ const ResetPassword = () => {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Listen for the PASSWORD_RECOVERY event
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         setReady(true);
       }
     });
     
-    // Also check hash for recovery type
     const hash = window.location.hash;
     if (hash.includes('type=recovery')) {
       setReady(true);
@@ -86,7 +84,8 @@ const ResetPassword = () => {
               <Label htmlFor="confirmPassword">{t('auth.reset.confirmPassword')}</Label>
               <Input id="confirmPassword" type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
             </div>
-            <Button type="submit" className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90" disabled={loading}>
+            {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
+            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:brightness-110" disabled={loading}>
               {loading ? t('common.loading') : t('auth.reset.button')}
             </Button>
           </form>

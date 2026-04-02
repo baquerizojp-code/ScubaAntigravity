@@ -92,24 +92,24 @@ const ExploreTrip = () => {
         <div className="absolute bottom-0 w-full z-10">
           <div className="container mx-auto px-6 sm:px-10 pb-12 md:pb-24">
             <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
-              <Button variant="ghost" className="mb-6 text-white hover:bg-white/10 hover:text-white border border-white/20 rounded-full pl-3 pr-5" onClick={() => navigate('/explore')}>
+              <Button variant="ghost" className="mb-6 hover:bg-foreground/10 text-foreground border border-foreground/20 rounded-full pl-3 pr-5" onClick={() => navigate('/explore')}>
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Explore
               </Button>
               
               <div className="flex flex-wrap gap-3 mb-6">
-                <Badge className="bg-black/40 backdrop-blur-md text-white border border-white/20 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg">
+                <Badge className="bg-background/40 backdrop-blur-md text-foreground border border-foreground/20 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg">
                   <span className="w-2 h-2 rounded-full bg-secondary"></span>
                   {trip.dive_centers?.name || 'Independent Center'}
                 </Badge>
               </div>
               
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black font-headline text-white tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-black font-headline text-foreground tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
                 {trip.title}
               </h1>
               
-              <p className="text-xl md:text-2xl text-slate-200 font-light max-w-2xl flex items-center gap-2 bg-black/20 backdrop-blur-sm w-fit px-4 py-2 rounded-xl border border-white/10">
+              <p className="text-xl md:text-2xl text-foreground font-light max-w-2xl flex items-center gap-2 bg-background/40 backdrop-blur-sm w-fit px-4 py-2 rounded-xl border border-foreground/10">
                 <MapPin className="w-6 h-6 text-secondary" />
-                {trip.dive_site} <span className="text-slate-400 mx-2">•</span> <span className="opacity-80 text-lg">{trip.departure_point}</span>
+                {trip.dive_site} <span className="text-foreground/40 mx-2">•</span> <span className="opacity-80 text-lg">{trip.departure_point}</span>
               </p>
             </div>
           </div>

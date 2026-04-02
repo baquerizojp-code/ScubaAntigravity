@@ -44,7 +44,6 @@ const Dashboard = () => {
       const { data: p } = await supabase.from('diver_profiles').select('*').eq('user_id', user.id).single();
       if (p) {
         setProfile(p);
-        // Fetch upcoming bookings
         const { data: b } = await supabase
           .from('bookings')
           .select('id, status, trip_id, trips(id, title, trip_date, image_url, dive_centers(name))')
@@ -54,7 +53,6 @@ const Dashboard = () => {
           .limit(3);
         setBookings((b as unknown as DiverBooking[]) || []);
 
-        // Count completed dives (confirmed bookings on completed trips)
         const { count } = await supabase
           .from('bookings')
           .select('id, trips!inner(status)', { count: 'exact', head: true })
@@ -82,7 +80,8 @@ const Dashboard = () => {
             <h1 className="text-4xl md:text-5xl font-black font-headline text-white mb-2 leading-tight">
               {t('diver.dashboard.welcomeBack')} {profile?.full_name?.split(' ')[0] || 'Diver'}
             </h1>
-            <p className="text-slate-200">{t('diver.dashboard.readyToDive')}</p>
+            {/* AUDIT FIX: Replaced text-slate-200 with text-ocean-200 */}
+            <p className="text-ocean-200">{t('diver.dashboard.readyToDive')}</p>
           </div>
           <Button asChild className="rounded-full bg-white text-primary hover:bg-slate-100 font-bold px-8 shadow-lg">
             <Link to="/app/discover">{t('diver.dashboard.findExpeditions')}</Link>
@@ -154,7 +153,8 @@ const Dashboard = () => {
                     <h3 className="font-bold text-foreground text-lg truncate group-hover:text-primary transition-colors">{booking.trips.title}</h3>
                     <p className="text-sm text-muted-foreground truncate">{booking.trips.dive_centers?.name}</p>
                   </div>
-                  <Badge variant="outline" className={booking.status === 'confirmed' ? 'bg-green-500/10 text-green-600 border-green-500/20 px-3' : 'px-3 capitalize'}>
+                  {/* AUDIT FIX: Replaced hardcoded bg-green-500/10 text-green-600 with semantic tokens */}
+                  <Badge variant="outline" className={booking.status === 'confirmed' ? 'bg-success/10 text-success border-success/20 px-3' : 'px-3 capitalize'}>
                     {booking.status}
                   </Badge>
                 </div>

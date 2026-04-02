@@ -54,7 +54,8 @@ const ForgotPassword = () => {
                 <Label htmlFor="email">{t('auth.email')}</Label>
                 <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
               </div>
-              <Button type="submit" className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90" disabled={loading}>
+              {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground rounded-full */}
+              <Button type="submit" className="w-full bg-primary text-primary-foreground hover:brightness-110" disabled={loading}>
                 {loading ? t('common.loading') : t('auth.forgot.button')}
               </Button>
               <p className="text-center text-sm text-muted-foreground">

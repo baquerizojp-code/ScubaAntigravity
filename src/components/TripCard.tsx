@@ -10,10 +10,11 @@ export type TripWithCenter = Tables<'trips'> & {
   dive_centers: { name: string; logo_url: string | null } | null;
 };
 
+/* AUDIT FIX: Replaced hardcoded Tailwind colors with semantic tokens */
 const bookingStatusColors: Record<string, string> = {
-  pending: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50',
-  confirmed: 'bg-green-500/20 text-green-300 border-green-500/50',
-  cancellation_requested: 'bg-orange-500/20 text-orange-300 border-orange-500/50',
+  pending: 'bg-warning/20 text-warning border-warning/50',
+  confirmed: 'bg-success/20 text-success border-success/50',
+  cancellation_requested: 'bg-warning/20 text-warning border-warning/50',
 };
 
 const bookingStatusLabels: Record<string, { es: string; en: string }> = {
@@ -43,7 +44,8 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
         <div className="absolute inset-0 w-full h-full bg-ocean-900 transition-transform duration-700 group-hover:scale-110" />
       )}
       
-      <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/40 to-transparent"></div>
+      {/* AUDIT FIX: Changed from from-primary/95 via-primary/40 to from-background/95 via-background/40 for deep ocean overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent"></div>
       
       <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
 
@@ -62,32 +64,37 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
         <div className="bg-primary/60 backdrop-blur-lg rounded-xl p-4 sm:p-5 text-white border border-white/10 shadow-2xl">
           <div className="flex justify-between items-start mb-2">
             <div className="pr-2">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#00f0ff] mb-1 truncate flex items-center gap-1">
+              {/* AUDIT FIX: Replaced hardcoded text-[#00f0ff] with text-cyan-electric */}
+              <p className="text-[10px] font-bold uppercase tracking-widest text-cyan-electric mb-1 truncate flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
                 {trip.dive_site}
               </p>
               <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-2">{trip.title}</h3>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-xs text-slate-300">from</p>
+              {/* AUDIT FIX: Replaced text-slate-300 with text-ocean-200 */}
+              <p className="text-xs text-ocean-200">from</p>
               <p className="text-lg sm:text-xl font-black text-white">${Number(trip.price_usd)}</p>
             </div>
           </div>
           
           <div className="flex items-center gap-2 mb-4">
             <Badge className="bg-white/10 hover:bg-white/20 text-white border-white/10 px-2 py-0.5 font-normal tracking-wide flex gap-1.5 items-center">
-              <span className="w-2 h-2 rounded-full bg-[#00f0ff]"></span>
-              <span className="text-xs text-slate-200 truncate">{trip.dive_centers?.name || 'Independent Center'}</span>
+              {/* AUDIT FIX: Replaced hardcoded bg-[#00f0ff] with bg-cyan-electric */}
+              <span className="w-2 h-2 rounded-full bg-cyan-electric"></span>
+              {/* AUDIT FIX: Replaced text-slate-200 with text-ocean-200 */}
+              <span className="text-xs text-ocean-200 truncate">{trip.dive_centers?.name || 'Independent Center'}</span>
             </Badge>
           </div>
           
           <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-2">
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 text-slate-300">
+              {/* AUDIT FIX: Replaced text-slate-300 with text-ocean-300 */}
+              <div className="flex items-center gap-1.5 text-ocean-300">
                 <Clock className="w-3.5 h-3.5" />
                 <span className="text-[10px] font-bold uppercase tracking-tighter">{trip.trip_time.slice(0, 5)}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-slate-300">
+              <div className="flex items-center gap-1.5 text-ocean-300">
                 <Users className="w-3.5 h-3.5" />
                 <span className="text-[10px] font-bold uppercase tracking-tighter">{trip.available_spots} {t('common.spots')}</span>
               </div>

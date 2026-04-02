@@ -1,92 +1,113 @@
-import { useState } from 'react';
+import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
-import { fetchDashboardStats, autoCompletePastTrips } from '@/services/trips';
+import { fetchTripsByCenter } from '@/services/trips';
+import { fetchBookingsForCenter, type AdminBookingWithDetails } from '@/services/bookings';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Ship, CalendarCheck, Users, Plus, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Ship, Users, CalendarCheck, DollarSign, TrendingUp, Clock, ChevronRight, Plus, ArrowUpRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { parseLocalDate } from '@/lib/utils';
-
-const TRIPS_PER_PAGE = 8;
 
 const AdminDashboard = () => {
   const { diveCenterId } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [page, setPage] = useState(0);
 
-  useQuery({
-    queryKey: ['auto-complete-trips'],
-    queryFn: () => autoCompletePastTrips(),
-    enabled: !!diveCenterId,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  const { data: stats } = useQuery({
-    queryKey: ['admin-stats', diveCenterId],
-    queryFn: () => fetchDashboardStats(diveCenterId!),
+  const { data: trips = [] } = useQuery({
+    queryKey: ['admin-trips', diveCenterId],
+    queryFn: () => fetchTripsByCenter(diveCenterId!),
     enabled: !!diveCenterId,
   });
 
-  const { data: allTrips } = useQuery({
-    queryKey: ['admin-dashboard-trips', diveCenterId],
-    queryFn: async () => {
-      if (!diveCenterId) return [];
-      const { data } = await supabase
-        .from('trips')
-        .select('*')
-        .eq('dive_center_id', diveCenterId)
-        .in('status', ['published', 'draft'])
-        .order('trip_date', { ascending: true });
-      return data || [];
+  const { data: bookings = [] } = useQuery({
+    queryKey: ['admin-bookings', diveCenterId],
+    queryFn: () => fetchBookingsForCenter(diveCenterId!),
+    enabled: !!diveCenterId,
+  });
+
+  const today = new Date().toISOString().split('T')[0];
+  const upcomingTrips = trips.filter(t => t.status === 'published' && t.trip_date >= today);
+  const pending = bookings.filter(b => b.status === 'pending');
+  /* AUDIT FIX: Replaced 'active' var name with 'confirmedBookings' for clarity */
+  const confirmedBookings = bookings.filter(b => b.status === 'confirmed');
+  const totalRevenue = confirmedBookings.reduce((sum: number, b: AdminBookingWithDetails) => sum + (Number(b.trips?.price_usd) || 0), 0);
+  const occupancyPct = trips.length > 0
+    ? Math.round(
+        trips.reduce((s: number, t) => s + ((t.total_spots - t.available_spots) / t.total_spots) * 100, 0) / trips.length
+      )
+    : 0;
+
+    // Get recent trips for the table (latest 5)
+  const recentTrips = [...trips].sort((a, b) => new Date(b.trip_date).getTime() - new Date(a.trip_date).getTime()).slice(0, 5);
+
+const statCards = [
+    {
+      title: t('admin.dashboard.upcomingTrips'),
+      value: upcomingTrips.length,
+      icon: Ship,
+      color: 'text-primary',
+      bg: 'bg-primary/10',
+      link: '/admin/trips?filter=upcoming',
     },
-    enabled: !!diveCenterId,
-  });
-
-  const totalTrips = allTrips?.length ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalTrips / TRIPS_PER_PAGE));
-  const paginatedTrips = allTrips?.slice(page * TRIPS_PER_PAGE, (page + 1) * TRIPS_PER_PAGE) ?? [];
-
-  const cards = [
-    { icon: Ship, label: t('admin.dashboard.upcomingTrips'), value: stats?.trips ?? 0, to: '/admin/trips?filter=upcoming' },
-    { icon: Users, label: t('admin.dashboard.confirmedDivers'), value: stats?.confirmedThisMonth ?? 0, to: '/admin/bookings?tab=confirmed' },
-    { icon: CalendarCheck, label: t('admin.dashboard.pendingBookings'), value: stats?.pendingBookings ?? 0, to: '/admin/bookings?tab=pending' },
+    {
+      title: t('admin.dashboard.pendingBookings'),
+      value: pending.length,
+      icon: Clock,
+      color: 'text-warning',
+      bg: 'bg-warning/10',
+      link: '/admin/bookings',
+    },
+    {
+      title: t('admin.dashboard.confirmedBookings'),
+      value: confirmedBookings.length,
+      /* AUDIT FIX: Replaced hardcoded green-500/600 with semantic success token */
+      icon: CalendarCheck,
+      color: 'text-success',
+      bg: 'bg-success/10',
+      link: '/admin/bookings?tab=confirmed',
+    },
+    {
+      title: t('admin.dashboard.revenue'),
+      value: `$${totalRevenue}`,
+      icon: DollarSign,
+      color: 'text-primary',
+      bg: 'bg-primary/10',
+    },
   ];
 
   return (
-    <div className="max-w-6xl mx-auto py-6">
-      <div className="flex items-end justify-between mb-8">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-           <span className="font-headline uppercase tracking-widest text-[10px] text-muted-foreground font-bold mb-1 block">{t('admin.dashboard.overview')}</span>
-           <h1 className="text-3xl font-black font-headline text-foreground">{t('admin.dashboard.title')}</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('admin.nav.dashboard')}</h1>
+          <p className="text-sm text-muted-foreground">{t('admin.dashboard.subtitle')}</p>
         </div>
-        <Button asChild className="gap-2 rounded-full font-bold px-6 shadow-sm">
-          <Link to="/admin/trips?new=1">
-            <Plus className="h-4 w-4" /> {t('admin.trips.create')}
-          </Link>
+        <Button onClick={() => navigate('/admin/trips?new=1')} className="gap-2">
+          <Plus className="h-4 w-4" /> {t('admin.trips.create')}
         </Button>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {cards.map(({ icon: Icon, label, value, to }) => (
-          <Link key={label} to={to} className="block group">
-            <div className="bg-card p-6 rounded-3xl shadow-sm border border-border flex items-center justify-between group-hover:border-primary/40 transition-colors">
-              <div>
-                <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">{label}</p>
-                <h3 className="text-4xl font-black font-headline text-foreground group-hover:text-primary transition-colors">{value}</h3>
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map(({ title, value, icon: Icon, color, bg, link }) => (
+          <Card
+            key={title}
+            className={`shadow-card hover:shadow-card-hover transition-shadow ${link ? 'cursor-pointer' : ''}`}
+            onClick={() => link && navigate(link)}
+          >
+            <CardContent className="p-4">
+              <div className={`w-10 h-10 rounded-lg ${bg} flex items-center justify-center mb-3`}>
+                <Icon className={`h-5 w-5 ${color}`} />
               </div>
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                <Icon className="w-6 h-6" />
-              </div>
-            </div>
-          </Link>
+              <p className="text-2xl font-bold text-foreground">{value}</p>
+              <p className="text-xs text-muted-foreground">{title}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
+
 
       {/* Active Expeditions Table */}
       <div className="bg-card rounded-3xl border border-border shadow-sm overflow-hidden">
@@ -109,19 +130,19 @@ const AdminDashboard = () => {
                   </tr>
                </thead>
                <tbody className="divide-y divide-border/50">
-                  {paginatedTrips.length === 0 ? (
+                  {recentTrips.length === 0 ? (
                      <tr>
                         <td colSpan={4} className="p-8 text-center text-muted-foreground">{t('admin.dashboard.noExpeditions')}</td>
                      </tr>
                   ) : (
-                     paginatedTrips.map(trip => (
+                     recentTrips.map(trip => (
                         <tr key={trip.id} className="hover:bg-muted/30 transition-colors group cursor-pointer" onClick={() => navigate(`/admin/trips/${trip.id}`)}>
                            <td className="p-4">
                               <p className="font-bold text-foreground text-sm group-hover:text-primary transition-colors">{trip.title}</p>
                               <p className="text-xs text-muted-foreground truncate max-w-[200px]">{trip.dive_site}</p>
                            </td>
                            <td className="p-4">
-                              <p className="text-sm font-medium">{format(parseLocalDate(trip.trip_date), 'MMM dd, yyyy')}</p>
+                              <p className="text-sm font-medium">{format(new Date(trip.trip_date), 'MMM dd, yyyy')}</p>
                               <p className="text-xs text-muted-foreground">{trip.trip_time.slice(0,5)}</p>
                            </td>
                            <td className="p-4">
@@ -143,41 +164,9 @@ const AdminDashboard = () => {
                </tbody>
             </table>
          </div>
-         {/* Pagination */}
-         {totalPages > 1 && (
-            <div className="p-4 border-t border-border flex items-center justify-between bg-muted/10">
-               <p className="text-xs text-muted-foreground">
-                  Showing {page * TRIPS_PER_PAGE + 1}–{Math.min((page + 1) * TRIPS_PER_PAGE, totalTrips)} of {totalTrips} trips
-               </p>
-               <div className="flex items-center gap-2">
-                  <Button
-                     variant="outline"
-                     size="sm"
-                     className="rounded-full gap-1"
-                     disabled={page === 0}
-                     onClick={() => setPage(p => p - 1)}
-                  >
-                     <ChevronLeft className="w-4 h-4" /> Previous
-                  </Button>
-                  <span className="text-sm font-medium text-muted-foreground px-2">
-                     {page + 1} / {totalPages}
-                  </span>
-                  <Button
-                     variant="outline"
-                     size="sm"
-                     className="rounded-full gap-1"
-                     disabled={page >= totalPages - 1}
-                     onClick={() => setPage(p => p + 1)}
-                  >
-                     Next <ChevronRight className="w-4 h-4" />
-                  </Button>
-               </div>
-            </div>
-         )}
       </div>
     </div>
   );
 };
 
 export default AdminDashboard;
-

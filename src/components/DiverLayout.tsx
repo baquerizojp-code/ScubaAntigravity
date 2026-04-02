@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import NotificationBell from '@/components/NotificationBell';
 import ScubaMaskLogo from '@/components/ScubaMaskLogo';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const DiverLayout = () => {
   const { pathname } = useLocation();
@@ -20,14 +21,15 @@ const DiverLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Top bar */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b border-border px-4">
+      {/* AUDIT FIX: Added glassmorphism to top bar — backdrop-blur-xl bg-card/80 border-white/10 */}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-card/80 border-b border-white/10 px-4">
         <div className="container mx-auto h-16 flex items-center justify-between">
           <div className="flex items-center gap-2.5 min-h-[48px]">
             <ScubaMaskLogo className="h-9 w-7 text-primary" />
             <span className="text-lg font-bold text-foreground">ScubaTrip</span>
           </div>
           <div className="flex items-center gap-1">
+            <ThemeToggle />
             <NotificationBell />
             <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')} aria-label={t('nav.language')}>
               <Globe className="w-5 h-5" />
@@ -44,8 +46,8 @@ const DiverLayout = () => {
         <Outlet />
       </main>
 
-      {/* Bottom nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border px-safe">
+      {/* AUDIT FIX: Added glassmorphism to bottom nav — backdrop-blur-xl bg-card/80 border-white/10 */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-card/80 border-t border-white/10 px-safe">
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
           {navItems.map(({ to, icon: Icon, label, exact }) => {
             const active = exact ? pathname === to : pathname.startsWith(to);

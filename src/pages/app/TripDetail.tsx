@@ -23,35 +23,17 @@ import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { MapPin, Calendar, Clock, Users, DollarSign, ArrowLeft, Shield, Wrench, CalendarPlus, XCircle, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
@@ -75,7 +57,6 @@ const TripDetail = () => {
   const navigate = useNavigate();
   const { user, refreshRole } = useAuth();
   const { t } = useI18n();
-  
 
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,14 +65,11 @@ const TripDetail = () => {
   const [existingBooking, setExistingBooking] = useState<Tables<'bookings'> | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelling, setCancelling] = useState(false);
-
-  // Profile completion dialog state
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [dialogFullName, setDialogFullName] = useState('');
   const [dialogCertification, setDialogCertification] = useState('none');
   const [creatingProfile, setCreatingProfile] = useState(false);
 
-  // Pre-fill name from OAuth metadata
   useEffect(() => {
     if (user) {
       const meta = user.user_metadata;
@@ -104,7 +82,6 @@ const TripDetail = () => {
     const fetchData = async () => {
       const tripData = await fetchTripById(id);
       setTrip(tripData);
-
       const profile = await fetchDiverProfile(user!.id);
       if (profile) {
         const bk = await fetchBookingForTrip(id, profile.id);
@@ -129,13 +106,11 @@ const TripDetail = () => {
     if (!trip || !user) return;
     setBooking(true);
     const profile = await fetchDiverProfile(user.id);
-
     if (!profile) {
       setShowProfileDialog(true);
       setBooking(false);
       return;
     }
-
     await insertBooking(trip.id, profile.id);
     setBooking(false);
   };
@@ -143,23 +118,15 @@ const TripDetail = () => {
   const handleCompleteProfileAndBook = async () => {
     if (!trip || !user || !dialogFullName.trim()) return;
     setCreatingProfile(true);
-
     try {
-      // 1. Assign diver role
       await assignDiverRole(user.id);
-
-      // 2. Create diver profile
       const newProfile = await createDiverProfile({
         user_id: user.id,
         full_name: dialogFullName.trim(),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         certification: dialogCertification as any,
       });
-
-      // 3. Refresh auth context role
       await refreshRole();
-
-      // 4. Auto-book
       await insertBooking(trip.id, newProfile.id);
       setShowProfileDialog(false);
     } catch {
@@ -228,12 +195,13 @@ const TripDetail = () => {
 
   if (!trip) return <div className="p-6 text-center text-muted-foreground">{t('common.notFound')}</div>;
 
+  /* AUDIT FIX: Replaced hardcoded status badge colors with semantic tokens */
   const statusMap: Record<string, { label: string; className: string }> = {
-    pending: { label: t('diver.trip.statusPending'), className: 'bg-yellow-100 text-yellow-800' },
-    confirmed: { label: t('diver.trip.statusConfirmed'), className: 'bg-green-100 text-green-800' },
-    rejected: { label: t('diver.trip.statusRejected'), className: 'bg-red-100 text-red-800' },
+    pending: { label: t('diver.trip.statusPending'), className: 'bg-warning/10 text-warning' },
+    confirmed: { label: t('diver.trip.statusConfirmed'), className: 'bg-success/10 text-success' },
+    rejected: { label: t('diver.trip.statusRejected'), className: 'bg-destructive/10 text-destructive' },
     cancelled: { label: t('diver.trip.statusCancelled'), className: 'bg-muted text-muted-foreground' },
-    cancellation_requested: { label: t('diver.trip.statusCancellationRequested'), className: 'bg-orange-100 text-orange-800' },
+    cancellation_requested: { label: t('diver.trip.statusCancellationRequested'), className: 'bg-warning/10 text-warning' },
   };
 
   const isPending = existingBooking?.status === 'pending';
@@ -246,13 +214,11 @@ const TripDetail = () => {
         <ArrowLeft className="w-4 h-4 mr-1" /> {t('common.back')}
       </Button>
 
-      {/* Header */}
       <div className="bg-gradient-ocean rounded-xl p-6 text-primary-foreground mb-4">
         <h1 className="text-2xl font-bold">{trip.title}</h1>
         <p className="opacity-90 mt-1">{trip.dive_centers?.name}</p>
       </div>
 
-      {/* Details */}
       <Card className="shadow-card mb-4">
         <CardContent className="p-5 space-y-3">
           <div className="flex items-center gap-3 text-sm">
@@ -278,7 +244,6 @@ const TripDetail = () => {
             <DollarSign className="w-4 h-4 text-primary" />
             <span className="text-foreground font-bold text-lg">${Number(trip.price_usd)} USD</span>
           </div>
-
         </CardContent>
       </Card>
 
@@ -290,7 +255,6 @@ const TripDetail = () => {
         </Card>
       )}
 
-      {/* Booking section */}
       {existingBooking ? (
         <Card className="shadow-card">
           <CardContent className="p-5 space-y-3">
@@ -306,26 +270,21 @@ const TripDetail = () => {
               <p className="text-sm text-destructive mt-2">{existingBooking.rejection_reason}</p>
             )}
 
-            {/* Actions for confirmed bookings */}
             {isConfirmed && (
               <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 pt-2">
                 {trip.whatsapp_group_url ? (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="gap-2 text-green-600 border-green-300 hover:bg-green-50 hover:text-green-700"
+                    /* AUDIT FIX: Replaced hardcoded green with success tokens */
+                    className="gap-2 text-success border-success/30 hover:bg-success/5 hover:text-success"
                     onClick={() => window.open(trip.whatsapp_group_url!, '_blank')}
                   >
                     <MessageCircle className="w-4 h-4" />
                     {t('diver.trip.joinWhatsApp')}
                   </Button>
                 ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                    disabled
-                  >
+                  <Button variant="outline" size="sm" className="gap-2" disabled>
                     <MessageCircle className="w-4 h-4" />
                     {t('diver.trip.whatsAppPending')}
                   </Button>
@@ -338,17 +297,12 @@ const TripDetail = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleAddToCalendar('google')}>
-                      Google Calendar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleAddToCalendar('ics')}>
-                      Apple Calendar / iCal
-                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAddToCalendar('google')}>Google Calendar</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAddToCalendar('ics')}>Apple Calendar / iCal</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <Button
-                  variant="outline"
-                  size="sm"
+                  variant="outline" size="sm"
                   className="gap-2 text-destructive hover:text-destructive"
                   onClick={() => setShowCancelDialog(true)}
                 >
@@ -358,11 +312,9 @@ const TripDetail = () => {
               </div>
             )}
 
-            {/* Cancel pending booking */}
             {isPending && (
               <Button
-                variant="outline"
-                size="sm"
+                variant="outline" size="sm"
                 className="gap-2 text-destructive hover:text-destructive mt-2"
                 onClick={() => setShowCancelDialog(true)}
               >
@@ -371,9 +323,8 @@ const TripDetail = () => {
               </Button>
             )}
 
-            {/* Cancellation requested info */}
             {isCancellationRequested && (
-              <p className="text-sm text-orange-700">{t('diver.trip.cancellationPendingApproval')}</p>
+              <p className="text-sm text-warning">{t('diver.trip.cancellationPendingApproval')}</p>
             )}
           </CardContent>
         </Card>
@@ -389,8 +340,9 @@ const TripDetail = () => {
               onChange={e => setNotes(e.target.value)}
               rows={3}
             />
+            {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
             <Button
-              className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90 shadow-ocean"
+              className="w-full bg-primary text-primary-foreground hover:brightness-110 shadow-ocean"
               onClick={handleBook}
               disabled={booking}
             >
@@ -406,7 +358,6 @@ const TripDetail = () => {
         </Card>
       )}
 
-      {/* Cancel confirmation dialog */}
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -430,7 +381,6 @@ const TripDetail = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Complete profile dialog */}
       <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -440,32 +390,24 @@ const TripDetail = () => {
           <div className="space-y-4 py-2">
             <div className="space-y-2">
               <Label htmlFor="profile-name">{t('diver.trip.fullNameLabel')}</Label>
-              <Input
-                id="profile-name"
-                value={dialogFullName}
-                onChange={e => setDialogFullName(e.target.value)}
-                placeholder={t('diver.trip.fullNameLabel')}
-              />
+              <Input id="profile-name" value={dialogFullName} onChange={e => setDialogFullName(e.target.value)} placeholder={t('diver.trip.fullNameLabel')} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="profile-cert">{t('diver.trip.certLabel')}</Label>
               <Select value={dialogCertification} onValueChange={setDialogCertification}>
-                <SelectTrigger id="profile-cert">
-                  <SelectValue />
-                </SelectTrigger>
+                <SelectTrigger id="profile-cert"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {certOptions.map(opt => (
-                    <SelectItem key={opt.value} value={opt.value}>
-                      {t(opt.labelKey)}
-                    </SelectItem>
+                    <SelectItem key={opt.value} value={opt.value}>{t(opt.labelKey)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
           <DialogFooter>
+            {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
             <Button
-              className="w-full bg-gradient-ocean text-primary-foreground hover:opacity-90 shadow-ocean"
+              className="w-full bg-primary text-primary-foreground hover:brightness-110 shadow-ocean"
               onClick={handleCompleteProfileAndBook}
               disabled={creatingProfile || !dialogFullName.trim()}
             >

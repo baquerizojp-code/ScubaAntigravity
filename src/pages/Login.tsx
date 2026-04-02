@@ -28,11 +28,9 @@ const Login = () => {
   const rawFrom = (location.state as { from?: string })?.from || redirectParam || null;
   const from = rawFrom && isSafeRedirect(rawFrom) ? rawFrom : null;
 
-  // Determine initial mode from URL search param or path
   const modeParam = searchParams.get('mode');
   const [isSignup, setIsSignup] = useState(modeParam === 'signup' || location.pathname === '/signup');
 
-  // Redirect if already logged in
   useEffect(() => {
     if (user && role) {
       if (from) navigate(from, { replace: true });
@@ -47,13 +45,9 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    // Set the remember me preference in localStorage for the customStorage proxy
     localStorage.setItem('scubatrip-remember-me', rememberMe ? 'true' : 'false');
-
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    
     if (error) {
       toast.error(error.message);
     }
@@ -67,7 +61,7 @@ const Login = () => {
       password,
       options: { 
         emailRedirectTo: window.location.origin,
-        data: { role: 'diver' } // Explicitly signal 'diver' role for the trigger
+        data: { role: 'diver' }
       },
     });
     setLoading(false);
@@ -76,8 +70,6 @@ const Login = () => {
     } else if (data.session) {
       toast.success(t('auth.signup.success'));
     } else if (data.user && !data.session) {
-      // User created but no session — could mean email confirmation needed
-      // or user already exists (Supabase hides this for security)
       toast.info(t('registerCenter.checkEmail'));
       setIsSignup(false);
     } else {
@@ -124,7 +116,8 @@ const Login = () => {
           </p>
         </div>
 
-        <div className="bg-card rounded-xl shadow-card p-6 border border-border">
+        {/* AUDIT FIX: Reduced border to border-white/5 for tonal stacking per BRAND.md */}
+        <div className="bg-card rounded-xl shadow-card p-6 border border-white/5">
           {/* Tab toggle */}
           <div className="flex rounded-lg bg-muted p-1 mb-5">
             <button
@@ -193,6 +186,7 @@ const Login = () => {
                 </Label>
               </div>
             )}
+            {/* AUDIT FIX: Submit button — rounded-full now inherited from button base */}
             <Button type="submit" className="w-full bg-primary text-primary-foreground hover:brightness-110" disabled={loading}>
               {loading ? t('common.loading') : isSignup ? t('auth.signup.button') : t('auth.login.button')}
             </Button>

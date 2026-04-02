@@ -33,7 +33,8 @@ const AdminBookings = () => {
 
   // Determine default tab from query params
   const tabParam = searchParams.get('tab');
-  const defaultTab = tabParam === 'confirmed' ? 'confirmed' : tabParam === 'rejected' ? 'rejected' : 'pending';
+  const validTabs = ['confirmed', 'pending', 'cancellation_requested', 'rejected'];
+  const defaultTab = validTabs.includes(tabParam as string) ? (tabParam as string) : 'confirmed';
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ['admin-bookings', diveCenterId],
@@ -105,7 +106,8 @@ const AdminBookings = () => {
       pending: { icon: Clock, className: 'bg-warning/10 text-warning border-warning/20' },
       confirmed: { icon: Check, className: 'bg-primary/10 text-primary border-primary/20' },
       rejected: { icon: Ban, className: 'bg-destructive/10 text-destructive border-destructive/20' },
-      cancellation_requested: { icon: AlertTriangle, className: 'bg-orange-100 text-orange-800 border-orange-200' },
+      /* AUDIT FIX: Replaced hardcoded bg-orange-100 text-orange-800 with semantic warning tokens */
+      cancellation_requested: { icon: AlertTriangle, className: 'bg-warning/10 text-warning border-warning/20' },
       cancelled: { icon: X, className: 'bg-muted text-muted-foreground border-muted' },
     };
     const { icon: Icon, className } = config[status] || config.pending;
@@ -224,11 +226,11 @@ const AdminBookings = () => {
 
       <Tabs defaultValue={defaultTab}>
         <TabsList className="flex-wrap h-auto">
-          <TabsTrigger value="pending" className="gap-1">
-            <Clock className="h-3.5 w-3.5" /> {t('admin.bookings.pending')} ({filterBookings('pending').length})
-          </TabsTrigger>
           <TabsTrigger value="confirmed" className="gap-1">
             <Check className="h-3.5 w-3.5" /> {t('admin.bookings.confirmedTab')} ({filterBookings('confirmed').length})
+          </TabsTrigger>
+          <TabsTrigger value="pending" className="gap-1">
+            <Clock className="h-3.5 w-3.5" /> {t('admin.bookings.pending')} ({filterBookings('pending').length})
           </TabsTrigger>
           <TabsTrigger value="cancellation_requested" className="gap-1">
             <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.bookings.cancellationRequests')} ({filterBookings('cancellation_requested').length})
@@ -238,8 +240,8 @@ const AdminBookings = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pending">{renderTabContent('pending', true)}</TabsContent>
         <TabsContent value="confirmed">{renderTabContent('confirmed', false)}</TabsContent>
+        <TabsContent value="pending">{renderTabContent('pending', true)}</TabsContent>
         <TabsContent value="cancellation_requested">{renderTabContent('cancellation_requested', false, true)}</TabsContent>
         <TabsContent value="rejected">{renderTabContent('rejected', false)}</TabsContent>
       </Tabs>
