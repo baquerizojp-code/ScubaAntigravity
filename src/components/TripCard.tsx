@@ -61,7 +61,7 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
       </div>
 
       <div className="absolute bottom-0 left-0 w-full p-3 sm:p-4 z-10">
-        <div className="bg-background/80 backdrop-blur-lg rounded-xl p-4 sm:p-5 text-white border border-white/10 shadow-2xl">
+        <div className="bg-ocean-900/85 backdrop-blur-lg rounded-xl p-4 sm:p-5 text-white border border-white/10 shadow-2xl">
           <div className="flex justify-between items-start mb-2">
             <div className="pr-2">
               {/* AUDIT FIX: Replaced hardcoded text-[#00f0ff] with text-cyan-electric */}
