@@ -93,13 +93,13 @@ const ExploreTrip = () => {
           <div className="container mx-auto px-6 sm:px-10 pb-12 md:pb-24">
             <div className="max-w-4xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
               <Button variant="ghost" className="mb-6 hover:bg-foreground/10 text-foreground border border-foreground/20 rounded-full pl-3 pr-5" onClick={() => navigate('/explore')}>
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Explore
+                <ArrowLeft className="w-4 h-4 mr-2" /> {t('explore.trip.backToExplore')}
               </Button>
               
               <div className="flex flex-wrap gap-3 mb-6">
                 <Badge className="bg-background/40 backdrop-blur-md text-foreground border border-foreground/20 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg">
                   <span className="w-2 h-2 rounded-full bg-secondary"></span>
-                  {trip.dive_centers?.name || 'Independent Center'}
+                  {trip.dive_centers?.name || t('explore.trip.independentCenter')}
                 </Badge>
               </div>
               
@@ -126,23 +126,23 @@ const ExploreTrip = () => {
              <div>
                 <h2 className="text-3xl font-headline font-bold mb-6 text-foreground flex items-center gap-3">
                    <div className="w-8 h-1 bg-secondary rounded-full"></div>
-                   The Experience
+                   {t('explore.trip.theExperience')}
                 </h2>
                 <div className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line prose prose-invert max-w-none">
-                  {trip.description || "Join us for an unforgettable diving experience exploring the depths and marine life."}
+                  {trip.description || t('explore.trip.defaultDescription')}
                 </div>
              </div>
              
              {/* Detailed Specs */}
              <div>
-                <h2 className="text-2xl font-headline font-bold mb-8 text-foreground">Expedition Details</h2>
+                <h2 className="text-2xl font-headline font-bold mb-8 text-foreground">{t('explore.trip.expeditionDetails')}</h2>
                 <div className="grid grid-cols-2 gap-4 md:gap-6 bg-card p-6 md:p-8 rounded-3xl border border-border shadow-sm">
                     <div className="space-y-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                           <Clock className="w-5 h-5 text-secondary" />
                       </div>
                       <div>
-                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Time</p>
+                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('common.time')}</p>
                           <p className="font-bold text-foreground">{trip.trip_time.slice(0,5)}</p>
                       </div>
                     </div>
@@ -152,8 +152,8 @@ const ExploreTrip = () => {
                           <Users className="w-5 h-5 text-secondary" />
                       </div>
                       <div>
-                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">Group</p>
-                          <p className="font-bold text-foreground">Max {trip.total_spots}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('explore.trip.group')}</p>
+                          <p className="font-bold text-foreground">{t('explore.trip.max')} {trip.total_spots}</p>
                       </div>
                     </div>
                 </div>
@@ -162,9 +162,9 @@ const ExploreTrip = () => {
              {/* Included / Excluded Mock */}
              <div className="grid sm:grid-cols-2 gap-8">
                 <div className="bg-primary/5 p-8 rounded-3xl border border-primary/10">
-                   <h3 className="font-headline font-bold text-xl mb-6">What's Included</h3>
+                   <h3 className="font-headline font-bold text-xl mb-6">{t('explore.trip.whatsIncluded')}</h3>
                    <ul className="space-y-4">
-                      {['Tanks & Weights', 'Local Dive Guide', 'Snacks & Water', 'Marine Park Fees'].map((item, i) => (
+                      {[t('explore.trip.included.tanks'), t('explore.trip.included.guide'), t('explore.trip.included.snacks'), t('explore.trip.included.fees')].map((item, i) => (
                          <li key={i} className="flex items-center gap-3 text-sm font-medium text-foreground">
                             <CheckCircle2 className="w-5 h-5 text-secondary shrink-0" />
                             {item}
@@ -173,9 +173,9 @@ const ExploreTrip = () => {
                    </ul>
                 </div>
                 <div className="bg-card p-8 rounded-3xl border border-border">
-                   <h3 className="font-headline font-bold text-xl mb-6">Requirements</h3>
+                   <h3 className="font-headline font-bold text-xl mb-6">{t('explore.trip.requirements')}</h3>
                    <ul className="space-y-4">
-                      {['Valid Certification Card', 'DAN Insurance', 'Reef Safe Sunscreen', 'Signed Liability Waiver'].map((item, i) => (
+                      {[t('explore.trip.req.cert'), t('explore.trip.req.insurance'), t('explore.trip.req.sunscreen'), t('explore.trip.req.waiver')].map((item, i) => (
                          <li key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
                             <div className="w-5 h-5 rounded-full border border-muted-foreground/30 flex items-center justify-center shrink-0">
                                <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/50"></div>
@@ -194,12 +194,12 @@ const ExploreTrip = () => {
               <div className="bg-card rounded-3xl p-8 border border-border shadow-2xl shadow-black/5 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-secondary to-primary"></div>
                 
-                <h3 className="text-2xl font-headline font-bold mb-2">Reserve Your Spot</h3>
-                <p className="text-muted-foreground mb-8 text-sm">{trip.available_spots} availability remains. Book now to secure your spot.</p>
+                <h3 className="text-2xl font-headline font-bold mb-2">{t('explore.trip.reserveYourSpot')}</h3>
+                <p className="text-muted-foreground mb-8 text-sm">{trip.available_spots} {t('explore.trip.availabilityRemains')}</p>
                 
                 <div className="flex items-end justify-between mb-8 pb-8 border-b border-border">
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">Total Investment</p>
+                    <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">{t('explore.trip.totalInvestment')}</p>
                     <div className="flex items-baseline gap-1">
                        <span className="text-5xl font-headline font-black text-primary leading-none">${Number(trip.price_usd)}</span>
                        <span className="text-muted-foreground font-bold">USD</span>
@@ -214,7 +214,7 @@ const ExploreTrip = () => {
                             <Calendar className="w-5 h-5" />
                          </div>
                          <div>
-                            <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Departure Date</p>
+                            <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.trip.departureDate')}</p>
                             <p className="font-bold text-foreground">{format(parseLocalDate(trip.trip_date), 'MMM dd, yyyy')}</p>
                          </div>
                       </div>
@@ -226,8 +226,8 @@ const ExploreTrip = () => {
                             <Users className="w-5 h-5" />
                          </div>
                          <div>
-                            <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">Spots Left</p>
-                            <p className="font-bold text-foreground">{trip.available_spots} Available</p>
+                            <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.trip.spotsLeft')}</p>
+                            <p className="font-bold text-foreground">{trip.available_spots} {t('explore.trip.available')}</p>
                          </div>
                       </div>
                    </div>
@@ -238,10 +238,10 @@ const ExploreTrip = () => {
                    onClick={handleBook}
                    disabled={trip.available_spots <= 0}
                 >
-                   {trip.available_spots > 0 ? (user ? t('diver.trip.bookButton') : "Log in to Book") : t('diver.trip.full')}
+                   {trip.available_spots > 0 ? (user ? t('diver.trip.bookButton') : t('explore.trip.loginToBook')) : t('diver.trip.full')}
                 </Button>
                 
-                <p className="text-center text-xs text-muted-foreground mt-5 italic">No payment required. We will confirm your request via email.</p>
+                <p className="text-center text-xs text-muted-foreground mt-5 italic">{t('explore.trip.noPaymentRequired')}</p>
               </div>
             </div>
           </div>
