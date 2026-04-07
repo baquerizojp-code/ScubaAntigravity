@@ -330,5 +330,25 @@
   "explore.trip.available": "Disponibles",
   "explore.trip.loginToBook": "Inicia Sesión para Reservar",
   "explore.trip.noPaymentRequired": "No se requiere pago. Confirmaremos tu solicitud por correo electrónico.",
-  "explore.trip.independentCenter": "Centro Independiente"
+  "explore.trip.independentCenter": "Centro Independiente",
+
+  "admin.tripDetail.tripOverview": "Resumen del Trip",
+  "admin.tripDetail.capacity": "Capacidad",
+  "admin.tripDetail.confirmed": "Confirmados",
+  "admin.tripDetail.totalSpots": "Lugares Totales",
+  "admin.tripDetail.available": "Disponibles",
+  "admin.tripDetail.price": "Precio",
+  "admin.tripDetail.departurePoint": "Punto de Salida",
+  "admin.tripDetail.description": "Descripción",
+  "admin.tripDetail.confirmedDivers": "Buzos Confirmados",
+  "admin.tripDetail.pendingRequests": "Solicitudes Pendientes",
+  "admin.tripDetail.noConfirmed": "Aún no hay buzos confirmados.",
+  "admin.tripDetail.noPending": "No hay solicitudes de reserva pendientes.",
+  "admin.tripDetail.unknownDiver": "Buzo Desconocido",
+  "admin.tripDetail.cert": "Cert",
+  "admin.tripDetail.dives": "inmersiones",
+  "admin.tripDetail.remove": "Eliminar",
+  "admin.tripDetail.confirmRemoveDiver": "¿Estás seguro de eliminar a este buzo confirmado? Se liberará su lugar.",
+  "admin.tripDetail.diverRemoved": "Buzo eliminado del trip exitosamente",
+  "admin.tripDetail.notFound": "Trip no encontrado."
 }

@@ -330,5 +330,25 @@
   "explore.trip.available": "Available",
   "explore.trip.loginToBook": "Log in to Book",
   "explore.trip.noPaymentRequired": "No payment required. We will confirm your request via email.",
-  "explore.trip.independentCenter": "Independent Center"
+  "explore.trip.independentCenter": "Independent Center",
+
+  "admin.tripDetail.tripOverview": "Trip Overview",
+  "admin.tripDetail.capacity": "Capacity",
+  "admin.tripDetail.confirmed": "Confirmed",
+  "admin.tripDetail.totalSpots": "Total Spots",
+  "admin.tripDetail.available": "Available",
+  "admin.tripDetail.price": "Price",
+  "admin.tripDetail.departurePoint": "Departure Point",
+  "admin.tripDetail.description": "Description",
+  "admin.tripDetail.confirmedDivers": "Confirmed Divers",
+  "admin.tripDetail.pendingRequests": "Pending Requests",
+  "admin.tripDetail.noConfirmed": "No confirmed divers yet.",
+  "admin.tripDetail.noPending": "No pending booking requests.",
+  "admin.tripDetail.unknownDiver": "Unknown Diver",
+  "admin.tripDetail.cert": "Cert",
+  "admin.tripDetail.dives": "dives",
+  "admin.tripDetail.remove": "Remove",
+  "admin.tripDetail.confirmRemoveDiver": "Are you sure you want to remove this confirmed diver? This will free up their spot.",
+  "admin.tripDetail.diverRemoved": "Diver successfully removed from trip",
+  "admin.tripDetail.notFound": "Trip not found."
 }
