@@ -69,7 +69,7 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
                 <MapPin className="w-3 h-3" />
                 {trip.dive_site}
               </p>
-              <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-2">{trip.title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-1">{trip.title}</h3>
             </div>
             <div className="text-right shrink-0">
               {/* AUDIT FIX: Replaced text-slate-300 with text-ocean-200 */}
