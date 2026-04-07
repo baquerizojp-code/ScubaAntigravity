@@ -113,6 +113,16 @@ Two typefaces create tension between editorial impact and technical precision.
 - **Body text** uses `font-light` (300) weight per the Abyssal Coral spec for a premium editorial feel
 - Pair a bold `font-display` headline with an uppercase `text-xs tracking-widest` sub-label in cyan-electric for maximum hierarchy contrast
 
+### Production Class Conventions
+
+| Class | Alias For | Applied To |
+|-------|-----------|-----------|
+| `font-headline` | Plus Jakarta Sans | All H1 page titles (Dashboard, Bookings, Discover, etc.) |
+| `font-display` | Plus Jakarta Sans | Hero headlines, marketing copy |
+| `font-sans` / `font-body` | Work Sans | Default body text, form labels |
+
+> In code, use `font-headline` on `<h1>` elements rather than `font-display` — both resolve to Plus Jakarta Sans but `font-headline` is the established pattern for page-level titles.
+
 ---
 
 ## 3. Component Guidelines
@@ -134,17 +144,38 @@ Two typefaces create tension between editorial impact and technical precision.
 - Large: `h-11 px-8`
 - Icon: `h-10 w-10`
 
+**Hover states:**
+- Primary buttons: `hover:brightness-110` (not `hover:opacity-90`) — brightness shift feels more dynamic
+- Ghost/outline: `hover:bg-accent hover:text-accent-foreground`
+
 > **Rule**: Primary CTAs must always be pill-shaped (`rounded-full`). This is a core
 > brand element from the Abyssal Coral system — the pill shape suggests reliability.
 
 ### Cards
 
-- Base: `rounded-lg` (0.75rem) or `rounded-xl` for trip cards
+- Base: `rounded-lg` (0.75rem) or `rounded-xl` for trip cards; `rounded-3xl` for large feature/stat cards
 - Background: `bg-card` token (resolves to dark navy in dark mode)
 - Padding: `p-6` standard; `p-3 sm:p-4` for compact trip cards
 - Elevation: `shadow-card` default, `shadow-card-hover` on hover
 - **No divider lines inside cards** — use spacing (`space-y-4` or `gap-6`) to separate sections
 - Hover: transition background from `card` to slightly brighter surface over `0.3s ease-out`
+- **Borders**: Prefer `border-white/5` over `border-border` on dark surfaces for a more refined look; the No-Line Rule is enforced on section-level cards (Landing feature cards have no border — shadows only)
+
+### TripCard Pattern
+
+The TripCard is the canonical production reference for image-overlay glassmorphism cards:
+
+| Layer | Classes | Purpose |
+|-------|---------|---------|
+| Card root | `rounded-xl overflow-hidden bg-ocean-900` | Base shape, fallback bg |
+| Image fill | `object-cover w-full h-full` | Full-bleed hero image |
+| Info panel | `bg-ocean-900/85 backdrop-blur-lg border-t border-white/10` | Bottom glass overlay |
+| Card title | `font-headline line-clamp-1` | Single-line, consistent height |
+| Location label | `text-cyan-electric text-xs tracking-widest uppercase` | HUD-style data label |
+| Secondary metadata | `text-ocean-200` or `text-ocean-300` | Center name, duration, etc. |
+| Action button | `bg-white/10 backdrop-blur-sm rounded-full` | Frosted glass icon button |
+
+> `line-clamp-1` on the title is intentional — it enforces a consistent panel height across all cards in a grid.
 
 ### Badges & Status Indicators
 
@@ -156,10 +187,19 @@ Two typefaces create tension between editorial impact and technical precision.
 | Cancelled | `muted` | `text-muted-foreground` | `muted` | — |
 | Cancellation Requested | `orange-100` | `text-orange-800` | `orange-200` | — |
 
-Badge base styling: `px-2.5 py-0.5 rounded-full text-xs font-bold`
+Badge base styling: `px-2.5 py-0.5 rounded-full text-xs font-bold border`
 
-> Badges should use the 10% opacity background pattern (`color/10`) with matching text,
+> Badges should use the 10% opacity background pattern (`color/10`) with matching text and a `/20` opacity border,
 > not solid-color backgrounds.
+
+**Trip status badge map** (used in admin TripDetail):
+
+| Status | Classes |
+|--------|---------|
+| `draft` | `bg-muted text-muted-foreground` |
+| `published` | `bg-primary/10 text-primary border-primary/20` |
+| `completed` | `bg-muted text-muted-foreground` |
+| `cancelled` | `bg-destructive/10 text-destructive border-destructive/20` |
 
 ### Form Inputs
 
@@ -176,6 +216,12 @@ Badge base styling: `px-2.5 py-0.5 rounded-full text-xs font-bold`
 - Default: `bg-background`, standard border
 - Destructive: `border-destructive/50`, `text-destructive`, explicit `dark:border-destructive`
 - Always include an icon (AlertCircle, CheckCircle, etc.)
+
+### Destructive Confirmations
+
+- Always use the `AlertDialog` component (Radix/shadcn) for destructive actions (delete, cancel, remove)
+- **Never** use `window.confirm()` — it blocks the browser and breaks the glass aesthetic
+- Destructive button in dialog: `bg-destructive text-destructive-foreground` variant
 
 ---
 
@@ -243,6 +289,17 @@ Layer 3 (Glass):    white/5-10%      + blur     Floating nav, modals
 - Border: `white/10` to simulate light catching acrylic glass edges
 - Use for: floating navigation bars, modal overlays, sticky headers
 
+**Production glass implementations (canonical references):**
+
+| Surface | Classes | File |
+|---------|---------|------|
+| TripCard info overlay | `bg-ocean-900/85 backdrop-blur-lg border-t border-white/10` | `src/components/TripCard.tsx` |
+| Admin mobile header | `bg-card/80 backdrop-blur-xl border-b border-white/10` | `src/components/AdminLayout.tsx` |
+| Hero secondary CTA | `bg-white/5 backdrop-blur-lg border border-white/20 rounded-full` | `src/pages/Landing.tsx` |
+| Card action button | `bg-white/10 backdrop-blur-sm rounded-full` | `src/components/TripCard.tsx` |
+
+> Use `ocean-900/85` (not pure white/10) when the glass surface sits over an image and needs to remain readable in both dark and light mode.
+
 ### Tonal Transitions (No-Line Rule)
 
 Section boundaries are defined by background color shifts, not borders:
@@ -275,18 +332,25 @@ Comparing the Stitch Abyssal Coral mockups against the live implementation:
 - Card-based layouts with rounded corners match
 - Ocean gradient usage is present in both
 
-### Gaps to Address
+### Resolved Gaps (as of design refinement phase)
+
+| Area | Resolution |
+|------|-----------|
+| **Dark mode primary** | ✅ `--primary` maps to coral `hsl(16 99% 65%)` in both light and dark mode; cyan-electric is used as a separate HUD/data accent |
+| **Hardcoded colors in TripCard** | ✅ Replaced with `text-cyan-electric`, `text-ocean-200/300`, `bg-success/10 text-success`, etc. |
+| **Button roundness** | ✅ All primary CTAs use `rounded-full` via button base class — enforced in `button.tsx` |
+| **Status badge tokens** | ✅ All booking/trip status badges use `bg-{token}/10 text-{token} border-{token}/20` pattern |
+| **Glass effects** | ✅ Implemented on TripCard overlay (`bg-ocean-900/85 backdrop-blur-lg`), AdminLayout mobile header (`bg-card/80 backdrop-blur-xl`), and Landing hero secondary CTA |
+| **Shadow system** | ✅ `shadow-card` / `shadow-card-hover` applied consistently — base Card component, search bars, feature cards |
+| **Border refinement** | ✅ `border-white/5` adopted for dark surfaces; No-Line Rule enforced on Landing feature cards (no borders, shadows only) |
+
+### Remaining Gaps
 
 | Area | Stitch Mockup (Abyssal Coral) | Live Code | Action Needed |
 |------|------------------------------|-----------|---------------|
-| **Dark mode primary** | Coral `#FE7E4F` is the primary CTA | Primary maps to teal-cyan `hsl(193 100% 42%)` in dark mode | Remap `--primary` in `.dark` to coral, use cyan-electric as a distinct data/accent token |
-| **Hardcoded colors** | Token-based design system | `TripCard.tsx` uses hardcoded `bg-yellow-500/20`, `text-green-300`, `text-[#00f0ff]` | Replace with semantic tokens (`warning/10`, `success`, `cyan-electric`) |
-| **Body font weight** | Light (300) for body text | Normal (400) default | Consider `font-light` for body text per Abyssal Coral spec |
-| **Border usage** | "No-Line Rule" — no 1px borders | Cards use `border` class with `border-border` | Evaluate removing card borders in favor of tonal stacking |
-| **Button roundness** | `rounded-full` pill shapes | Mix of `rounded-md` and `rounded-full` | Standardize primary CTAs to `rounded-full` |
-| **Glass effects** | `backdrop-blur-xl` on nav/modals | Limited glassmorphism in production | Add glass treatment to navbar and modal overlays |
-| **Spacing density** | Spacious `spacing-scale: 3` | Standard Tailwind spacing | Increase padding in key areas for editorial breathing room |
-| **Status badge tokens** | Uses design system semantic colors | Mix of hardcoded Tailwind colors and tokens | Consolidate to semantic token pattern |
+| **Body font weight** | Light (300) for body text | Normal (400) default | Consider applying `font-light` globally in `index.css` base layer |
+| **Spacing density** | Spacious `spacing-scale: 3` | Standard Tailwind spacing | Increase gap values in admin tables and dense sections (`gap-6` → `gap-8`) |
+| **Card borders** | "No-Line Rule" — no 1px borders | Some cards still use `border border-border` | Progressively replace with `border-white/5` or remove in favor of tonal stacking |
 
 ---
 
@@ -341,6 +405,9 @@ Comparing the Stitch Abyssal Coral mockups against the live implementation:
 | `src/components/ui/badge.tsx` | Badge variants |
 | `src/components/ui/card.tsx` | Card component structure |
 | `src/lib/utils.ts` | `cn()` utility for class merging |
+| `src/components/TripCard.tsx` | Canonical reference for image-overlay glassmorphism card pattern |
+| `src/components/AdminLayout.tsx` | Canonical reference for mobile glassmorphism header |
+| `src/pages/admin/TripDetail.tsx` | Admin trip management with image display and trip status badges |
 
 ### CSS Utility Classes
 
