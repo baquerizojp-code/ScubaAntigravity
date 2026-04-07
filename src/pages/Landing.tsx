@@ -54,7 +54,8 @@ const Landing = () => {
               alt="Technical diver descending"
               className="w-full h-full object-cover scale-105 opacity-50 animate-fade-in mix-blend-luminosity"
               loading="eager"
-              fetchPriority="high"
+              // @ts-expect-error React 18 doesn't type fetchpriority yet
+              fetchpriority="high"
             />
           </picture>
           {/* V3 Cinematic Gradient: transparent at top, solid dark at bottom */}
