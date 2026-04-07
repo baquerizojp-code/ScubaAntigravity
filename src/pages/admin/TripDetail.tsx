@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { 
@@ -36,6 +37,7 @@ const AdminTripDetail = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [rejectDialog, setRejectDialog] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
 
   // Fetch Trip Details
   const { data: trip, isLoading: isLoadingTrip } = useQuery({
@@ -233,11 +235,7 @@ const AdminTripDetail = () => {
                           variant="ghost"
                           size="sm"
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => {
-                            if (window.confirm(t('admin.tripDetail.confirmRemoveDiver'))) {
-                              removeConfirmedMutation.mutate(b.id);
-                            }
-                          }}
+                          onClick={() => setRemoveConfirmId(b.id)}
                           disabled={removeConfirmedMutation.isPending}
                         >
                           <Ban className="h-4 w-4 sm:mr-2" />
@@ -325,6 +323,25 @@ const AdminTripDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Remove Diver Confirmation */}
+      <AlertDialog open={!!removeConfirmId} onOpenChange={() => setRemoveConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('admin.tripDetail.remove')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('admin.tripDetail.confirmRemoveDiver')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (removeConfirmId) removeConfirmedMutation.mutate(removeConfirmId); setRemoveConfirmId(null); }}
+            >
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
