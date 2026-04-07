@@ -350,5 +350,9 @@
   "admin.tripDetail.remove": "Remove",
   "admin.tripDetail.confirmRemoveDiver": "Are you sure you want to remove this confirmed diver? This will free up their spot.",
   "admin.tripDetail.diverRemoved": "Diver successfully removed from trip",
-  "admin.tripDetail.notFound": "Trip not found."
+  "admin.tripDetail.notFound": "Trip not found.",
+
+  "notFound.title": "404",
+  "notFound.message": "Oops! Page not found",
+  "notFound.returnHome": "Return to Home"
 }
