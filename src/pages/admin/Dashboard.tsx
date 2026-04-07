@@ -154,7 +154,7 @@ const statCards = [
                               </div>
                            </td>
                            <td className="p-4 text-right">
-                              <Badge variant="outline" className={`px-3 py-1 text-[10px] uppercase tracking-widest border-0 ${trip.status === 'published' ? 'bg-green-500/10 text-green-600' : trip.status === 'draft' ? 'bg-yellow-500/10 text-yellow-600' : 'bg-muted text-muted-foreground'}`}>
+                              <Badge variant="outline" className={`px-3 py-1 text-[10px] uppercase tracking-widest border-0 ${trip.status === 'published' ? 'bg-success/10 text-success' : trip.status === 'draft' ? 'bg-warning/10 text-warning' : 'bg-muted text-muted-foreground'}`}>
                                  {trip.status}
                               </Badge>
                            </td>
