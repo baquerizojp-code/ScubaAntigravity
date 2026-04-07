@@ -91,7 +91,7 @@ const AdminLayout = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <header className="lg:hidden flex items-center gap-2 px-4 py-3 border-b border-border bg-card min-h-[56px]">
+        <header className="lg:hidden flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-card/80 backdrop-blur-xl min-h-[56px]">
           <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </Button>
