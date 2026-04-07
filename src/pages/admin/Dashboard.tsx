@@ -81,7 +81,7 @@ const statCards = [
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{t('admin.nav.dashboard')}</h1>
+          <h1 className="text-2xl font-bold font-headline text-foreground">{t('admin.nav.dashboard')}</h1>
           <p className="text-sm text-muted-foreground">{t('admin.dashboard.subtitle')}</p>
         </div>
         <Button onClick={() => navigate('/admin/trips?new=1')} className="gap-2">

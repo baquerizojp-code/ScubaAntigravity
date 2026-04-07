@@ -106,7 +106,7 @@ const AdminSettings = () => {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">{t('admin.nav.settings')}</h1>
+        <h1 className="text-2xl font-bold font-headline text-foreground">{t('admin.nav.settings')}</h1>
         <p className="text-sm text-muted-foreground">{t('admin.settings.subtitle')}</p>
       </div>
 

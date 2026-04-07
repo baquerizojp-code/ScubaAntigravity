@@ -220,7 +220,7 @@ const AdminBookings = () => {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">{t('admin.nav.bookings')}</h1>
+        <h1 className="text-2xl font-bold font-headline text-foreground">{t('admin.nav.bookings')}</h1>
         <p className="text-sm text-muted-foreground">{t('admin.bookings.subtitle')}</p>
       </div>
 
