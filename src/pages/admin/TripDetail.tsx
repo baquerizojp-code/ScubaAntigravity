@@ -22,7 +22,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { 
-  ArrowLeft, Edit, Check, X, Clock, Users, Ship, Calendar, MapPin, Anchor, Info, Ban 
+  ArrowLeft, Edit, Check, X, Clock, Users, Ship, Calendar, MapPin, Anchor, Info, Ban, Image as ImageIcon
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
@@ -156,6 +156,22 @@ const AdminTripDetail = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left Column: Details */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Trip Image */}
+          <Card className="overflow-hidden">
+            {trip.image_url ? (
+              <img
+                src={trip.image_url}
+                alt={trip.title}
+                className="w-full aspect-video object-cover"
+              />
+            ) : (
+              <div className="w-full aspect-video bg-ocean-900 flex flex-col items-center justify-center text-muted-foreground">
+                <ImageIcon className="h-10 w-10 opacity-40 mb-2" />
+                <span className="text-sm">{t('image.noImage')}</span>
+              </div>
+            )}
+          </Card>
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
