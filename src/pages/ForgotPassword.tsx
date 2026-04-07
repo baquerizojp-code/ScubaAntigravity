@@ -40,7 +40,7 @@ const ForgotPassword = () => {
           <p className="text-muted-foreground mt-1">{t('auth.forgot.subtitle')}</p>
         </div>
 
-        <div className="bg-card rounded-xl shadow-card p-6 border border-border">
+        <div className="bg-card rounded-xl shadow-card p-6 border border-white/5">
           {sent ? (
             <div className="text-center space-y-4">
               <p className="text-foreground">{t('auth.forgot.sent')}</p>

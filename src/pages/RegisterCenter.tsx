@@ -164,7 +164,7 @@ const RegisterCenter = () => {
           </p>
         </div>
 
-        <div className="bg-card rounded-xl shadow-card p-6 border border-border">
+        <div className="bg-card rounded-xl shadow-card p-6 border border-white/5">
           {step === 1 ? (
             <>
               <Button variant="outline" className="w-full mb-4" onClick={handleGoogleSignup}>
