@@ -104,7 +104,7 @@ const AdminBookings = () => {
   const statusBadge = (status: string) => {
     const config: Record<string, { icon: typeof Clock; className: string }> = {
       pending: { icon: Clock, className: 'bg-warning/10 text-warning border-warning/20' },
-      confirmed: { icon: Check, className: 'bg-primary/10 text-primary border-primary/20' },
+      confirmed: { icon: Check, className: 'bg-success/10 text-success border-success/20' },
       rejected: { icon: Ban, className: 'bg-destructive/10 text-destructive border-destructive/20' },
       /* AUDIT FIX: Replaced hardcoded bg-orange-100 text-orange-800 with semantic warning tokens */
       cancellation_requested: { icon: AlertTriangle, className: 'bg-warning/10 text-warning border-warning/20' },
