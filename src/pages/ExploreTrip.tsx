@@ -136,7 +136,7 @@ const ExploreTrip = () => {
              {/* Detailed Specs */}
              <div>
                 <h2 className="text-2xl font-headline font-bold mb-8 text-foreground">{t('explore.trip.expeditionDetails')}</h2>
-                <div className="grid grid-cols-2 gap-4 md:gap-6 bg-card p-6 md:p-8 rounded-3xl border border-border shadow-sm">
+                <div className="grid grid-cols-2 gap-4 md:gap-6 bg-card p-6 md:p-8 rounded-3xl border border-white/5 shadow-card">
                     <div className="space-y-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                           <Clock className="w-5 h-5 text-secondary" />
@@ -191,13 +191,13 @@ const ExploreTrip = () => {
           {/* Right Column - Booking Card Sticky */}
           <div className="xl:col-span-5 relative">
             <div className="sticky top-28">
-              <div className="bg-card rounded-3xl p-8 border border-border shadow-2xl shadow-black/5 relative overflow-hidden">
+              <div className="bg-card rounded-3xl p-8 border border-white/5 shadow-2xl shadow-black/5 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-secondary to-primary"></div>
                 
                 <h3 className="text-2xl font-headline font-bold mb-2">{t('explore.trip.reserveYourSpot')}</h3>
                 <p className="text-muted-foreground mb-8 text-sm">{trip.available_spots} {t('explore.trip.availabilityRemains')}</p>
                 
-                <div className="flex items-end justify-between mb-8 pb-8 border-b border-border">
+                <div className="flex items-end justify-between mb-8 pb-8">
                   <div>
                     <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-1">{t('explore.trip.totalInvestment')}</p>
                     <div className="flex items-baseline gap-1">
