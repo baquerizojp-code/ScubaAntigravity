@@ -81,7 +81,7 @@ const statCards = [
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{t('admin.nav.dashboard')}</h1>
+          <h1 className="text-2xl font-bold font-headline text-foreground">{t('admin.nav.dashboard')}</h1>
           <p className="text-sm text-muted-foreground">{t('admin.dashboard.subtitle')}</p>
         </div>
         <Button onClick={() => navigate('/admin/trips?new=1')} className="gap-2">
@@ -154,7 +154,7 @@ const statCards = [
                               </div>
                            </td>
                            <td className="p-4 text-right">
-                              <Badge variant="outline" className={`px-3 py-1 text-[10px] uppercase tracking-widest border-0 ${trip.status === 'published' ? 'bg-green-500/10 text-green-600' : trip.status === 'draft' ? 'bg-yellow-500/10 text-yellow-600' : 'bg-muted text-muted-foreground'}`}>
+                              <Badge variant="outline" className={`px-3 py-1 text-[10px] uppercase tracking-widest border-0 ${trip.status === 'published' ? 'bg-success/10 text-success' : trip.status === 'draft' ? 'bg-warning/10 text-warning' : 'bg-muted text-muted-foreground'}`}>
                                  {trip.status}
                               </Badge>
                            </td>

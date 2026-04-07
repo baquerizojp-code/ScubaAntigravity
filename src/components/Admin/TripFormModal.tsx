@@ -207,7 +207,7 @@ export const TripFormModal = ({ open, onOpenChange, trip, onSuccess }: TripFormM
                   type="button"
                   disabled={saveMutation.isPending}
                   onClick={() => handleSave('published')}
-                  className="gap-2 bg-gradient-ocean text-primary-foreground hover:opacity-90"
+                  className="gap-2 bg-primary text-primary-foreground hover:brightness-110"
                 >
                   {saveMutation.isPending ? t('common.loading') : t('admin.trips.saveChanges')}
                 </Button>
@@ -228,7 +228,7 @@ export const TripFormModal = ({ open, onOpenChange, trip, onSuccess }: TripFormM
                   type="button"
                   disabled={saveMutation.isPending}
                   onClick={() => handleSave('published')}
-                  className="gap-2 bg-gradient-ocean text-primary-foreground hover:opacity-90"
+                  className="gap-2 bg-primary text-primary-foreground hover:brightness-110"
                 >
                   <Send className="h-4 w-4" />
                   {saveMutation.isPending ? t('common.loading') : t('admin.trips.publish')}

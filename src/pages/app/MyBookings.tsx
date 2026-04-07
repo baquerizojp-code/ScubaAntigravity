@@ -171,7 +171,7 @@ const MyBookings = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="text-2xl font-bold text-foreground mb-1">{t('nav.myBookings')}</h1>
+      <h1 className="text-2xl font-bold font-headline text-foreground mb-1">{t('nav.myBookings')}</h1>
       <p className="text-muted-foreground text-sm mb-6">{t('diver.bookings.subtitle')}</p>
 
       {isLoading ? (

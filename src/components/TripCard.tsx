@@ -61,7 +61,7 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
       </div>
 
       <div className="absolute bottom-0 left-0 w-full p-3 sm:p-4 z-10">
-        <div className="bg-primary/60 backdrop-blur-lg rounded-xl p-4 sm:p-5 text-white border border-white/10 shadow-2xl">
+        <div className="bg-ocean-900/85 backdrop-blur-lg rounded-xl p-4 sm:p-5 text-white border border-white/10 shadow-2xl">
           <div className="flex justify-between items-start mb-2">
             <div className="pr-2">
               {/* AUDIT FIX: Replaced hardcoded text-[#00f0ff] with text-cyan-electric */}
@@ -69,7 +69,7 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
                 <MapPin className="w-3 h-3" />
                 {trip.dive_site}
               </p>
-              <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-2">{trip.title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-1">{trip.title}</h3>
             </div>
             <div className="text-right shrink-0">
               {/* AUDIT FIX: Replaced text-slate-300 with text-ocean-200 */}

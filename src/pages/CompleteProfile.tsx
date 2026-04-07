@@ -101,7 +101,7 @@ const CompleteProfile = () => {
           <p className="text-muted-foreground mt-1">{t('completeProfile.subtitle')}</p>
         </div>
 
-        <div className="bg-card rounded-xl shadow-card p-6 border border-border">
+        <div className="bg-card rounded-xl shadow-card p-6 border border-white/5">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="fullName">{t('diver.profile.name')}</Label>

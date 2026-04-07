@@ -54,7 +54,8 @@ const Landing = () => {
               alt="Technical diver descending"
               className="w-full h-full object-cover scale-105 opacity-50 animate-fade-in mix-blend-luminosity"
               loading="eager"
-              fetchPriority="high"
+              // @ts-expect-error React 18 doesn't type fetchpriority yet
+              fetchpriority="high"
             />
           </picture>
           {/* V3 Cinematic Gradient: transparent at top, solid dark at bottom */}
@@ -107,7 +108,7 @@ const Landing = () => {
             {features.map((f, i) => (
               <div
                 key={f.titleKey}
-                className="group relative p-5 sm:p-7 rounded-2xl bg-card border border-border hover:border-accent/30 shadow-card hover:shadow-card-hover transition-all duration-300 animate-slide-up"
+                className="group relative p-5 sm:p-7 rounded-2xl bg-card shadow-card hover:shadow-card-hover transition-all duration-300 animate-slide-up"
                 style={{ animationDelay: `${i * 0.08}s` }}
               >
                 <div className="w-11 h-11 rounded-xl bg-gradient-ocean flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">

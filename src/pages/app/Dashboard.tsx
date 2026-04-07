@@ -83,7 +83,7 @@ const Dashboard = () => {
             {/* AUDIT FIX: Replaced text-slate-200 with text-ocean-200 */}
             <p className="text-ocean-200">{t('diver.dashboard.readyToDive')}</p>
           </div>
-          <Button asChild className="rounded-full bg-white text-primary hover:bg-slate-100 font-bold px-8 shadow-lg">
+          <Button asChild className="rounded-full bg-white text-primary hover:bg-white/90 font-bold px-8 shadow-lg">
             <Link to="/app/discover">{t('diver.dashboard.findExpeditions')}</Link>
           </Button>
         </div>

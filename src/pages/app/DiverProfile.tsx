@@ -68,7 +68,7 @@ const DiverProfile = () => {
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-lg">
-      <h1 className="text-2xl font-bold text-foreground mb-6">{t('nav.profile')}</h1>
+      <h1 className="text-2xl font-bold font-headline text-foreground mb-6">{t('nav.profile')}</h1>
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="text-lg">{t('diver.profile.title')}</CardTitle>

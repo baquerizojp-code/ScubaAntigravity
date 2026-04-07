@@ -18,10 +18,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { 
-  ArrowLeft, Edit, Check, X, Clock, Users, Ship, Calendar, MapPin, Anchor, Info, Ban 
+  ArrowLeft, Edit, Check, X, Clock, Users, Ship, Calendar, MapPin, Anchor, Info, Ban, Image as ImageIcon
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
@@ -36,6 +37,7 @@ const AdminTripDetail = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [rejectDialog, setRejectDialog] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
 
   // Fetch Trip Details
   const { data: trip, isLoading: isLoadingTrip } = useQuery({
@@ -98,7 +100,7 @@ const AdminTripDetail = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-trip-bookings', id] });
       queryClient.invalidateQueries({ queryKey: ['admin-trip', id] });
-      toast.success('Diver successfully removed from trip');
+      toast.success(t('admin.tripDetail.diverRemoved'));
     },
     onError: (err: Error) => toast.error(err.message || 'Error removing diver'),
   });
@@ -108,7 +110,7 @@ const AdminTripDetail = () => {
   }
 
   if (!trip) {
-    return <div className="p-8 text-center text-muted-foreground">Trip not found.</div>;
+    return <div className="p-8 text-center text-muted-foreground">{t('admin.tripDetail.notFound')}</div>;
   }
 
   const pendingBookings = bookings?.filter(b => b.status === 'pending') || [];
@@ -154,36 +156,52 @@ const AdminTripDetail = () => {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Left Column: Details */}
         <div className="lg:col-span-1 space-y-6">
+          {/* Trip Image */}
+          <Card className="overflow-hidden">
+            {trip.image_url ? (
+              <img
+                src={trip.image_url}
+                alt={trip.title}
+                className="w-full aspect-video object-cover"
+              />
+            ) : (
+              <div className="w-full aspect-video bg-ocean-900 flex flex-col items-center justify-center text-muted-foreground">
+                <ImageIcon className="h-10 w-10 opacity-40 mb-2" />
+                <span className="text-sm">{t('image.noImage')}</span>
+              </div>
+            )}
+          </Card>
+
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <Info className="h-4 w-4 text-primary" /> Trip Overview
+                <Info className="h-4 w-4 text-primary" /> {t('admin.tripDetail.tripOverview')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm">
               <div>
-                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Capacity</span>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">{t('admin.tripDetail.capacity')}</span>
                 <div className="font-medium flex items-center justify-between">
-                  <span>{trip.total_spots - trip.available_spots} Confirmed / {trip.total_spots} Total Spots</span>
+                  <span>{trip.total_spots - trip.available_spots} {t('admin.tripDetail.confirmed')} / {trip.total_spots} {t('admin.tripDetail.totalSpots')}</span>
                   <div className="bg-secondary text-secondary-foreground rounded-full px-4 py-1.5 flex flex-col items-center justify-center shrink-0 min-w-[5.5rem] shadow-sm">
                     <span className="text-lg font-bold leading-none">{trip.available_spots}</span>
-                    <span className="text-[10px] uppercase tracking-wide opacity-90 mt-0.5">Available</span>
+                    <span className="text-[10px] uppercase tracking-wide opacity-90 mt-0.5">{t('admin.tripDetail.available')}</span>
                   </div>
                 </div>
               </div>
               <div>
-                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Price</span>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">{t('admin.tripDetail.price')}</span>
                 <span className="font-medium">${Number(trip.price_usd)} USD</span>
               </div>
               <div>
-                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Departure Point</span>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">{t('admin.tripDetail.departurePoint')}</span>
                 <span className="font-medium flex items-center gap-1">
                   <Anchor className="h-3 w-3" /> {trip.departure_point}
                 </span>
               </div>
               {trip.description && (
                 <div>
-                  <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">Description</span>
+                  <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">{t('admin.tripDetail.description')}</span>
                   <p className="line-clamp-3 text-muted-foreground">{trip.description}</p>
                 </div>
               )}
@@ -198,11 +216,11 @@ const AdminTripDetail = () => {
               <Tabs defaultValue="confirmed">
                 <TabsList className="mb-4">
                   <TabsTrigger value="confirmed" className="gap-2">
-                    <Check className="h-4 w-4" /> Confirmed Divers
+                    <Check className="h-4 w-4" /> {t('admin.tripDetail.confirmedDivers')}
                     <Badge variant="secondary" className="px-1.5 min-w-[1.25rem]">{confirmedBookings.length}</Badge>
                   </TabsTrigger>
                   <TabsTrigger value="pending" className="gap-2">
-                    <Clock className="h-4 w-4" /> Pending Requests
+                    <Clock className="h-4 w-4" /> {t('admin.tripDetail.pendingRequests')}
                     {pendingBookings.length > 0 && (
                       /* AUDIT FIX: Replaced hardcoded bg-orange-500 with semantic warning token */
                       <Badge variant="default" className="px-1.5 min-w-[1.25rem] bg-warning hover:bg-warning/90 border-none text-warning-foreground">
@@ -218,30 +236,26 @@ const AdminTripDetail = () => {
                   ) : confirmedBookings.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground border rounded-lg border-dashed">
                       <Users className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                      <p>No confirmed divers yet.</p>
+                      <p>{t('admin.tripDetail.noConfirmed')}</p>
                     </div>
                   ) : (
                     confirmedBookings.map((b: AdminBookingWithDetails) => (
                       <div key={b.id} className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors">
                         <div>
-                          <p className="font-semibold">{b.diver_profiles?.full_name || 'Unknown Diver'}</p>
+                          <p className="font-semibold">{b.diver_profiles?.full_name || t('admin.tripDetail.unknownDiver')}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            Cert: {b.diver_profiles?.certification || '-'} · {b.diver_profiles?.logged_dives || 0} dives
+                            {t('admin.tripDetail.cert')}: {b.diver_profiles?.certification || '-'} · {b.diver_profiles?.logged_dives || 0} {t('admin.tripDetail.dives')}
                           </p>
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => {
-                            if (window.confirm('Are you sure you want to remove this confirmed diver? This will free up their spot.')) {
-                              removeConfirmedMutation.mutate(b.id);
-                            }
-                          }}
+                          onClick={() => setRemoveConfirmId(b.id)}
                           disabled={removeConfirmedMutation.isPending}
                         >
                           <Ban className="h-4 w-4 sm:mr-2" />
-                          <span className="hidden sm:inline">Remove</span>
+                          <span className="hidden sm:inline">{t('admin.tripDetail.remove')}</span>
                         </Button>
                       </div>
                     ))
@@ -253,16 +267,16 @@ const AdminTripDetail = () => {
                     <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
                   ) : pendingBookings.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground border rounded-lg border-dashed">
-                      <p>No pending booking requests.</p>
+                      <p>{t('admin.tripDetail.noPending')}</p>
                     </div>
                   ) : (
                     pendingBookings.map((b: AdminBookingWithDetails) => (
                       /* AUDIT FIX: Replaced hardcoded bg-orange-50/50 border-orange-100 with semantic warning tokens */
                       <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-warning/5 border-warning/20 gap-4">
                         <div>
-                          <p className="font-semibold">{b.diver_profiles?.full_name || 'Unknown Diver'}</p>
+                          <p className="font-semibold">{b.diver_profiles?.full_name || t('admin.tripDetail.unknownDiver')}</p>
                           <p className="text-xs text-muted-foreground mt-0.5">
-                            Cert: {b.diver_profiles?.certification || '-'} · {b.diver_profiles?.logged_dives || 0} dives
+                            {t('admin.tripDetail.cert')}: {b.diver_profiles?.certification || '-'} · {b.diver_profiles?.logged_dives || 0} {t('admin.tripDetail.dives')}
                           </p>
                           {b.notes && <p className="text-xs text-muted-foreground mt-1 italic">"{b.notes}"</p>}
                         </div>
@@ -325,6 +339,25 @@ const AdminTripDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Remove Diver Confirmation */}
+      <AlertDialog open={!!removeConfirmId} onOpenChange={() => setRemoveConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('admin.tripDetail.remove')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('admin.tripDetail.confirmRemoveDiver')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (removeConfirmId) removeConfirmedMutation.mutate(removeConfirmId); setRemoveConfirmId(null); }}
+            >
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

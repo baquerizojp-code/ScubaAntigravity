@@ -47,7 +47,7 @@ const Explore = () => {
 
         {/* Search & Filter Bar */}
         <section className="mb-12">
-          <div className="bg-background p-2 rounded-full shadow-[0_8px_30px_rgb(0,10,30,0.04)] border border-border flex flex-wrap md:flex-nowrap items-center gap-2">
+          <div className="bg-background p-2 rounded-full shadow-card border border-border flex flex-wrap md:flex-nowrap items-center gap-2">
             <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
               <MapPin className="w-5 h-5 text-secondary" />
               <div className="flex flex-col w-full">

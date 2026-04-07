@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { UserPlus, Trash2, Users, Mail, Clock } from 'lucide-react';
 import { format } from 'date-fns';
@@ -24,6 +25,7 @@ const AdminStaff = () => {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState<StaffRole>('staff');
+  const [removeTarget, setRemoveTarget] = useState<string | null>(null);
   const isAdmin = role === 'dive_center_admin';
 
   const { data: staffMembers, isLoading: loadingStaff } = useQuery({
@@ -91,7 +93,7 @@ const AdminStaff = () => {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">{t('admin.nav.staff')}</h1>
+          <h1 className="text-2xl font-bold font-headline text-foreground">{t('admin.nav.staff')}</h1>
           <p className="text-sm text-muted-foreground">{t('admin.staff.subtitle')}</p>
         </div>
         {isAdmin && (
@@ -121,9 +123,7 @@ const AdminStaff = () => {
               {isAdmin && (
                 <Button
                   variant="ghost" size="icon"
-                  onClick={() => {
-                    if (confirm(t('admin.staff.confirmRemove'))) removeMutation.mutate(member.id);
-                  }}
+                  onClick={() => setRemoveTarget(member.id)}
                 >
                   <Trash2 className="h-4 w-4 text-destructive" />
                 </Button>
@@ -164,6 +164,25 @@ const AdminStaff = () => {
           )}
         </>
       )}
+
+      {/* Remove Confirmation */}
+      <AlertDialog open={!!removeTarget} onOpenChange={() => setRemoveTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('admin.staff.confirmRemove')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('admin.trips.confirmDeleteDesc')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (removeTarget) removeMutation.mutate(removeTarget); setRemoveTarget(null); }}
+            >
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Invite Dialog */}
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
