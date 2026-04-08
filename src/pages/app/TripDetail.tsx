@@ -13,6 +13,8 @@ import {
   assignDiverRole,
 } from '@/services/profiles';
 import { useAuth } from '@/contexts/AuthContext';
+import { BOOKING_STATUS_CLASSES } from '@/lib/statusColors';
+import { DEFAULT_TRIP_DURATION_HOURS } from '@/lib/constants';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -97,7 +99,8 @@ const TripDetail = () => {
       await createBooking(tripId, diverId, notes || undefined);
       toast.success(t('diver.trip.booked'));
       navigate('/app/bookings');
-    } catch {
+    } catch (err) {
+      console.error('[TripDetail] insertBooking failed:', err);
       toast.error(t('diver.trip.bookError'));
     }
   };
@@ -129,7 +132,8 @@ const TripDetail = () => {
       await refreshRole();
       await insertBooking(trip.id, newProfile.id);
       setShowProfileDialog(false);
-    } catch {
+    } catch (err) {
+      console.error('[TripDetail] handleCompleteProfileAndBook failed:', err);
       toast.error(t('diver.trip.bookError'));
     } finally {
       setCreatingProfile(false);
@@ -143,7 +147,8 @@ const TripDetail = () => {
       await cancelBooking(existingBooking.id);
       toast.success(t('diver.bookings.cancelled'));
       setExistingBooking({ ...existingBooking, status: 'cancelled' });
-    } catch {
+    } catch (err) {
+      console.error('[TripDetail] handleCancelPending failed:', err);
       toast.error(t('diver.trip.bookError'));
     } finally {
       setCancelling(false);
@@ -158,7 +163,8 @@ const TripDetail = () => {
       await requestCancellation(existingBooking.id);
       toast.success(t('diver.trip.cancellationRequested'));
       setExistingBooking({ ...existingBooking, status: 'cancellation_requested' });
-    } catch {
+    } catch (err) {
+      console.error('[TripDetail] handleRequestCancellation failed:', err);
       toast.error(t('diver.trip.bookError'));
     } finally {
       setCancelling(false);
@@ -174,7 +180,7 @@ const TripDetail = () => {
       location: `${trip.dive_site}, ${trip.departure_point}`,
       startDate: trip.trip_date,
       startTime: trip.trip_time,
-      durationHours: 3,
+      durationHours: DEFAULT_TRIP_DURATION_HOURS,
     };
     if (type === 'google') {
       window.open(getGoogleCalendarUrl(event), '_blank');
@@ -195,13 +201,13 @@ const TripDetail = () => {
 
   if (!trip) return <div className="p-6 text-center text-muted-foreground">{t('common.notFound')}</div>;
 
-  /* AUDIT FIX: Replaced hardcoded status badge colors with semantic tokens */
+  /* Status styling consolidated in src/lib/statusColors.ts */
   const statusMap: Record<string, { label: string; className: string }> = {
-    pending: { label: t('diver.trip.statusPending'), className: 'bg-warning/10 text-warning' },
-    confirmed: { label: t('diver.trip.statusConfirmed'), className: 'bg-success/10 text-success' },
-    rejected: { label: t('diver.trip.statusRejected'), className: 'bg-destructive/10 text-destructive' },
-    cancelled: { label: t('diver.trip.statusCancelled'), className: 'bg-muted text-muted-foreground' },
-    cancellation_requested: { label: t('diver.trip.statusCancellationRequested'), className: 'bg-warning/10 text-warning' },
+    pending: { label: t('diver.trip.statusPending'), className: BOOKING_STATUS_CLASSES.pending },
+    confirmed: { label: t('diver.trip.statusConfirmed'), className: BOOKING_STATUS_CLASSES.confirmed },
+    rejected: { label: t('diver.trip.statusRejected'), className: BOOKING_STATUS_CLASSES.rejected },
+    cancelled: { label: t('diver.trip.statusCancelled'), className: BOOKING_STATUS_CLASSES.cancelled },
+    cancellation_requested: { label: t('diver.trip.statusCancellationRequested'), className: BOOKING_STATUS_CLASSES.cancellation_requested },
   };
 
   const isPending = existingBooking?.status === 'pending';

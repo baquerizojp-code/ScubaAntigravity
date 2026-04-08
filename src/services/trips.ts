@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
+import { getTodayDateString } from '@/lib/utils';
 
 export type Trip = Tables<'trips'>;
 export type TripInsert = TablesInsert<'trips'>;
@@ -36,7 +37,7 @@ export async function fetchTripById(id: string) {
  * Fetch all published trips (for the public explore page).
  */
 export async function fetchPublishedTrips() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayDateString();
   const { data, error } = await supabase
     .from('trips')
     .select('*, dive_centers(name)')
@@ -89,7 +90,7 @@ export async function deleteTrip(id: string) {
  * Fetch admin dashboard stats for a dive center.
  */
 export async function fetchDashboardStats(diveCenterId: string) {
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayDateString();
   const monthStart = new Date(
     new Date().getFullYear(),
     new Date().getMonth(),

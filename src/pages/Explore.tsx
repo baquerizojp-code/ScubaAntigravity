@@ -1,4 +1,5 @@
 import { useI18n } from '@/lib/i18n';
+import { getTodayDateString } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,7 +18,7 @@ const Explore = () => {
         .from('trips')
         .select('id, title, dive_site, departure_point, trip_date, trip_time, available_spots, total_spots, price_usd, difficulty, min_certification, gear_rental_available, description, status, dive_center_id, created_at, updated_at, image_url, dive_centers(name, logo_url)')
         .eq('status', 'published')
-        .gte('trip_date', new Date().toISOString().split('T')[0])
+        .gte('trip_date', getTodayDateString())
         .order('trip_date', { ascending: true });
       if (error) throw error;
       return (data as TripWithCenter[]) || [];

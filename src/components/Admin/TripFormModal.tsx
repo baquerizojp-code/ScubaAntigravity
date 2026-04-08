@@ -12,6 +12,8 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { getTodayDateString } from '@/lib/utils';
+import { MAX_TRIP_SPOTS, MAX_FUTURE_TRIP_DAYS } from '@/lib/constants';
 import { FileText, Send } from 'lucide-react';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -168,7 +170,7 @@ export const TripFormModal = ({ open, onOpenChange, trip, onSuccess }: TripFormM
             </div>
             <div>
               <Label>{t('common.date')}</Label>
-              <Input type="date" value={form.trip_date} onChange={(e) => setForm({ ...form, trip_date: e.target.value })} min={new Date().toISOString().split('T')[0]} max={new Date(Date.now() + 365 * 86400000).toISOString().split('T')[0]} onKeyDown={(e) => e.preventDefault()} required />
+              <Input type="date" value={form.trip_date} onChange={(e) => setForm({ ...form, trip_date: e.target.value })} min={getTodayDateString()} max={new Date(Date.now() + MAX_FUTURE_TRIP_DAYS * 86400000).toISOString().split('T')[0]} onKeyDown={(e) => e.preventDefault()} required />
               {formErrors.trip_date && <p className="text-sm text-destructive mt-1">{formErrors.trip_date}</p>}
             </div>
             <div>
@@ -181,7 +183,7 @@ export const TripFormModal = ({ open, onOpenChange, trip, onSuccess }: TripFormM
             </div>
             <div>
               <Label>{t('admin.trips.field.spots')}</Label>
-              <Input type="number" min={1} max={20} value={form.total_spots || ''} onChange={(e) => setForm({ ...form, total_spots: Number(e.target.value) })} onFocus={(e) => e.target.select()} required />
+              <Input type="number" min={1} max={MAX_TRIP_SPOTS} value={form.total_spots || ''} onChange={(e) => setForm({ ...form, total_spots: Number(e.target.value) })} onFocus={(e) => e.target.select()} required />
             </div>
 
             <div className="md:col-span-2">
