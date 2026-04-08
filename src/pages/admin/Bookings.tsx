@@ -10,6 +10,8 @@ import {
   type AdminBookingWithDetails,
 } from '@/services/bookings';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { BOOKING_STATUS_CLASSES_WITH_BORDER } from '@/lib/statusColors';
+import { getTodayDateString } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -102,15 +104,12 @@ const AdminBookings = () => {
   });
 
   const statusBadge = (status: string) => {
-    const config: Record<string, { icon: typeof Clock; className: string }> = {
-      pending: { icon: Clock, className: 'bg-warning/10 text-warning border-warning/20' },
-      confirmed: { icon: Check, className: 'bg-success/10 text-success border-success/20' },
-      rejected: { icon: Ban, className: 'bg-destructive/10 text-destructive border-destructive/20' },
-      /* AUDIT FIX: Replaced hardcoded bg-orange-100 text-orange-800 with semantic warning tokens */
-      cancellation_requested: { icon: AlertTriangle, className: 'bg-warning/10 text-warning border-warning/20' },
-      cancelled: { icon: X, className: 'bg-muted text-muted-foreground border-muted' },
+    const iconMap: Record<string, typeof Clock> = {
+      pending: Clock, confirmed: Check, rejected: Ban,
+      cancellation_requested: AlertTriangle, cancelled: X,
     };
-    const { icon: Icon, className } = config[status] || config.pending;
+    const Icon = iconMap[status] || Clock;
+    const className = BOOKING_STATUS_CLASSES_WITH_BORDER[status] || BOOKING_STATUS_CLASSES_WITH_BORDER.pending;
     return <Badge variant="outline" className={className}><Icon className="h-3 w-3 mr-1" />{status}</Badge>;
   };
 
@@ -118,7 +117,7 @@ const AdminBookings = () => {
     if (!bookings) return [];
     
     if (status === 'confirmed') {
-      const today = new Date().toISOString().split('T')[0];
+      const today = getTodayDateString();
       return bookings.filter(b => 
         b.status === 'confirmed' && 
         b.trips?.status === 'published' && 

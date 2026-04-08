@@ -13,6 +13,7 @@ import {
   type AdminBookingWithDetails
 } from '@/services/bookings';
 import { TripFormModal } from '@/components/Admin/TripFormModal';
+import { TRIP_STATUS_CLASSES } from '@/lib/statusColors';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -116,15 +117,7 @@ const AdminTripDetail = () => {
   const pendingBookings = bookings?.filter(b => b.status === 'pending') || [];
   const confirmedBookings = bookings?.filter(b => b.status === 'confirmed') || [];
 
-  const statusColor = (s: string) => {
-    const map: Record<string, string> = {
-      draft: 'bg-muted text-muted-foreground',
-      published: 'bg-primary/10 text-primary',
-      completed: 'bg-muted text-muted-foreground',
-      cancelled: 'bg-destructive/10 text-destructive',
-    };
-    return map[s] || map.draft;
-  };
+  const statusColor = (s: string) => TRIP_STATUS_CLASSES[s] || TRIP_STATUS_CLASSES.draft;
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">

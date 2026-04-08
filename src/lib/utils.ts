@@ -18,3 +18,13 @@ export function parseLocalDate(dateStr: string): Date {
   }
   return new Date(dateStr);
 }
+
+/**
+ * Returns today's date as a YYYY-MM-DD string in UTC.
+ *
+ * Replaces the `new Date().toISOString().split('T')[0]` pattern
+ * that was duplicated across the codebase.
+ */
+export function getTodayDateString(): string {
+  return new Date().toISOString().split('T')[0];
+}

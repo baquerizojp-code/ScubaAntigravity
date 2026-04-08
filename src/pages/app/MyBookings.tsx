@@ -31,14 +31,8 @@ import { toast } from 'sonner';
 
 
 
-/* AUDIT FIX: Replaced hardcoded Tailwind colors with semantic tokens for dark-mode compat */
-const statusBadge: Record<string, string> = {
-  pending: 'bg-warning/10 text-warning',
-  confirmed: 'bg-success/10 text-success',
-  rejected: 'bg-destructive/10 text-destructive',
-  cancelled: 'bg-muted text-muted-foreground',
-  cancellation_requested: 'bg-warning/10 text-warning',
-};
+/* Status styling consolidated in src/lib/statusColors.ts */
+import { BOOKING_STATUS_CLASSES as statusBadge } from '@/lib/statusColors';
 
 const MyBookings = () => {
   const { user } = useAuth();
@@ -79,7 +73,8 @@ const MyBookings = () => {
       await cancelBooking(cancelId);
       toast.success(t('diver.bookings.cancelled'));
       queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
-    } catch {
+    } catch (err) {
+      console.error('[MyBookings] handleCancel failed:', err);
       toast.error(t('diver.trip.bookError'));
     } finally {
       setCancelling(false);

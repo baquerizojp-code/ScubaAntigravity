@@ -6,6 +6,7 @@ import { fetchTripsByCenter, createTrip, updateTrip, deleteTrip } from '@/servic
 import { tripSchema } from '@/lib/schemas';
 import ImageUpload from '@/components/ImageUpload';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTodayDateString } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -94,7 +95,7 @@ const AdminTrips = () => {
   const filteredTrips = (() => {
     if (!trips) return [];
     if (filterParam === 'upcoming') {
-      const today = new Date().toISOString().split('T')[0];
+      const today = getTodayDateString();
       return trips
         .filter(t => t.status === 'published' && t.trip_date >= today)
         .sort((a, b) => a.trip_date.localeCompare(b.trip_date));

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { MAX_TRIP_SPOTS } from '@/lib/constants';
 
 /**
  * Trip creation/editing form schema.
@@ -15,7 +16,7 @@ export const tripSchema = z.object({
     return !isNaN(date.getTime()) && date >= today;
   }, 'Date must be today or in the future'),
   trip_time: z.string().min(1, 'Time is required'),
-  total_spots: z.number().int().positive('Must be at least 1').max(20, 'Maximum 20 spots allowed'),
+  total_spots: z.number().int().positive('Must be at least 1').max(MAX_TRIP_SPOTS, `Maximum ${MAX_TRIP_SPOTS} spots allowed`),
   price_usd: z.number().nonnegative('Price must be 0 or more'),
   difficulty: z.enum(['beginner', 'intermediate', 'advanced', '']).optional().default(''),
   min_certification: z

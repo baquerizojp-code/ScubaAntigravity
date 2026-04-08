@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Ship, Users, CalendarCheck, DollarSign, TrendingUp, Clock, ChevronRight, Plus, ArrowUpRight } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { getTodayDateString } from '@/lib/utils';
 
 const AdminDashboard = () => {
   const { diveCenterId } = useAuth();
@@ -27,7 +28,7 @@ const AdminDashboard = () => {
     enabled: !!diveCenterId,
   });
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayDateString();
   const upcomingTrips = trips.filter(t => t.status === 'published' && t.trip_date >= today);
   const pending = bookings.filter(b => b.status === 'pending');
   /* AUDIT FIX: Replaced 'active' var name with 'confirmedBookings' for clarity */

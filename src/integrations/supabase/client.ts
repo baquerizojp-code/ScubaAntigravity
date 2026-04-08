@@ -8,7 +8,10 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 // Custom storage proxy to support "Remember Me"
 const customStorage = {
   getItem: (key: string) => {
-    return localStorage.getItem(key) || sessionStorage.getItem(key);
+    // Use the "Remember Me" flag to pick the correct storage,
+    // avoiding cross-storage token leakage when a user toggles the setting.
+    const rememberMe = localStorage.getItem('scubatrip-remember-me') !== 'false';
+    return rememberMe ? localStorage.getItem(key) : sessionStorage.getItem(key);
   },
   setItem: (key: string, value: string) => {
     // Default to true if not set
