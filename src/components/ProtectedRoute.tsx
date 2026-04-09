@@ -2,9 +2,7 @@ import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
-import type { Database } from '@/integrations/supabase/types';
-
-type AppRole = Database['public']['Enums']['app_role'];
+import type { AppRole } from '@/types';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -35,7 +33,7 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login', skipRol
   }
 
   // Check allowed roles
-  if (allowedRoles && !allowedRoles.includes(role)) {
+  if (allowedRoles && (!role || !allowedRoles.includes(role))) {
     // Redirect based on their actual role
     if (role === 'diver') {
       return <Navigate to="/app/discover" replace />;

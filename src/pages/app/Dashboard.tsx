@@ -9,32 +9,12 @@ import { Compass, CalendarCheck, Award, ChevronRight, Shield } from 'lucide-reac
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
-
-interface DiverProfile {
-  id: string;
-  user_id: string;
-  full_name: string;
-  certification: string | null;
-  logged_dives: number | null;
-}
-
-interface DiverBooking {
-  id: string;
-  status: string;
-  trip_id: string;
-  trips: {
-    id: string;
-    title: string;
-    trip_date: string;
-    image_url: string | null;
-    dive_centers: { name: string } | null;
-  };
-}
+import type { DiverProfileSummary, DiverBooking } from '@/types';
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { t } = useI18n();
-  const [profile, setProfile] = useState<DiverProfile | null>(null);
+  const [profile, setProfile] = useState<DiverProfileSummary | null>(null);
   const [bookings, setBookings] = useState<DiverBooking[]>([]);
   const [completedDives, setCompletedDives] = useState(0);
 
@@ -51,7 +31,7 @@ const Dashboard = () => {
           .in('status', ['confirmed', 'pending'])
           .order('created_at', { ascending: false })
           .limit(3);
-        setBookings((b as unknown as DiverBooking[]) || []);
+        setBookings((b ?? []) as DiverBooking[]);
 
         const { count } = await supabase
           .from('bookings')

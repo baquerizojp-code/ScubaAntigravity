@@ -1,18 +1,28 @@
 # ScubaTrip Tech Debt Audit
 
-**Date:** April 7, 2026
+**Date:** April 7, 2026 | **Last updated:** April 9, 2026
 **Codebase:** React + Vite SPA with Supabase backend
+
+---
+
+## Progress
+
+| Phase | Status | PR | Date |
+|-------|--------|-----|------|
+| Phase 1: Quick Wins | MERGED | #6 | Apr 7, 2026 |
+| Phase 2: Type Safety | MERGED | #8 | Apr 9, 2026 |
+| Phase 3: Testing Foundation | MERGED | #7 | Apr 9, 2026 |
+| Phase 4: Component Decomposition | TODO | - | - |
 
 ---
 
 ## Summary
 
-47+ issues identified across 6 categories. The codebase has solid foundations (good RLS policies, lazy-loaded routes, proper i18n parity) but carries significant debt in test coverage, type safety, and code organization that will slow feature development and increase regression risk.
+47+ issues originally identified across 6 categories. Phases 1, 2, and 3 are complete. The codebase now has 100 tests across 8 test files, TypeScript strict mode enabled, shared types extracted, consolidated constants/status colors, proper error logging, and a fixed auth storage bug.
 
-**Top 3 risks:**
-1. ~94% of code is untested (3 test files for ~49 source files)
-2. TypeScript strict mode is OFF, with multiple `as any` casts hiding bugs
-3. Status/booking logic is duplicated across 4+ files, making changes error-prone
+**Remaining top risks:**
+1. Large page components (TripDetail 423 lines, 10+ responsibilities) are hard to maintain
+2. Realtime subscription pattern duplicated 3x with no shared hook
 
 ---
 
@@ -24,11 +34,11 @@ Priority = (Impact + Risk) x (6 - Effort). Higher = fix first.
 
 | # | Item | Type | Impact | Risk | Effort | Priority | Business Case |
 |---|------|------|--------|------|--------|----------|---------------|
-| 1 | **Test coverage at ~6%** | Test | 5 | 5 | 4 | 20* | Every deploy is a gamble. Services layer (bookings, trips, profiles) has 0 tests. Auth flow is untested. A single booking regression could cost real revenue. |
-| 2 | **TypeScript strict mode disabled** | Code | 4 | 5 | 2 | 36 | `strict: false`, `noImplicitAny: false`, `noUnusedLocals: false` in tsconfig. Allows null reference bugs and dead code to slip through undetected. |
-| 3 | **Unsafe type casts (`as any`, `as unknown`)** | Code | 4 | 5 | 3 | 27 | 8+ instances in bookings.ts, TripDetail.tsx, DiverProfile.tsx, Dashboard.tsx. These bypass the type system at critical data boundaries (Supabase responses). |
-| 4 | **No Supabase client mocking infrastructure** | Test | 5 | 4 | 3 | 27 | Test setup has no Supabase mocks, no React Query test utilities, no auth provider mocks. This is the blocker for writing any meaningful integration tests. |
-| 5 | **Error handling: bare catches everywhere** | Code | 4 | 5 | 2 | 36 | Multiple catch blocks swallow errors with only a generic toast. No console.error, no context, no error tracking. Debugging production issues is blind. |
+| 1 | ~~**Test coverage at ~6%**~~ DONE (Phase 3) | Test | 5 | 5 | 4 | 20* | ~~Every deploy is a gamble.~~ Now at 100 tests across 8 files. Services, auth, and route protection fully covered. |
+| 2 | ~~**TypeScript strict mode disabled**~~ DONE (Phase 2) | Code | 4 | 5 | 2 | 36 | ~~`strict: false`, `noImplicitAny: false` in tsconfig.~~ Now `strict: true` with `strictNullChecks`, `noImplicitAny`, and all strict family flags enabled. |
+| 3 | ~~**Unsafe type casts (`as any`, `as unknown`)**~~ DONE (Phase 2) | Code | 4 | 5 | 3 | 27 | ~~8+ instances in bookings.ts, TripDetail.tsx, DiverProfile.tsx, Dashboard.tsx.~~ All production `as any` casts replaced with proper types. `asJoinResult<T>()` helper for Supabase joins. Shared `src/types/index.ts` for reusable types. |
+| 4 | ~~**No Supabase client mocking infrastructure**~~ DONE (Phase 3) | Test | 5 | 4 | 3 | 27 | ~~This is the blocker for writing any meaningful integration tests.~~ Mock client, React Query wrapper, and auth provider all in `src/test/`. |
+| 5 | ~~**Error handling: bare catches everywhere**~~ DONE (Phase 1) | Code | 4 | 5 | 2 | 36 | ~~Debugging production issues is blind.~~ All catch blocks now have `console.error` with context labels. |
 
 *Test coverage effort is 4 (high) but its combined Impact+Risk of 10 still makes it the top strategic priority.
 
@@ -36,22 +46,22 @@ Priority = (Impact + Risk) x (6 - Effort). Higher = fix first.
 
 | # | Item | Type | Impact | Risk | Effort | Priority | Business Case |
 |---|------|------|--------|------|--------|----------|---------------|
-| 6 | **Status badge/color logic duplicated 4x** | Code | 3 | 3 | 1 | 30 | MyBookings.tsx, admin/Bookings.tsx, admin/TripDetail.tsx, app/TripDetail.tsx all define their own status color maps. One change requires updating 4 files. |
+| 6 | ~~**Status badge/color logic duplicated 4x**~~ DONE (Phase 1) | Code | 3 | 3 | 1 | 30 | ~~One change requires updating 4 files.~~ Consolidated into `src/lib/statusColors.ts`. |
 | 7 | **TripDetail.tsx (diver) is 423 lines with 10+ responsibilities** | Architecture | 4 | 3 | 3 | 21 | Fetches data, manages 3 dialogs, handles bookings, cancellation, profile creation, calendar export. Impossible to test or modify safely. |
 | 8 | **TripDetail.tsx (admin) is 365 lines, similar issues** | Architecture | 3 | 3 | 3 | 18 | Trip display + booking management + realtime subscriptions + multiple modals all in one component. |
 | 9 | **Realtime subscription pattern duplicated 3x** | Code | 3 | 3 | 2 | 24 | Bookings.tsx, MyBookings.tsx, admin/TripDetail.tsx each manually set up Supabase channels. Should be a `useRealtimeSubscription()` hook. |
 | 10 | **Missing `useMemo` on filter operations** | Code | 3 | 2 | 1 | 25 | `filterBookings()` called 4x in tab headers re-filters on every render. Dashboard sorts/slices arrays inline. |
-| 11 | **ESLint `no-unused-vars: off`** | Code | 3 | 3 | 1 | 30 | Dead code accumulates silently. Missing accessibility and import-order plugins. |
-| 12 | **Supabase storage fallback logic bug** | Code | 2 | 4 | 1 | 30 | `getItem` checks localStorage first, then sessionStorage. If tokens exist in both (user toggled "Remember Me"), wrong token could be returned. |
+| 11 | ~~**ESLint `no-unused-vars: off`**~~ DONE (Phase 1) | Code | 3 | 3 | 1 | 30 | ~~Dead code accumulates silently.~~ Now set to `warn` with `_` prefix ignore pattern. Surfaced 40 existing warnings. |
+| 12 | ~~**Supabase storage fallback logic bug**~~ DONE (Phase 1) | Code | 2 | 4 | 1 | 30 | ~~Wrong token could be returned.~~ `getItem` now uses "Remember Me" flag as single source of truth. |
 
 ### Tier 3: Fix This Month (Priority 8-14)
 
 | # | Item | Type | Impact | Risk | Effort | Priority | Business Case |
 |---|------|------|--------|------|--------|----------|---------------|
-| 13 | **Magic numbers scattered across codebase** | Code | 2 | 2 | 1 | 20 | Max spots (20), limits (3), duration (3 hours), date ranges (365 days) hardcoded in multiple files. |
+| 13 | ~~**Magic numbers scattered across codebase**~~ DONE (Phase 1) | Code | 2 | 2 | 1 | 20 | ~~Hardcoded in multiple files.~~ Extracted to `src/lib/constants.ts`. |
 | 14 | **No Vite chunk splitting config** | Infra | 2 | 2 | 1 | 20 | No `manualChunks` for vendor/UI libraries. Bundle could be optimized for caching. |
-| 15 | **Inline type definitions in pages** | Code | 2 | 2 | 2 | 16 | DiverProfile, DiverBooking, AdminBookingWithDetails interfaces defined inside page components instead of shared types file. |
-| 16 | **Date string parsing duplicated** | Code | 2 | 2 | 1 | 20 | `new Date().toISOString().split('T')[0]` appears 4+ times. Already have `parseLocalDate()` but missing `getTodayDateString()`. |
+| 15 | ~~**Inline type definitions in pages**~~ DONE (Phase 2) | Code | 2 | 2 | 2 | 16 | ~~DiverProfile, DiverBooking interfaces defined inside page components.~~ Extracted to `src/types/index.ts`. Enum aliases (AppRole, TripStatus, etc.) centralised there too. |
+| 16 | ~~**Date string parsing duplicated**~~ DONE (Phase 1) | Code | 2 | 2 | 1 | 20 | ~~Appears 4+ times.~~ Added `getTodayDateString()` to utils.ts, replaced all 9 instances. |
 | 17 | **Mutation error handling inconsistent** | Code | 2 | 3 | 2 | 20 | Some mutations have `onError` with toast, some have empty callbacks, some have nothing. |
 
 ### Tier 4: Backlog (Priority < 8)
@@ -67,40 +77,35 @@ Priority = (Impact + Risk) x (6 - Effort). Higher = fix first.
 
 ## Phased Remediation Plan
 
-### Phase 1: Quick Wins (1-2 days, do alongside feature work)
+### Phase 1: Quick Wins -- COMPLETE (PR #6, Apr 7)
 
-These are low-effort, high-impact fixes you can knock out between features:
+All 6 items shipped:
 
-1. **Create `src/lib/constants.ts`** - Extract all magic numbers (MAX_TRIP_SPOTS, RECENT_BOOKINGS_LIMIT, etc.)
-2. **Create `src/lib/statusColors.ts`** - Single source of truth for booking/trip status styling
-3. **Add `getTodayDateString()` to utils.ts** - Replace 4+ duplicated date parsing calls
-4. **Add `console.error` to all catch blocks** - Zero-cost debugging improvement
-5. **Enable ESLint `no-unused-vars: warn`** - Start catching dead code
-6. **Fix Supabase storage `getItem` logic** - Use "Remember Me" flag to pick the right storage
+1. `src/lib/constants.ts` - MAX_TRIP_SPOTS, DEFAULT_TRIP_DURATION_HOURS, MAX_FUTURE_TRIP_DAYS, etc.
+2. `src/lib/statusColors.ts` - BOOKING_STATUS_CLASSES, TRIP_STATUS_CLASSES (replaced 4 duplicates)
+3. `getTodayDateString()` in utils.ts - replaced 9 instances of duplicated date parsing
+4. `console.error` with context labels on all 5 bare catch blocks
+5. ESLint `no-unused-vars: warn` with `_` prefix ignore (surfaced 40 pre-existing warnings)
+6. Supabase `getItem` fix - uses "Remember Me" flag instead of checking both storages
 
-### Phase 2: Type Safety Sprint (3-5 days)
+### Phase 2: Type Safety Sprint -- COMPLETE (PR #8, Apr 9)
 
-1. **Enable `strict: true` in tsconfig.app.json** incrementally:
-   - Start with `strictNullChecks: true` and `noImplicitAny: true`
-   - Fix resulting type errors (expect 50-100)
-   - Then enable full `strict: true`
-2. **Replace all `as any` / `as unknown` casts** with proper types or type guards
-3. **Extract shared interfaces to `src/types/index.ts`** - DiverBooking, AdminBookingWithDetails, etc.
-4. **Type the Supabase RPC responses properly** - Eliminate unsafe casts in services layer
+All 4 items shipped:
 
-### Phase 3: Testing Foundation (1-2 weeks)
+1. **`strict: true` in tsconfig.app.json** -- enabled incrementally (strictNullChecks + noImplicitAny first, then full strict). Fixed 9 compiler errors across 4 files. Also enabled `noFallthroughCasesInSwitch`.
+2. **Replaced all production `as any` / `as unknown` casts** -- certification casts now use `CertificationLevel` type, Supabase join casts use `asJoinResult<T>()` helper in bookings.ts, Dashboard cast uses typed `DiverBooking[]`.
+3. **Extracted shared interfaces to `src/types/index.ts`** -- `DiverProfileSummary`, `DiverBooking`, plus enum aliases (`AppRole`, `TripStatus`, `TripDifficulty`, `CertificationLevel`, `BookingStatus`). Removed duplicated type definitions from 5 files.
+4. **Typed Supabase join responses properly** -- `AdminBookingWithDetails.trips` now includes `price_usd`, matching the actual select query. `TripFormEditData` accepts nullable DB fields for the edit modal.
 
-1. **Set up test infrastructure:**
-   - Mock Supabase client in test/setup.ts
-   - Create React Query test wrapper with mock QueryClient
-   - Create auth context test provider
-2. **Test the services layer first** (highest ROI):
-   - bookings.ts (10 functions, critical business logic)
-   - trips.ts (9 functions including RPC calls)
-   - profiles.ts (6 functions)
-3. **Test AuthContext** - session management, role fetching, sign-out
-4. **Test ProtectedRoute** - role-based access control
-5. **Test form schemas** (already partially done, expand coverage)
+### Phase 3: Testing Foundation -- COMPLETE (PR #7, Apr 9)
+
+Coverage went from 3 test files / ~17 tests to 8 test files / 100 tests:
+
+1. **Test infrastructure** - `src/test/mocks/supabase.ts` (chainable mock with mockTable/mockRpc/mockAuth), `src/test/test-utils.tsx` (renderWithProviders with React Query + Auth + Router)
+2. **Services layer** - bookings.test.ts (20 tests), trips.test.ts (12 tests), profiles.test.ts (13 tests). All functions covered with happy paths, error paths, and edge cases.
+3. **AuthContext** - 5 tests (no session, diver role, admin diveCenterId, sign-out, no-role)
+4. **ProtectedRoute** - 9 tests (loading, unauthenticated redirect, role routing, skipRoleCheck, cross-role)
+5. **Schema tests expanded** - 24 new edge cases (boundary values, past dates, all cert levels, E.164 phone)
 
 ### Phase 4: Component Decomposition (2-3 weeks, spread across sprints)
 
@@ -130,4 +135,7 @@ Not everything is debt. These are solid:
 - **Migration structure** is clean and sequential (23 migrations)
 - **Error boundary** exists and works for render errors
 - **Zod schemas** are well-tested with edge cases
-- **Auth flow** with dual-storage "Remember Me" is a nice touch (just needs the getItem bug fixed)
+- **Auth flow** with dual-storage "Remember Me" works correctly (getItem bug fixed in Phase 1)
+- **Test coverage** at 100 tests across services, auth, routes, and schemas (added in Phase 3)
+- **Shared constants and status colors** eliminate duplication (added in Phase 1)
+- **Error logging** on all catch blocks with context labels (added in Phase 1)
