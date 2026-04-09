@@ -15,11 +15,7 @@ import { toast } from 'sonner';
 import { getTodayDateString } from '@/lib/utils';
 import { MAX_TRIP_SPOTS, MAX_FUTURE_TRIP_DAYS } from '@/lib/constants';
 import { FileText, Send } from 'lucide-react';
-import type { Database } from '@/integrations/supabase/types';
-
-type TripStatus = Database['public']['Enums']['trip_status'];
-type TripDifficulty = Database['public']['Enums']['trip_difficulty'];
-type CertLevel = Database['public']['Enums']['certification_level'];
+import type { TripStatus, TripDifficulty, CertificationLevel } from '@/types';
 
 export interface TripFormData {
   title: string;
@@ -31,7 +27,7 @@ export interface TripFormData {
   total_spots: number;
   price_usd: number;
   difficulty: TripDifficulty | '';
-  min_certification: CertLevel | '';
+  min_certification: CertificationLevel | '';
   gear_rental_available: boolean;
   whatsapp_group_url: string;
   image_url: string;
@@ -45,10 +41,29 @@ export const emptyForm: TripFormData = {
   whatsapp_group_url: '', image_url: '',
 };
 
+/** Props accepted when passing an existing trip for editing. Nullable DB fields are accepted. */
+export interface TripFormEditData {
+  id?: string;
+  status?: TripStatus;
+  title: string;
+  description: string | null;
+  dive_site: string;
+  departure_point: string;
+  trip_date: string;
+  trip_time: string;
+  total_spots: number;
+  price_usd: number;
+  difficulty: TripDifficulty | '' | null;
+  min_certification: CertificationLevel | '' | null;
+  gear_rental_available: boolean | null;
+  whatsapp_group_url: string | null;
+  image_url: string | null;
+}
+
 interface TripFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  trip: (TripFormData & { id?: string; status?: TripStatus }) | null; // Pass null to create new trip, or trip object to edit.
+  trip: TripFormEditData | null; // Pass null to create new trip, or trip object to edit.
   onSuccess?: () => void;
 }
 

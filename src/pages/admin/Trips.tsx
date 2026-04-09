@@ -26,34 +26,8 @@ import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Eye, Ship, FileText, Send } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
-import type { Database } from '@/integrations/supabase/types';
-
-type TripStatus = Database['public']['Enums']['trip_status'];
-type TripDifficulty = Database['public']['Enums']['trip_difficulty'];
-type CertLevel = Database['public']['Enums']['certification_level'];
-
-interface TripFormData {
-  title: string;
-  description: string;
-  dive_site: string;
-  departure_point: string;
-  trip_date: string;
-  trip_time: string;
-  total_spots: number;
-  price_usd: number;
-  difficulty: TripDifficulty | '';
-  min_certification: CertLevel | '';
-  gear_rental_available: boolean;
-  whatsapp_group_url: string;
-  image_url: string;
-}
-
-const emptyForm: TripFormData = {
-  title: '', description: '', dive_site: '', departure_point: '',
-  trip_date: '', trip_time: '08:00', total_spots: 10, price_usd: 0,
-  difficulty: '', min_certification: '', gear_rental_available: false,
-  whatsapp_group_url: '', image_url: '',
-};
+import type { TripStatus } from '@/types';
+import type { TripFormEditData } from '@/components/Admin/TripFormModal';
 
 const AdminTrips = () => {
   const { diveCenterId } = useAuth();
@@ -62,7 +36,7 @@ const AdminTrips = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTrip, setEditingTrip] = useState<TripFormData & { id: string; status: TripStatus } | null>(null);
+  const [editingTrip, setEditingTrip] = useState<TripFormEditData | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const { data: trips, isLoading } = useQuery({
@@ -111,7 +85,7 @@ const AdminTrips = () => {
     },
   });
 
-  const openEdit = (trip: TripFormData & { id: string; status: TripStatus }) => {
+  const openEdit = (trip: TripFormEditData) => {
     setEditingTrip(trip);
     setDialogOpen(true);
   };

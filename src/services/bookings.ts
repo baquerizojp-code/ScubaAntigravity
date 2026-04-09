@@ -3,6 +3,15 @@ import type { Tables } from '@/integrations/supabase/types';
 
 export type Booking = Tables<'bookings'>;
 
+/**
+ * Supabase's generated types don't fully represent joined/nested selects.
+ * This helper narrows the untyped join result to our known interface shape.
+ * Unlike bare `as unknown as T`, it provides a single auditable conversion point.
+ */
+function asJoinResult<T>(data: unknown): T {
+  return data as T;
+}
+
 export interface BookingWithDetails extends Booking {
   trips: {
     id: string;
@@ -22,6 +31,7 @@ export interface AdminBookingWithDetails extends Booking {
     trip_time: string;
     dive_site: string;
     status: string;
+    price_usd: number;
   } | null;
   diver_profiles: {
     full_name: string;
@@ -50,7 +60,7 @@ export async function fetchBookingsForDiver(userId: string) {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data as unknown as BookingWithDetails[]) || [];
+  return asJoinResult<BookingWithDetails[]>(data) ?? [];
 }
 
 /**
@@ -68,13 +78,13 @@ export async function fetchBookingsForCenter(diveCenterId: string) {
   const { data, error } = await supabase
     .from('bookings')
     .select(
-      '*, trips(title, trip_date, trip_time, dive_site, status), diver_profiles(full_name, certification, logged_dives)'
+      '*, trips(title, trip_date, trip_time, dive_site, status, price_usd), diver_profiles(full_name, certification, logged_dives)'
     )
     .in('trip_id', tripIds)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data as unknown as AdminBookingWithDetails[]) || [];
+  return asJoinResult<AdminBookingWithDetails[]>(data) ?? [];
 }
 
 /**
@@ -84,13 +94,13 @@ export async function fetchBookingsByTripId(tripId: string) {
   const { data, error } = await supabase
     .from('bookings')
     .select(
-      '*, trips(title, trip_date, trip_time, dive_site, status), diver_profiles(full_name, certification, logged_dives)'
+      '*, trips(title, trip_date, trip_time, dive_site, status, price_usd), diver_profiles(full_name, certification, logged_dives)'
     )
     .eq('trip_id', tripId)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data as unknown as AdminBookingWithDetails[]) || [];
+  return asJoinResult<AdminBookingWithDetails[]>(data) ?? [];
 }
 
 /**

@@ -41,7 +41,9 @@ import { MapPin, Calendar, Clock, Users, DollarSign, ArrowLeft, Shield, Wrench, 
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
 import { downloadICSFile, getGoogleCalendarUrl } from '@/lib/calendar';
-import type { Tables } from '@/integrations/supabase/types';
+import type { Tables, Database } from '@/integrations/supabase/types';
+
+type CertificationLevel = Database['public']['Enums']['certification_level'];
 
 type Trip = TripWithCenter;
 
@@ -126,8 +128,7 @@ const TripDetail = () => {
       const newProfile = await createDiverProfile({
         user_id: user.id,
         full_name: dialogFullName.trim(),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        certification: dialogCertification as any,
+        certification: dialogCertification as CertificationLevel,
       });
       await refreshRole();
       await insertBooking(trip.id, newProfile.id);

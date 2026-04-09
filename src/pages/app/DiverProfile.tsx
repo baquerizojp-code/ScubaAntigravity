@@ -9,6 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Constants } from '@/integrations/supabase/types';
+import type { Database } from '@/integrations/supabase/types';
+
+type CertificationLevel = Database['public']['Enums']['certification_level'];
 
 const certLevels = Constants.public.Enums.certification_level;
 
@@ -52,8 +55,7 @@ const DiverProfile = () => {
       .from('diver_profiles')
       .update({
         full_name: form.full_name,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        certification: form.certification as any,
+        certification: form.certification as CertificationLevel,
         logged_dives: form.logged_dives,
         emergency_contact: form.emergency_contact || null,
       })
