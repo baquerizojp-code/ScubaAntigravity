@@ -91,16 +91,16 @@ const AdminLayout = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <header className="lg:hidden flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-card/80 backdrop-blur-xl min-h-[56px]">
-          <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
+        <header className="lg:hidden flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-secondary/95 backdrop-blur-xl shadow-lg min-h-[56px]">
+          <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px] text-ocean-200 hover:text-white" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </Button>
           <div className="flex items-center flex-1">
             <ScubaMaskLogo className="h-8 w-6 text-primary" />
-            <span className="font-bold text-foreground ml-2">ScubaTrip</span>
+            <span className="text-xl font-black text-white tracking-tighter font-headline ml-2">ScubaTrip</span>
           </div>
-          <ThemeToggle />
-          <NotificationBell />
+          <ThemeToggle className="text-ocean-200 hover:text-white hover:bg-white/10" />
+          <NotificationBell className="text-ocean-200 hover:text-white hover:bg-white/10" />
         </header>
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">

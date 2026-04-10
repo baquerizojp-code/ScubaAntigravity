@@ -8,12 +8,19 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Constants } from '@/integrations/supabase/types';
 import type { Database } from '@/integrations/supabase/types';
+import { Mail } from 'lucide-react';
 
 type CertificationLevel = Database['public']['Enums']['certification_level'];
 
-const certLevels = Constants.public.Enums.certification_level;
+const certOptions = [
+  { value: 'none',                  labelKey: 'profile.cert.none' },
+  { value: 'open_water',            labelKey: 'profile.cert.openWater' },
+  { value: 'advanced_open_water',   labelKey: 'profile.cert.advanced' },
+  { value: 'rescue_diver',          labelKey: 'profile.cert.rescue' },
+  { value: 'divemaster',            labelKey: 'profile.cert.divemaster' },
+  { value: 'instructor',            labelKey: 'profile.cert.instructor' },
+] as const;
 
 const DiverProfile = () => {
   const { user } = useAuth();
@@ -22,7 +29,8 @@ const DiverProfile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
-    full_name: '',
+    first_name: '',
+    last_name: '',
     certification: 'none' as string,
     logged_dives: 0,
     emergency_contact: '',
@@ -37,8 +45,13 @@ const DiverProfile = () => {
       .maybeSingle()
       .then(({ data }) => {
         if (data) {
+          // Split stored full_name into first / last for display
+          const parts = (data.full_name || '').trim().split(/\s+/);
+          const first = parts[0] ?? '';
+          const last = parts.slice(1).join(' ');
           setForm({
-            full_name: data.full_name,
+            first_name: first,
+            last_name: last,
             certification: data.certification || 'none',
             logged_dives: data.logged_dives || 0,
             emergency_contact: data.emergency_contact || '',
@@ -51,10 +64,11 @@ const DiverProfile = () => {
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
+    const full_name = [form.first_name.trim(), form.last_name.trim()].filter(Boolean).join(' ');
     const { error } = await supabase
       .from('diver_profiles')
       .update({
-        full_name: form.full_name,
+        full_name,
         certification: form.certification as CertificationLevel,
         logged_dives: form.logged_dives,
         emergency_contact: form.emergency_contact || null,
@@ -76,30 +90,76 @@ const DiverProfile = () => {
           <CardTitle className="text-lg">{t('diver.profile.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label>{t('diver.profile.name')}</Label>
-            <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
+
+          {/* Email — read-only */}
+          <div className="space-y-1.5">
+            <Label className="flex items-center gap-1.5">
+              <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+              {t('diver.profile.email')}
+            </Label>
+            <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted/40 px-3 py-2 text-sm text-muted-foreground select-all cursor-default">
+              {user?.email ?? '—'}
+            </div>
+            <p className="text-xs text-muted-foreground">{t('diver.profile.emailHint')}</p>
           </div>
-          <div>
+
+          {/* Name — split into two columns */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="first_name">{t('diver.profile.firstName')}</Label>
+              <Input
+                id="first_name"
+                value={form.first_name}
+                onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))}
+                placeholder="Juan"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="last_name">{t('diver.profile.lastName')}</Label>
+              <Input
+                id="last_name"
+                value={form.last_name}
+                onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))}
+                placeholder="Pérez"
+              />
+            </div>
+          </div>
+
+          {/* Certification */}
+          <div className="space-y-1.5">
             <Label>{t('diver.profile.cert')}</Label>
             <Select value={form.certification} onValueChange={v => setForm(f => ({ ...f, certification: v }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {certLevels.map(c => (
-                  <SelectItem key={c} value={c}>{c.replace(/_/g, ' ')}</SelectItem>
+                {certOptions.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>{t(opt.labelKey)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <Label>{t('diver.profile.dives')}</Label>
-            <Input type="number" value={form.logged_dives} onChange={e => setForm(f => ({ ...f, logged_dives: parseInt(e.target.value) || 0 }))} onFocus={(e) => e.target.select()} />
+
+          {/* Logged dives */}
+          <div className="space-y-1.5">
+            <Label htmlFor="logged_dives">{t('diver.profile.dives')}</Label>
+            <Input
+              id="logged_dives"
+              type="number"
+              value={form.logged_dives}
+              onChange={e => setForm(f => ({ ...f, logged_dives: parseInt(e.target.value) || 0 }))}
+              onFocus={e => e.target.select()}
+            />
           </div>
-          <div>
-            <Label>{t('diver.profile.emergency')}</Label>
-            <Input value={form.emergency_contact} onChange={e => setForm(f => ({ ...f, emergency_contact: e.target.value }))} />
+
+          {/* Emergency contact */}
+          <div className="space-y-1.5">
+            <Label htmlFor="emergency_contact">{t('diver.profile.emergency')}</Label>
+            <Input
+              id="emergency_contact"
+              value={form.emergency_contact}
+              onChange={e => setForm(f => ({ ...f, emergency_contact: e.target.value }))}
+            />
           </div>
-          {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
+
           <Button onClick={handleSave} disabled={saving} className="w-full bg-primary text-primary-foreground hover:brightness-110">
             {saving ? t('common.loading') : t('common.save')}
           </Button>

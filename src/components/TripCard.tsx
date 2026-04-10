@@ -12,9 +12,9 @@ export type TripWithCenter = Tables<'trips'> & {
 
 /* AUDIT FIX: Replaced hardcoded Tailwind colors with semantic tokens */
 const bookingStatusColors: Record<string, string> = {
-  pending: 'bg-warning/20 text-warning border-warning/50',
-  confirmed: 'bg-success/20 text-success border-success/50',
-  cancellation_requested: 'bg-warning/20 text-warning border-warning/50',
+  pending: 'bg-ocean-900/95 shadow-lg shadow-black/40 backdrop-blur-md text-warning border border-warning/30',
+  confirmed: 'bg-ocean-900/95 shadow-lg shadow-black/40 backdrop-blur-md text-success border border-success/30',
+  cancellation_requested: 'bg-ocean-900/95 shadow-lg shadow-black/40 backdrop-blur-md text-warning border border-warning/30',
 };
 
 const bookingStatusLabels: Record<string, { es: string; en: string }> = {
@@ -50,7 +50,7 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
       <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
 
         {bookingStatus && (
-          <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-white/10 w-fit ${bookingStatusColors[bookingStatus] || 'bg-white/20 text-white'}`}>
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full w-fit ${bookingStatusColors[bookingStatus] || 'bg-ocean-900/80 backdrop-blur-md border border-white/10 text-white'}`}>
             {bookingStatusLabels[bookingStatus]?.[locale] || bookingStatus}
           </span>
         )}

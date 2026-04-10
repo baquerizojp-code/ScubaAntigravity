@@ -144,10 +144,12 @@
   }
 
   .bg-gradient-ocean {
+    background-color: transparent;
     background-image: var(--gradient-ocean);
   }
 
   .bg-gradient-ocean-deep {
+    background-color: transparent;
     background-image: var(--gradient-ocean-deep);
   }
 

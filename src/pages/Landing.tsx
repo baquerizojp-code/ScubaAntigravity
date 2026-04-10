@@ -112,7 +112,7 @@ const Landing = () => {
                 style={{ animationDelay: `${i * 0.08}s` }}
               >
                 <div className="w-11 h-11 rounded-xl bg-gradient-ocean flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <f.icon className="w-5 h-5 text-primary-foreground" />
+                  <f.icon className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-base sm:text-lg font-semibold text-foreground mb-1.5">{t(f.titleKey)}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{t(f.descKey)}</p>
@@ -140,7 +140,7 @@ const Landing = () => {
                 {i < steps.length - 1 && (
                   <div className="hidden lg:block absolute top-6 left-[60%] w-[80%] h-px bg-border" />
                 )}
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-ocean text-primary-foreground font-bold text-sm mb-4">
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gradient-ocean text-white font-bold text-sm mb-4">
                   <s.icon className="w-5 h-5" />
                 </div>
                 <p className="text-xs font-bold text-accent tracking-widest uppercase mb-1">{s.num}</p>

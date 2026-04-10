@@ -21,20 +21,19 @@ const DiverLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* AUDIT FIX: Added glassmorphism to top bar — backdrop-blur-xl bg-card/80 border-white/10 */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-card/80 border-b border-white/10 px-4">
-        <div className="container mx-auto h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-50 bg-secondary/95 backdrop-blur-xl border-b border-white/10 shadow-lg px-4">
+        <div className="container mx-auto h-14 sm:h-16 flex items-center justify-between max-w-7xl">
           <div className="flex items-center gap-2.5 min-h-[48px]">
-            <ScubaMaskLogo className="h-9 w-7 text-primary" />
-            <span className="text-lg font-bold text-foreground">ScubaTrip</span>
+            <ScubaMaskLogo className="w-8 h-10 text-primary" />
+            <span className="text-2xl font-black text-white tracking-tighter font-headline">ScubaTrip</span>
           </div>
-          <div className="flex items-center gap-1">
-            <ThemeToggle />
-            <NotificationBell />
-            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')} aria-label={t('nav.language')}>
+          <div className="flex items-center gap-1 sm:gap-2">
+            <ThemeToggle className="text-ocean-200 hover:text-white hover:bg-white/10" />
+            <NotificationBell className="text-ocean-200 hover:text-white hover:bg-white/10" />
+            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px] text-ocean-200 hover:text-white hover:bg-white/10 rounded-full" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')} aria-label={t('nav.language')}>
               <Globe className="w-5 h-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px]" onClick={signOut} aria-label={t('nav.logout')}>
+            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px] text-ocean-200 hover:text-white hover:bg-white/10 rounded-full" onClick={signOut} aria-label={t('nav.logout')}>
               <LogOut className="w-5 h-5" />
             </Button>
           </div>

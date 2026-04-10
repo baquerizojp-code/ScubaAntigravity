@@ -50,7 +50,7 @@ const Explore = () => {
         <section className="mb-12">
           <div className="bg-background p-2 rounded-full shadow-card border border-border flex flex-wrap md:flex-nowrap items-center gap-2">
             <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
-              <MapPin className="w-5 h-5 text-secondary" />
+              <MapPin className="w-5 h-5 text-primary" />
               <div className="flex flex-col w-full">
                 {/* AUDIT FIX: Internationalized search bar labels */}
                 <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.location')}</label>
@@ -65,7 +65,7 @@ const Explore = () => {
             <div className="w-px h-10 bg-border hidden md:block"></div>
             
             <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
-              <Calendar className="w-5 h-5 text-secondary" />
+              <Calendar className="w-5 h-5 text-primary" />
               <div className="flex flex-col w-full">
                 <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.dateRange')}</label>
                 <input 
@@ -79,7 +79,7 @@ const Explore = () => {
             <div className="w-px h-10 bg-border hidden md:block"></div>
             
             <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
-              <Compass className="w-5 h-5 text-secondary" />
+              <Compass className="w-5 h-5 text-primary" />
               <div className="flex flex-col w-full">
                 <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.diverLevel')}</label>
                 <select className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 text-sm appearance-none flex-1 w-full outline-none ring-0 focus:border-none focus:outline-none">

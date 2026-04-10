@@ -108,7 +108,7 @@ const ExploreTrip = () => {
               </h1>
               
               <p className="text-xl md:text-2xl text-foreground font-light max-w-2xl flex items-center gap-2 bg-background/40 backdrop-blur-sm w-fit px-4 py-2 rounded-xl border border-foreground/10">
-                <MapPin className="w-6 h-6 text-secondary" />
+                <MapPin className="w-6 h-6 text-primary" />
                 {trip.dive_site} <span className="text-foreground/40 mx-2">•</span> <span className="opacity-80 text-lg">{trip.departure_point}</span>
               </p>
             </div>
@@ -138,8 +138,8 @@ const ExploreTrip = () => {
                 <h2 className="text-2xl font-headline font-bold mb-8 text-foreground">{t('explore.trip.expeditionDetails')}</h2>
                 <div className="grid grid-cols-2 gap-4 md:gap-6 bg-card p-6 md:p-8 rounded-3xl border border-white/5 shadow-card">
                     <div className="space-y-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Clock className="w-5 h-5 text-secondary" />
+                      <div className="w-10 h-10 rounded-full bg-cyan-electric/10 flex items-center justify-center">
+                          <Clock className="w-5 h-5 text-cyan-electric" />
                       </div>
                       <div>
                           <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('common.time')}</p>
@@ -148,8 +148,8 @@ const ExploreTrip = () => {
                     </div>
                     
                     <div className="space-y-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Users className="w-5 h-5 text-secondary" />
+                      <div className="w-10 h-10 rounded-full bg-cyan-electric/10 flex items-center justify-center">
+                          <Users className="w-5 h-5 text-cyan-electric" />
                       </div>
                       <div>
                           <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t('explore.trip.group')}</p>
@@ -166,7 +166,7 @@ const ExploreTrip = () => {
                    <ul className="space-y-4">
                       {[t('explore.trip.included.tanks'), t('explore.trip.included.guide'), t('explore.trip.included.snacks'), t('explore.trip.included.fees')].map((item, i) => (
                          <li key={i} className="flex items-center gap-3 text-sm font-medium text-foreground">
-                            <CheckCircle2 className="w-5 h-5 text-secondary shrink-0" />
+                            <CheckCircle2 className="w-5 h-5 text-cyan-electric shrink-0" />
                             {item}
                          </li>
                       ))}
@@ -210,7 +210,7 @@ const ExploreTrip = () => {
                 <div className="space-y-4 mb-8">
                    <div className="p-4 bg-background rounded-2xl border border-border flex justify-between items-center group hover:border-secondary transition-colors cursor-pointer">
                       <div className="flex items-center gap-4">
-                         <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-secondary-foreground transition-colors">
+                         <div className="w-10 h-10 rounded-full bg-cyan-electric/10 flex items-center justify-center text-cyan-electric group-hover:bg-cyan-electric group-hover:text-cyan-electric-foreground transition-colors">
                             <Calendar className="w-5 h-5" />
                          </div>
                          <div>
@@ -222,7 +222,7 @@ const ExploreTrip = () => {
                    
                    <div className="p-4 bg-background rounded-2xl border border-border flex justify-between items-center group hover:border-secondary transition-colors cursor-pointer">
                       <div className="flex items-center gap-4">
-                         <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-secondary-foreground transition-colors">
+                         <div className="w-10 h-10 rounded-full bg-cyan-electric/10 flex items-center justify-center text-cyan-electric group-hover:bg-cyan-electric group-hover:text-cyan-electric-foreground transition-colors">
                             <Users className="w-5 h-5" />
                          </div>
                          <div>

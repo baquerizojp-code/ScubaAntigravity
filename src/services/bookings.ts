@@ -19,8 +19,12 @@ export interface BookingWithDetails extends Booking {
     dive_site: string;
     trip_date: string;
     trip_time: string;
+    image_url: string | null;
+    price_usd: number;
+    total_spots: number;
+    available_spots: number;
     whatsapp_group_url: string | null;
-    dive_centers: { name: string } | null;
+    dive_centers: { name: string; logo_url: string | null } | null;
   } | null;
 }
 
@@ -54,7 +58,7 @@ export async function fetchBookingsForDiver(userId: string) {
   const { data, error } = await supabase
     .from('bookings')
     .select(
-      'id, status, notes, rejection_reason, created_at, updated_at, diver_id, trip_id, trips(id, title, dive_site, trip_date, trip_time, whatsapp_group_url, dive_centers(name))'
+      'id, status, notes, rejection_reason, created_at, updated_at, diver_id, trip_id, trips(id, title, dive_site, trip_date, trip_time, image_url, price_usd, total_spots, available_spots, whatsapp_group_url, dive_centers(name, logo_url))'
     )
     .eq('diver_id', profile.id)
     .order('created_at', { ascending: false });
