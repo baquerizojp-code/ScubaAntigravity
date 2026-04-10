@@ -1,194 +1,52 @@
-import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchTripById, type TripWithCenter } from '@/services/trips';
-import {
-  createBooking,
-  fetchBookingForTrip,
-  cancelBooking,
-  requestCancellation,
-} from '@/services/bookings';
-import {
-  fetchDiverProfile,
-  createDiverProfile,
-  assignDiverRole,
-} from '@/services/profiles';
-import { useAuth } from '@/contexts/AuthContext';
-import { BOOKING_STATUS_CLASSES } from '@/lib/statusColors';
-import { DEFAULT_TRIP_DURATION_HOURS } from '@/lib/constants';
+import { useTripBooking } from '@/hooks/useTripBooking';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { toast } from 'sonner';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { MapPin, Calendar, Clock, Users, DollarSign, ArrowLeft, Shield, Wrench, CalendarPlus, XCircle, MessageCircle } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, DollarSign, ArrowLeft, CalendarPlus, XCircle, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
-import { downloadICSFile, getGoogleCalendarUrl } from '@/lib/calendar';
-import type { Tables, Database } from '@/integrations/supabase/types';
 
-type CertificationLevel = Database['public']['Enums']['certification_level'];
-
-type Trip = TripWithCenter;
-
-const certOptions = [
-  { value: 'none', labelKey: 'profile.cert.none' },
-  { value: 'open_water', labelKey: 'profile.cert.openWater' },
-  { value: 'advanced_open_water', labelKey: 'profile.cert.advanced' },
-  { value: 'rescue_diver', labelKey: 'profile.cert.rescue' },
-  { value: 'divemaster', labelKey: 'profile.cert.divemaster' },
-  { value: 'instructor', labelKey: 'profile.cert.instructor' },
-] as const;
+import { BookingStatusBadge } from '@/components/app/BookingStatusBadge';
+import { BookingDialog } from '@/components/app/BookingDialog';
+import { CancellationDialog } from '@/components/app/CancellationDialog';
+import { ProfileCompletionDialog } from '@/components/app/ProfileCompletionDialog';
 
 const TripDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, refreshRole } = useAuth();
   const { t } = useI18n();
 
-  const [trip, setTrip] = useState<Trip | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [booking, setBooking] = useState(false);
-  const [notes, setNotes] = useState('');
-  const [existingBooking, setExistingBooking] = useState<Tables<'bookings'> | null>(null);
-  const [showCancelDialog, setShowCancelDialog] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
-  const [showProfileDialog, setShowProfileDialog] = useState(false);
-  const [dialogFullName, setDialogFullName] = useState('');
-  const [dialogCertification, setDialogCertification] = useState('none');
-  const [creatingProfile, setCreatingProfile] = useState(false);
-
-  useEffect(() => {
-    if (user) {
-      const meta = user.user_metadata;
-      setDialogFullName(meta?.full_name || meta?.name || '');
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (!id) return;
-    const fetchData = async () => {
-      const tripData = await fetchTripById(id);
-      setTrip(tripData);
-      const profile = await fetchDiverProfile(user!.id);
-      if (profile) {
-        const bk = await fetchBookingForTrip(id, profile.id);
-        setExistingBooking(bk);
-      }
-      setLoading(false);
-    };
-    fetchData();
-  }, [id, user]);
-
-  const insertBooking = async (tripId: string, diverId: string) => {
-    try {
-      await createBooking(tripId, diverId, notes || undefined);
-      toast.success(t('diver.trip.booked'));
-      navigate('/app/bookings');
-    } catch (err) {
-      console.error('[TripDetail] insertBooking failed:', err);
-      toast.error(t('diver.trip.bookError'));
-    }
-  };
-
-  const handleBook = async () => {
-    if (!trip || !user) return;
-    setBooking(true);
-    const profile = await fetchDiverProfile(user.id);
-    if (!profile) {
-      setShowProfileDialog(true);
-      setBooking(false);
-      return;
-    }
-    await insertBooking(trip.id, profile.id);
-    setBooking(false);
-  };
-
-  const handleCompleteProfileAndBook = async () => {
-    if (!trip || !user || !dialogFullName.trim()) return;
-    setCreatingProfile(true);
-    try {
-      await assignDiverRole(user.id);
-      const newProfile = await createDiverProfile({
-        user_id: user.id,
-        full_name: dialogFullName.trim(),
-        certification: dialogCertification as CertificationLevel,
-      });
-      await refreshRole();
-      await insertBooking(trip.id, newProfile.id);
-      setShowProfileDialog(false);
-    } catch (err) {
-      console.error('[TripDetail] handleCompleteProfileAndBook failed:', err);
-      toast.error(t('diver.trip.bookError'));
-    } finally {
-      setCreatingProfile(false);
-    }
-  };
-
-  const handleCancelPending = async () => {
-    if (!existingBooking) return;
-    setCancelling(true);
-    try {
-      await cancelBooking(existingBooking.id);
-      toast.success(t('diver.bookings.cancelled'));
-      setExistingBooking({ ...existingBooking, status: 'cancelled' });
-    } catch (err) {
-      console.error('[TripDetail] handleCancelPending failed:', err);
-      toast.error(t('diver.trip.bookError'));
-    } finally {
-      setCancelling(false);
-      setShowCancelDialog(false);
-    }
-  };
-
-  const handleRequestCancellation = async () => {
-    if (!existingBooking) return;
-    setCancelling(true);
-    try {
-      await requestCancellation(existingBooking.id);
-      toast.success(t('diver.trip.cancellationRequested'));
-      setExistingBooking({ ...existingBooking, status: 'cancellation_requested' });
-    } catch (err) {
-      console.error('[TripDetail] handleRequestCancellation failed:', err);
-      toast.error(t('diver.trip.bookError'));
-    } finally {
-      setCancelling(false);
-      setShowCancelDialog(false);
-    }
-  };
-
-  const handleAddToCalendar = (type: 'ics' | 'google') => {
-    if (!trip) return;
-    const event = {
-      title: trip.title,
-      description: `${trip.dive_centers?.name || ''}\n${trip.dive_site}\n${trip.departure_point}`,
-      location: `${trip.dive_site}, ${trip.departure_point}`,
-      startDate: trip.trip_date,
-      startTime: trip.trip_time,
-      durationHours: DEFAULT_TRIP_DURATION_HOURS,
-    };
-    if (type === 'google') {
-      window.open(getGoogleCalendarUrl(event), '_blank');
-    } else {
-      downloadICSFile(event);
-    }
-  };
+  const {
+    trip,
+    loading,
+    booking,
+    notes,
+    setNotes,
+    existingBooking,
+    showCancelDialog,
+    setShowCancelDialog,
+    cancelling,
+    showProfileDialog,
+    setShowProfileDialog,
+    dialogFullName,
+    setDialogFullName,
+    dialogCertification,
+    setDialogCertification,
+    creatingProfile,
+    isPending,
+    isConfirmed,
+    isCancellationRequested,
+    handleBook,
+    handleCompleteProfileAndBook,
+    handleCancelPending,
+    handleRequestCancellation,
+    handleAddToCalendar,
+  } = useTripBooking(id);
 
   if (loading) {
     return (
@@ -201,19 +59,6 @@ const TripDetail = () => {
   }
 
   if (!trip) return <div className="p-6 text-center text-muted-foreground">{t('common.notFound')}</div>;
-
-  /* Status styling consolidated in src/lib/statusColors.ts */
-  const statusMap: Record<string, { label: string; className: string }> = {
-    pending: { label: t('diver.trip.statusPending'), className: BOOKING_STATUS_CLASSES.pending },
-    confirmed: { label: t('diver.trip.statusConfirmed'), className: BOOKING_STATUS_CLASSES.confirmed },
-    rejected: { label: t('diver.trip.statusRejected'), className: BOOKING_STATUS_CLASSES.rejected },
-    cancelled: { label: t('diver.trip.statusCancelled'), className: BOOKING_STATUS_CLASSES.cancelled },
-    cancellation_requested: { label: t('diver.trip.statusCancellationRequested'), className: BOOKING_STATUS_CLASSES.cancellation_requested },
-  };
-
-  const isPending = existingBooking?.status === 'pending';
-  const isConfirmed = existingBooking?.status === 'confirmed';
-  const isCancellationRequested = existingBooking?.status === 'cancellation_requested';
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-2xl">
@@ -268,9 +113,9 @@ const TripDetail = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-foreground">{t('diver.trip.yourBooking')}</p>
-                <Badge className={statusMap[existingBooking.status]?.className + ' mt-1'}>
-                  {statusMap[existingBooking.status]?.label}
-                </Badge>
+                <div className="mt-1">
+                  <BookingStatusBadge status={existingBooking.status} />
+                </div>
               </div>
             </div>
             {existingBooking.rejection_reason && (
@@ -283,7 +128,6 @@ const TripDetail = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    /* AUDIT FIX: Replaced hardcoded green with success tokens */
                     className="gap-2 text-success border-success/30 hover:bg-success/5 hover:text-success"
                     onClick={() => window.open(trip.whatsapp_group_url!, '_blank')}
                   >
@@ -336,27 +180,12 @@ const TripDetail = () => {
           </CardContent>
         </Card>
       ) : trip.available_spots > 0 ? (
-        <Card className="shadow-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">{t('diver.trip.requestSpot')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Textarea
-              placeholder={t('diver.trip.notesPlaceholder')}
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              rows={3}
-            />
-            {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
-            <Button
-              className="w-full bg-primary text-primary-foreground hover:brightness-110 shadow-ocean"
-              onClick={handleBook}
-              disabled={booking}
-            >
-              {booking ? t('common.loading') : t('diver.trip.bookButton')}
-            </Button>
-          </CardContent>
-        </Card>
+        <BookingDialog
+          notes={notes}
+          onNotesChange={setNotes}
+          booking={booking}
+          onBook={handleBook}
+        />
       ) : (
         <Card className="shadow-card">
           <CardContent className="p-5 text-center text-muted-foreground">
@@ -365,64 +194,25 @@ const TripDetail = () => {
         </Card>
       )}
 
-      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {isConfirmed ? t('diver.trip.requestCancellationTitle') : t('diver.bookings.cancelTitle')}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {isConfirmed ? t('diver.trip.requestCancellationDesc') : t('diver.bookings.cancelDescription')}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={cancelling}>{t('common.back')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={isConfirmed ? handleRequestCancellation : handleCancelPending}
-              disabled={cancelling}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {isConfirmed ? t('diver.trip.requestCancellation') : t('diver.bookings.cancelConfirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <CancellationDialog
+        open={showCancelDialog}
+        onOpenChange={setShowCancelDialog}
+        isConfirmed={isConfirmed}
+        cancelling={cancelling}
+        onCancelPending={handleCancelPending}
+        onRequestCancellation={handleRequestCancellation}
+      />
 
-      <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('diver.trip.completeProfileTitle')}</DialogTitle>
-            <DialogDescription>{t('diver.trip.completeProfileDesc')}</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-2">
-              <Label htmlFor="profile-name">{t('diver.trip.fullNameLabel')}</Label>
-              <Input id="profile-name" value={dialogFullName} onChange={e => setDialogFullName(e.target.value)} placeholder={t('diver.trip.fullNameLabel')} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="profile-cert">{t('diver.trip.certLabel')}</Label>
-              <Select value={dialogCertification} onValueChange={setDialogCertification}>
-                <SelectTrigger id="profile-cert"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {certOptions.map(opt => (
-                    <SelectItem key={opt.value} value={opt.value}>{t(opt.labelKey)}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            {/* AUDIT FIX: Changed bg-gradient-ocean → bg-primary text-primary-foreground */}
-            <Button
-              className="w-full bg-primary text-primary-foreground hover:brightness-110 shadow-ocean"
-              onClick={handleCompleteProfileAndBook}
-              disabled={creatingProfile || !dialogFullName.trim()}
-            >
-              {creatingProfile ? t('common.loading') : t('diver.trip.completeAndBook')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ProfileCompletionDialog
+        open={showProfileDialog}
+        onOpenChange={setShowProfileDialog}
+        fullName={dialogFullName}
+        onFullNameChange={setDialogFullName}
+        certification={dialogCertification}
+        onCertificationChange={setDialogCertification}
+        creating={creatingProfile}
+        onSubmit={handleCompleteProfileAndBook}
+      />
     </div>
   );
 };
