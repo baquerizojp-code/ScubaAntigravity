@@ -11,6 +11,15 @@ import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
 import type { DiverProfileSummary, DiverBooking } from '@/types';
 
+const CERT_LABELS: Record<string, string> = {
+  none:                'No Certification',
+  open_water:          'Open Water',
+  advanced_open_water: 'Advanced Open Water',
+  rescue_diver:        'Rescue Diver',
+  divemaster:          'Divemaster',
+  instructor:          'Instructor',
+};
+
 const Dashboard = () => {
   const { user } = useAuth();
   const { t } = useI18n();
@@ -55,7 +64,7 @@ const Dashboard = () => {
         <div className="relative z-20 p-8 md:p-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <Badge className="bg-secondary text-secondary-foreground mb-4 border-0 font-bold tracking-widest uppercase">
-              {profile?.certification ? profile.certification.replace(/_/g, ' ') : 'Diver'}
+              {CERT_LABELS[profile?.certification ?? ''] ?? 'Diver'}
             </Badge>
             <h1 className="text-4xl md:text-5xl font-black font-headline text-white mb-2 leading-tight">
               {t('diver.dashboard.welcomeBack')} {profile?.full_name?.split(' ')[0] || 'Diver'}
@@ -89,7 +98,7 @@ const Dashboard = () => {
                <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center mb-6">
                   <Shield className="w-6 h-6 text-secondary" />
                </div>
-               <p className="text-xl font-black font-headline text-foreground capitalize">{profile?.certification ? profile.certification.replace(/_/g, ' ') : t('profile.cert.none')}</p>
+               <p className="text-xl font-black font-headline text-foreground">{CERT_LABELS[profile?.certification ?? ''] ?? t('profile.cert.none')}</p>
                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold mt-1">{t('diver.dashboard.certLevel')}</p>
             </CardContent>
           </Card>

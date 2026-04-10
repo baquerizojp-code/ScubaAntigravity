@@ -17,7 +17,7 @@ const Login = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, role } = useAuth();
+  const { user, role, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
@@ -32,6 +32,8 @@ const Login = () => {
   const [isSignup, setIsSignup] = useState(modeParam === 'signup' || location.pathname === '/signup');
 
   useEffect(() => {
+    if (authLoading) return;
+    
     if (user && role) {
       if (from) navigate(from, { replace: true });
       else if (role === 'diver') navigate('/app/discover', { replace: true });
@@ -40,7 +42,7 @@ const Login = () => {
       if (from) localStorage.setItem('pending_redirect', from);
       navigate('/complete-profile', { replace: true, state: { from } });
     }
-  }, [user, role, from, navigate]);
+  }, [user, role, authLoading, from, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

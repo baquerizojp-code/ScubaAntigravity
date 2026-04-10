@@ -28,7 +28,8 @@ const CompleteProfile = () => {
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
-  const [fullName, setFullName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [certification, setCertification] = useState('none');
   const [loading, setLoading] = useState(false);
 
@@ -70,7 +71,7 @@ const CompleteProfile = () => {
       .from('diver_profiles')
       .upsert({
         user_id: user.id,
-        full_name: fullName,
+        full_name: [firstName.trim(), lastName.trim()].filter(Boolean).join(' '),
         certification: certification as "none" | "open_water" | "advanced_open_water" | "rescue_diver" | "divemaster" | "instructor",
       }, { onConflict: 'user_id' });
 
@@ -103,15 +104,27 @@ const CompleteProfile = () => {
 
         <div className="bg-card rounded-xl shadow-card p-6 border border-white/5">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="fullName">{t('diver.profile.name')}</Label>
-              <Input
-                id="fullName"
-                value={fullName}
-                onChange={e => setFullName(e.target.value)}
-                required
-                placeholder="Juan Pérez"
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="firstName">{t('diver.profile.firstName')}</Label>
+                <Input
+                  id="firstName"
+                  value={firstName}
+                  onChange={e => setFirstName(e.target.value)}
+                  required
+                  placeholder="Juan"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="lastName">{t('diver.profile.lastName')}</Label>
+                <Input
+                  id="lastName"
+                  value={lastName}
+                  onChange={e => setLastName(e.target.value)}
+                  required
+                  placeholder="Pérez"
+                />
+              </div>
             </div>
             <div>
               <Label>{t('diver.profile.cert')}</Label>
