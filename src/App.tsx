@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Landing from "./pages/Landing";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -112,6 +113,7 @@ const App = () => (
           </ErrorBoundary>
         </BrowserRouter>
         <Analytics />
+        <SpeedInsights />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
