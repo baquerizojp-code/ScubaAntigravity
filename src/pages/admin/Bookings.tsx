@@ -1,6 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
-import { supabase } from '@/integrations/supabase/client';
 import {
   fetchBookingsForCenter,
   confirmBooking,
@@ -10,19 +9,17 @@ import {
   type AdminBookingWithDetails,
 } from '@/services/bookings';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { BOOKING_STATUS_CLASSES_WITH_BORDER } from '@/lib/statusColors';
-import { getTodayDateString } from '@/lib/utils';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
+import { useBookingFilters } from '@/hooks/useBookingFilters';
+import { BookingCard, type BookingCardActions } from '@/components/Admin/BookingCard';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { Check, X, CalendarCheck, Clock, Ban, AlertTriangle } from 'lucide-react';
-import { format } from 'date-fns';
-import { parseLocalDate } from '@/lib/utils';
-import { useState, useEffect } from 'react';
+import { Check, Clock, Ban, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 const AdminBookings = () => {
@@ -44,23 +41,21 @@ const AdminBookings = () => {
     enabled: !!diveCenterId,
   });
 
-  // Realtime: auto-refresh when bookings change
-  useEffect(() => {
-    const channel = supabase
-      .channel('admin-bookings-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'bookings' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['admin-bookings'] });
-        }
-      )
-      .subscribe();
+  // Realtime: auto-refresh when bookings change (replaced manual useEffect)
+  useRealtimeSubscription({
+    channelName: 'admin-bookings-realtime',
+    table: 'bookings',
+    queryKeys: [['admin-bookings']],
+    enabled: !!diveCenterId,
+  });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+  // Memoized filters (replaced raw filterBookings() calls that re-ran on every render)
+  const {
+    confirmedBookings,
+    pendingBookings,
+    cancellationRequestedBookings,
+    rejectedBookings,
+  } = useBookingFilters(bookings);
 
   const confirmMutation = useMutation({
     mutationFn: (bookingId: string) => confirmBooking(bookingId),
@@ -103,106 +98,21 @@ const AdminBookings = () => {
     },
   });
 
-  const statusBadge = (status: string) => {
-    const iconMap: Record<string, typeof Clock> = {
-      pending: Clock, confirmed: Check, rejected: Ban,
-      cancellation_requested: AlertTriangle, cancelled: X,
-    };
-    const Icon = iconMap[status] || Clock;
-    const className = BOOKING_STATUS_CLASSES_WITH_BORDER[status] || BOOKING_STATUS_CLASSES_WITH_BORDER.pending;
-    return <Badge variant="outline" className={className}><Icon className="h-3 w-3 mr-1" />{status}</Badge>;
+  const cardActions: BookingCardActions = {
+    onConfirm: (id) => confirmMutation.mutate(id),
+    onReject: (id) => setRejectDialog(id),
+    onApproveCancellation: (id) => approveCancellationMutation.mutate(id),
+    onDenyCancellation: (id) => denyCancellationMutation.mutate(id),
+    confirmPending: confirmMutation.isPending,
+    approveCancellationPending: approveCancellationMutation.isPending,
+    denyCancellationPending: denyCancellationMutation.isPending,
   };
 
-  const filterBookings = (status: string) => {
-    if (!bookings) return [];
-    
-    if (status === 'confirmed') {
-      const today = getTodayDateString();
-      return bookings.filter(b => 
-        b.status === 'confirmed' && 
-        b.trips?.status === 'published' && 
-        b.trips?.trip_date && b.trips.trip_date >= today
-      ).sort((a, b) => {
-        const dateA = a.trips?.trip_date || '';
-        const dateB = b.trips?.trip_date || '';
-        return dateA.localeCompare(dateB);
-      });
-    }
-
-    const filtered = bookings.filter(b => b.status === status);
-    if (status === 'pending') {
-      return filtered.sort((a, b) => {
-        const dateA = a.trips?.trip_date || '';
-        const dateB = b.trips?.trip_date || '';
-        return dateA.localeCompare(dateB);
-      });
-    }
-    return filtered;
-  };
-
-  const renderBookingCard = (booking: AdminBookingWithDetails, showActions: boolean, showCancellationActions?: boolean) => (
-    <Card key={booking.id} className="p-4">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-semibold text-foreground">
-              {booking.diver_profiles?.full_name || 'Unknown'}
-            </h3>
-            {statusBadge(booking.status)}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {booking.trips?.title} · {booking.trips?.dive_site}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {booking.trips?.trip_date && format(parseLocalDate(booking.trips.trip_date), 'dd/MM/yyyy')} · {booking.trips?.trip_time?.slice(0, 5)}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Cert: {booking.diver_profiles?.certification || '-'} · {booking.diver_profiles?.logged_dives ?? 0} dives
-          </p>
-          {booking.notes && <p className="text-xs text-muted-foreground mt-1 italic">"{booking.notes}"</p>}
-          {booking.rejection_reason && <p className="text-xs text-destructive mt-1">Reason: {booking.rejection_reason}</p>}
-        </div>
-        {showActions && (
-          <div className="flex gap-2 shrink-0">
-            <Button 
-              size="sm" className="gap-1"
-              onClick={() => confirmMutation.mutate(booking.id)}
-              disabled={confirmMutation.isPending}
-            >
-              <Check className="h-3.5 w-3.5" /> {t('common.confirm')}
-            </Button>
-            <Button 
-              size="sm" variant="outline" className="gap-1 text-destructive"
-              onClick={() => setRejectDialog(booking.id)}
-            >
-              <X className="h-3.5 w-3.5" /> {t('admin.bookings.reject')}
-            </Button>
-          </div>
-        )}
-        {showCancellationActions && (
-          <div className="flex gap-2 shrink-0">
-            <Button 
-              size="sm" variant="destructive" className="gap-1"
-              onClick={() => approveCancellationMutation.mutate(booking.id)}
-              disabled={approveCancellationMutation.isPending}
-            >
-              <Check className="h-3.5 w-3.5" /> {t('admin.bookings.approveCancellation')}
-            </Button>
-            <Button 
-              size="sm" variant="outline" className="gap-1"
-              onClick={() => denyCancellationMutation.mutate(booking.id)}
-              disabled={denyCancellationMutation.isPending}
-            >
-              <X className="h-3.5 w-3.5" /> {t('admin.bookings.denyCancellation')}
-            </Button>
-          </div>
-        )}
-      </div>
-    </Card>
-  );
-
-  const renderTabContent = (status: string, showActions: boolean, showCancellationActions?: boolean) => {
-    const filtered = filterBookings(status);
+  const renderTabContent = (
+    filtered: AdminBookingWithDetails[],
+    showActions: boolean,
+    showCancellationActions?: boolean,
+  ) => {
     return isLoading ? (
       <p className="text-muted-foreground py-8">{t('common.loading')}</p>
     ) : !filtered.length ? (
@@ -211,7 +121,15 @@ const AdminBookings = () => {
       </Card>
     ) : (
       <div className="grid gap-3 mt-4">
-        {filtered.map((booking: AdminBookingWithDetails) => renderBookingCard(booking, showActions, showCancellationActions))}
+        {filtered.map((booking) => (
+          <BookingCard
+            key={booking.id}
+            booking={booking}
+            showActions={showActions}
+            showCancellationActions={showCancellationActions}
+            actions={cardActions}
+          />
+        ))}
       </div>
     );
   };
@@ -226,23 +144,23 @@ const AdminBookings = () => {
       <Tabs defaultValue={defaultTab}>
         <TabsList className="flex-wrap h-auto">
           <TabsTrigger value="confirmed" className="gap-1">
-            <Check className="h-3.5 w-3.5" /> {t('admin.bookings.confirmedTab')} ({filterBookings('confirmed').length})
+            <Check className="h-3.5 w-3.5" /> {t('admin.bookings.confirmedTab')} ({confirmedBookings.length})
           </TabsTrigger>
           <TabsTrigger value="pending" className="gap-1">
-            <Clock className="h-3.5 w-3.5" /> {t('admin.bookings.pending')} ({filterBookings('pending').length})
+            <Clock className="h-3.5 w-3.5" /> {t('admin.bookings.pending')} ({pendingBookings.length})
           </TabsTrigger>
           <TabsTrigger value="cancellation_requested" className="gap-1">
-            <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.bookings.cancellationRequests')} ({filterBookings('cancellation_requested').length})
+            <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.bookings.cancellationRequests')} ({cancellationRequestedBookings.length})
           </TabsTrigger>
           <TabsTrigger value="rejected" className="gap-1">
-            <Ban className="h-3.5 w-3.5" /> {t('admin.bookings.rejectedTab')} ({filterBookings('rejected').length})
+            <Ban className="h-3.5 w-3.5" /> {t('admin.bookings.rejectedTab')} ({rejectedBookings.length})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="confirmed">{renderTabContent('confirmed', false)}</TabsContent>
-        <TabsContent value="pending">{renderTabContent('pending', true)}</TabsContent>
-        <TabsContent value="cancellation_requested">{renderTabContent('cancellation_requested', false, true)}</TabsContent>
-        <TabsContent value="rejected">{renderTabContent('rejected', false)}</TabsContent>
+        <TabsContent value="confirmed">{renderTabContent(confirmedBookings, false)}</TabsContent>
+        <TabsContent value="pending">{renderTabContent(pendingBookings, true)}</TabsContent>
+        <TabsContent value="cancellation_requested">{renderTabContent(cancellationRequestedBookings, false, true)}</TabsContent>
+        <TabsContent value="rejected">{renderTabContent(rejectedBookings, false)}</TabsContent>
       </Tabs>
 
       {/* Reject Dialog */}
@@ -251,14 +169,14 @@ const AdminBookings = () => {
           <DialogHeader>
             <DialogTitle>{t('admin.bookings.rejectTitle')}</DialogTitle>
           </DialogHeader>
-          <Textarea 
+          <Textarea
             placeholder={t('admin.bookings.rejectPlaceholder')}
-            value={rejectReason} 
-            onChange={(e) => setRejectReason(e.target.value)} 
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
           />
           <div className="flex justify-end gap-2">
             <Button variant="outline" onClick={() => setRejectDialog(null)}>{t('common.cancel')}</Button>
-            <Button 
+            <Button
               variant="destructive"
               onClick={() => rejectDialog && rejectMutation.mutate({ id: rejectDialog, reason: rejectReason })}
               disabled={rejectMutation.isPending}

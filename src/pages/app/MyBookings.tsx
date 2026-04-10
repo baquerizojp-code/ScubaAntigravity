@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import {
   fetchBookingsForDiver,
   cancelBooking,
-  type BookingWithDetails,
 } from '@/services/bookings';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
@@ -48,23 +47,14 @@ const MyBookings = () => {
     refetchInterval: 30000,
   });
 
-  // Realtime subscription for instant booking status updates
-  useEffect(() => {
-    const channel = supabase
-      .channel('my-bookings-realtime')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'bookings' },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['my-bookings'] });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+  // Realtime subscription for instant booking status updates (replaced manual useEffect)
+  useRealtimeSubscription({
+    channelName: 'my-bookings-realtime',
+    table: 'bookings',
+    event: 'UPDATE',
+    queryKeys: [['my-bookings']],
+    enabled: !!user,
+  });
 
   const handleCancel = async () => {
     if (!cancelId) return;

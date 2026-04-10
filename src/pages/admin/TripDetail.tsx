@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { fetchTripById } from '@/services/trips';
-import { 
-  fetchBookingsByTripId, 
-  confirmBooking, 
-  rejectBooking, 
+import {
+  fetchBookingsByTripId,
+  confirmBooking,
+  rejectBooking,
   removeConfirmedBooking,
-  type AdminBookingWithDetails
+  type AdminBookingWithDetails,
 } from '@/services/bookings';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import { TripFormModal } from '@/components/Admin/TripFormModal';
 import { TRIP_STATUS_CLASSES } from '@/lib/statusColors';
 import { Button } from '@/components/ui/button';
@@ -22,8 +22,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { 
-  ArrowLeft, Edit, Check, X, Clock, Users, Ship, Calendar, MapPin, Anchor, Info, Ban, Image as ImageIcon
+import {
+  ArrowLeft, Edit, Check, X, Clock, Users, Ship, Calendar, MapPin, Anchor, Info, Ban, Image as ImageIcon,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
@@ -54,25 +54,24 @@ const AdminTripDetail = () => {
     enabled: !!id,
   });
 
-  // Realtime Bookings
-  useEffect(() => {
-    if (!id) return;
-    const channel = supabase
-      .channel(`trip-bookings-${id}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'bookings', filter: `trip_id=eq.${id}` },
-        () => {
-          queryClient.invalidateQueries({ queryKey: ['admin-trip-bookings', id] });
-          queryClient.invalidateQueries({ queryKey: ['admin-trip', id] }); // Spots may have changed
-        }
-      )
-      .subscribe();
+  // Realtime Bookings (replaced manual useEffect)
+  useRealtimeSubscription({
+    channelName: `trip-bookings-${id}`,
+    table: 'bookings',
+    filter: `trip_id=eq.${id}`,
+    queryKeys: [['admin-trip-bookings', id], ['admin-trip', id]],
+    enabled: !!id,
+  });
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [id, queryClient]);
+  // Memoized filtered lists
+  const pendingBookings = useMemo(
+    () => bookings?.filter(b => b.status === 'pending') || [],
+    [bookings],
+  );
+  const confirmedBookings = useMemo(
+    () => bookings?.filter(b => b.status === 'confirmed') || [],
+    [bookings],
+  );
 
   // Mutations
   const confirmMutation = useMutation({
@@ -113,9 +112,6 @@ const AdminTripDetail = () => {
   if (!trip) {
     return <div className="p-8 text-center text-muted-foreground">{t('admin.tripDetail.notFound')}</div>;
   }
-
-  const pendingBookings = bookings?.filter(b => b.status === 'pending') || [];
-  const confirmedBookings = bookings?.filter(b => b.status === 'confirmed') || [];
 
   const statusColor = (s: string) => TRIP_STATUS_CLASSES[s] || TRIP_STATUS_CLASSES.draft;
 
@@ -215,14 +211,13 @@ const AdminTripDetail = () => {
                   <TabsTrigger value="pending" className="gap-2">
                     <Clock className="h-4 w-4" /> {t('admin.tripDetail.pendingRequests')}
                     {pendingBookings.length > 0 && (
-                      /* AUDIT FIX: Replaced hardcoded bg-orange-500 with semantic warning token */
                       <Badge variant="default" className="px-1.5 min-w-[1.25rem] bg-warning hover:bg-warning/90 border-none text-warning-foreground">
                         {pendingBookings.length}
                       </Badge>
                     )}
                   </TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="confirmed" className="space-y-4 mt-0">
                   {isLoadingBookings ? (
                     <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
@@ -264,7 +259,6 @@ const AdminTripDetail = () => {
                     </div>
                   ) : (
                     pendingBookings.map((b: AdminBookingWithDetails) => (
-                      /* AUDIT FIX: Replaced hardcoded bg-orange-50/50 border-orange-100 with semantic warning tokens */
                       <div key={b.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-warning/5 border-warning/20 gap-4">
                         <div>
                           <p className="font-semibold">{b.diver_profiles?.full_name || t('admin.tripDetail.unknownDiver')}</p>
@@ -274,18 +268,17 @@ const AdminTripDetail = () => {
                           {b.notes && <p className="text-xs text-muted-foreground mt-1 italic">"{b.notes}"</p>}
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
-                          {/* AUDIT FIX: Replaced hardcoded bg-green-600 with semantic success token */}
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             className="bg-success hover:bg-success/90 text-success-foreground"
                             onClick={() => confirmMutation.mutate(b.id)}
                             disabled={confirmMutation.isPending || (trip.available_spots <= 0)}
                           >
                             <Check className="h-4 w-4 mr-1" /> {t('common.confirm')}
                           </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            size="sm"
+                            variant="outline"
                             className="text-destructive border-destructive/30 hover:bg-destructive/10"
                             onClick={() => setRejectDialog(b.id)}
                           >
@@ -303,7 +296,7 @@ const AdminTripDetail = () => {
       </div>
 
       {/* Edit Form Modal */}
-      <TripFormModal 
+      <TripFormModal
         open={editModalOpen}
         onOpenChange={setEditModalOpen}
         trip={trip}
@@ -315,14 +308,14 @@ const AdminTripDetail = () => {
           <DialogHeader>
             <DialogTitle>{t('admin.bookings.rejectTitle')}</DialogTitle>
           </DialogHeader>
-          <Textarea 
+          <Textarea
             placeholder={t('admin.bookings.rejectPlaceholder')}
-            value={rejectReason} 
-            onChange={(e) => setRejectReason(e.target.value)} 
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
           />
           <div className="flex justify-end gap-2 mt-4">
             <Button variant="outline" onClick={() => setRejectDialog(null)}>{t('common.cancel')}</Button>
-            <Button 
+            <Button
               variant="destructive"
               onClick={() => rejectDialog && rejectMutation.mutate({ bookingId: rejectDialog, reason: rejectReason })}
               disabled={rejectMutation.isPending}
