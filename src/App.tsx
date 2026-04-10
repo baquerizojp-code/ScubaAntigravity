@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Landing from "./pages/Landing";
+import { Analytics } from "@vercel/analytics/react";
 
 // Lazy-loaded routes
 const Login = lazy(() => import("./pages/Login"));
@@ -110,6 +111,7 @@ const App = () => (
           </Suspense>
           </ErrorBoundary>
         </BrowserRouter>
+        <Analytics />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
