@@ -359,5 +359,35 @@
 
   "notFound.title": "404",
   "notFound.message": "¡Oops! Página no encontrada",
-  "notFound.returnHome": "Volver al Inicio"
+  "notFound.returnHome": "Volver al Inicio",
+
+  "registerCenter.pendingApproval": "¡Registro enviado! Tu centro está pendiente de aprobación.",
+
+  "admin.pendingApproval.title": "Pendiente de Aprobación",
+  "admin.pendingApproval.description": "Tu centro de buceo está en revisión. No podrás crear trips hasta que sea aprobado.",
+
+  "roleSwitcher.superAdmin": "Admin",
+  "roleSwitcher.diveCenter": "Centro",
+  "roleSwitcher.diver": "Buzo",
+
+  "superAdmin.title": "Gestión de Centros",
+  "superAdmin.subtitle": "Revisa y gestiona los registros de centros de buceo",
+  "superAdmin.nav.dashboard": "Panel",
+  "superAdmin.approve": "Aprobar",
+  "superAdmin.reject": "Rechazar",
+  "superAdmin.approved": "Centro de buceo aprobado",
+  "superAdmin.rejected": "Centro de buceo rechazado",
+  "superAdmin.confirmApprove": "¿Aprobar este centro de buceo?",
+  "superAdmin.confirmApproveDesc": "El centro podrá crear y publicar trips.",
+  "superAdmin.confirmReject": "¿Rechazar este centro de buceo?",
+  "superAdmin.confirmRejectDesc": "El centro no podrá crear trips.",
+  "superAdmin.noCenters": "No se encontraron centros de buceo",
+  "superAdmin.filter.all": "Todos",
+  "superAdmin.filter.pending": "Pendientes",
+  "superAdmin.filter.approved": "Aprobados",
+  "superAdmin.filter.rejected": "Rechazados",
+  "superAdmin.notification.approvedTitle": "¡Centro Aprobado!",
+  "superAdmin.notification.approvedBody": "Tu centro de buceo ha sido aprobado. ¡Ya puedes crear trips!",
+  "superAdmin.notification.rejectedTitle": "Centro No Aprobado",
+  "superAdmin.notification.rejectedBody": "El registro de tu centro de buceo no fue aprobado."
 }

@@ -6,10 +6,11 @@ import { useI18n } from '@/lib/i18n';
 import NotificationBell from '@/components/NotificationBell';
 import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import RoleSwitcher from '@/components/RoleSwitcher';
 
 const DiverLayout = () => {
   const { pathname } = useLocation();
-  const { signOut } = useAuth();
+  const { signOut, role } = useAuth();
   const { t, locale, setLocale } = useI18n();
 
   const navItems = [
@@ -30,6 +31,7 @@ const DiverLayout = () => {
           <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggle className="text-ocean-200 hover:text-white hover:bg-white/10" />
             <NotificationBell className="text-ocean-200 hover:text-white hover:bg-white/10" />
+            {role === 'super_admin' && <RoleSwitcher compact />}
             <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px] text-ocean-200 hover:text-white hover:bg-white/10 rounded-full" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')} aria-label={t('nav.language')}>
               <Globe className="w-5 h-5" />
             </Button>

@@ -14,6 +14,12 @@ export type TripDifficulty = Database['public']['Enums']['trip_difficulty'];
 export type CertificationLevel = Database['public']['Enums']['certification_level'];
 export type BookingStatus = Database['public']['Enums']['booking_status'];
 
+/** The "active view" for super_admin users who can switch between roles. */
+export type ActiveView = 'super_admin' | 'dive_center' | 'diver';
+
+/** Center approval status. */
+export type CenterStatus = 'pending' | 'approved' | 'rejected';
+
 // ── Diver dashboard types ─────────────────────────────────────────────
 /** Subset of diver_profiles used on the diver dashboard. */
 export interface DiverProfileSummary {

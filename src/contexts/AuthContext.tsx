@@ -1,16 +1,19 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import type { AppRole } from '@/types';
+import type { AppRole, ActiveView, CenterStatus } from '@/types';
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   role: AppRole | null;
   diveCenterId: string | null;
+  centerStatus: CenterStatus | null;
+  activeView: ActiveView;
   loading: boolean;
   signOut: () => Promise<void>;
   refreshRole: () => Promise<void>;
+  setActiveView: (view: ActiveView) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,9 +21,12 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   role: null,
   diveCenterId: null,
+  centerStatus: null,
+  activeView: 'diver',
   loading: true,
   signOut: async () => {},
   refreshRole: async () => {},
+  setActiveView: () => {},
 });
 
 // eslint-disable-next-line react-refresh/only-export-components
@@ -31,6 +37,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [diveCenterId, setDiveCenterId] = useState<string | null>(null);
+  const [centerStatus, setCenterStatus] = useState<CenterStatus | null>(null);
+  const [activeView, setActiveView] = useState<ActiveView>('diver');
   const [loading, setLoading] = useState(true);
 
   const fetchUserRole = async (userId: string) => {
@@ -43,13 +51,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (data) {
       setRole(data.role);
       
-      if (data.role === 'dive_center_admin' || data.role === 'dive_center_staff') {
-        const { data: staff } = await supabase
-          .from('staff_members')
-          .select('dive_center_id')
-          .eq('user_id', userId)
+      if (data.role === 'super_admin') {
+        // Super admin: set default view and check if they own a center
+        setActiveView('super_admin');
+        const { data: center } = await supabase
+          .from('dive_centers')
+          .select('id, center_status')
+          .eq('created_by', userId)
           .maybeSingle();
-        if (staff) setDiveCenterId(staff.dive_center_id);
+        if (center) {
+          setDiveCenterId(center.id);
+          setCenterStatus(center.center_status as CenterStatus);
+        }
+      } else if (data.role === 'dive_center') {
+        // Dive center owner: look up their center via created_by
+        setActiveView('dive_center');
+        const { data: center } = await supabase
+          .from('dive_centers')
+          .select('id, center_status')
+          .eq('created_by', userId)
+          .maybeSingle();
+        if (center) {
+          setDiveCenterId(center.id);
+          setCenterStatus(center.center_status as CenterStatus);
+        }
+      } else {
+        // Diver
+        setActiveView('diver');
       }
     } else {
       setRole(null);
@@ -80,6 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setRole(null);
           setDiveCenterId(null);
+          setCenterStatus(null);
           setLoading(false);
         }
       }
@@ -105,6 +134,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await supabase.auth.signOut();
     setRole(null);
     setDiveCenterId(null);
+    setCenterStatus(null);
+    setActiveView('diver');
   };
 
   const refreshRole = async () => {
@@ -112,7 +143,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, diveCenterId, loading, signOut, refreshRole }}>
+    <AuthContext.Provider value={{ user, session, role, diveCenterId, centerStatus, activeView, loading, signOut, refreshRole, setActiveView }}>
       {children}
     </AuthContext.Provider>
   );

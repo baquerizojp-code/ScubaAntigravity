@@ -1,30 +1,22 @@
 import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
-import { 
-  LayoutDashboard, Ship, CalendarCheck, Settings, LogOut, Menu
-} from 'lucide-react';
+import { Shield, LogOut, Menu } from 'lucide-react';
 import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
-import NotificationBell from '@/components/NotificationBell';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import RoleSwitcher from '@/components/RoleSwitcher';
-import PendingApprovalBanner from '@/components/PendingApprovalBanner';
 
-const AdminLayout = () => {
-  // Vite HMR flush
-  const { signOut, role } = useAuth();
+const SuperAdminLayout = () => {
+  const { signOut } = useAuth();
   const { t } = useI18n();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
-    { to: '/admin', icon: LayoutDashboard, label: t('admin.nav.dashboard'), end: true },
-    { to: '/admin/trips', icon: Ship, label: t('admin.nav.trips') },
-    { to: '/admin/bookings', icon: CalendarCheck, label: t('admin.nav.bookings') },
-    { to: '/admin/settings', icon: Settings, label: t('admin.nav.settings') },
+    { to: '/super-admin', icon: Shield, label: t('superAdmin.nav.dashboard'), end: true },
   ];
 
   const isActive = (path: string, end?: boolean) => {
@@ -42,28 +34,22 @@ const AdminLayout = () => {
         />
       )}
 
-      {/* AUDIT FIX: Sidebar uses tonal background shift instead of border-r per No-Line Rule */}
       <aside className={cn(
         "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-muted flex flex-col transition-transform lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="p-6 flex items-center justify-between">
-          <Link to="/admin" className="flex items-center gap-2">
+          <Link to="/super-admin" className="flex items-center gap-2">
             <ScubaMaskLogo className="h-8 w-6 text-primary" />
             <span className="text-lg font-bold text-foreground">ScubaTrip</span>
           </Link>
-          <div className="hidden lg:flex items-center gap-2">
-            <ThemeToggle />
-            <NotificationBell />
-          </div>
+          <ThemeToggle />
         </div>
 
-        {/* Role Switcher for super_admin */}
-        {role === 'super_admin' && (
-          <div className="px-4 mb-4">
-            <RoleSwitcher />
-          </div>
-        )}
+        {/* Role Switcher */}
+        <div className="px-4 mb-4">
+          <RoleSwitcher />
+        </div>
 
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map(({ to, icon: Icon, label, end }) => (
@@ -96,7 +82,6 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
         <header className="lg:hidden flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-secondary/95 backdrop-blur-xl shadow-lg min-h-[56px]">
@@ -107,13 +92,10 @@ const AdminLayout = () => {
             <ScubaMaskLogo className="h-8 w-6 text-primary" />
             <span className="text-xl font-black text-white tracking-tighter font-headline ml-2">ScubaTrip</span>
           </div>
-          {role === 'super_admin' && <RoleSwitcher compact />}
-          <ThemeToggle className="text-ocean-200 hover:text-white hover:bg-white/10" />
-          <NotificationBell className="text-ocean-200 hover:text-white hover:bg-white/10" />
+          <RoleSwitcher compact />
         </header>
 
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-          <PendingApprovalBanner />
           <Outlet />
         </main>
       </div>
@@ -121,4 +103,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default SuperAdminLayout;

@@ -130,17 +130,13 @@ const NotificationBell = ({ className }: NotificationBellProps = {}) => {
                     if (!n.is_read) markAsRead(n.id);
                     setOpen(false);
                     // Navigate based on notification type and role
-                    const isAdmin = role === 'dive_center_admin' || role === 'dive_center_staff';
-                    if (isAdmin) {
-                      if (n.type === 'new_booking' || n.type === 'cancellation_request') {
-                        navigate('/admin/bookings');
-                      } else if (n.type === 'booking_cancelled') {
-                        navigate('/admin/bookings');
-                      }
-                    } else {
-                      if ((n.type === 'booking_confirmed' || n.type === 'booking_rejected' || n.type === 'new_trip') && n.trip_id) {
-                        navigate(`/app/trip/${n.trip_id}`);
-                      }
+                    const isDiveCenter = role === 'dive_center' || (role === 'super_admin');
+                    if (n.type === 'center_approved' || n.type === 'center_rejected') {
+                      navigate('/admin');
+                    } else if (isDiveCenter && (n.type === 'new_booking' || n.type === 'cancellation_request' || n.type === 'booking_cancelled')) {
+                      navigate('/admin/bookings');
+                    } else if ((n.type === 'booking_confirmed' || n.type === 'booking_rejected' || n.type === 'new_trip') && n.trip_id) {
+                      navigate(`/app/trip/${n.trip_id}`);
                     }
                   }}
                 >

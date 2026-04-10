@@ -29,7 +29,8 @@ const RegisterCenter = () => {
   useEffect(() => {
     if (user && role) {
       if (role === 'diver') navigate('/app/discover', { replace: true });
-      else navigate('/admin', { replace: true });
+      else if (role === 'super_admin' && diveCenterId) navigate('/super-admin', { replace: true });
+      else if (role === 'dive_center' && diveCenterId) navigate('/admin', { replace: true });
     }
   }, [user, role, navigate]);
 
@@ -94,7 +95,7 @@ const RegisterCenter = () => {
     setLoading(true);
 
     const { error: roleError } = await supabase
-      .rpc('assign_dive_center_admin_role', { _user_id: user.id });
+      .rpc('assign_dive_center_role', { _user_id: user.id });
 
     if (roleError) {
       toast.error(roleError.message);
@@ -102,38 +103,22 @@ const RegisterCenter = () => {
       return;
     }
 
-    const { data: center, error: centerError } = await supabase
+    const { error: centerError } = await supabase
       .from('dive_centers')
       .insert({
         name: centerName,
         whatsapp_number: centerWhatsapp ? stripPhoneFormat(centerWhatsapp) : null,
         created_by: user.id,
-      })
-      .select()
-      .single();
-
-    if (centerError || !center) {
-      toast.error(centerError?.message || 'Error creating center');
-      setLoading(false);
-      return;
-    }
-
-    const { error: staffError } = await supabase
-      .from('staff_members')
-      .insert({
-        dive_center_id: center.id,
-        user_id: user.id,
-        role: 'admin' as const,
       });
 
-    if (staffError) {
-      toast.error(staffError.message);
+    if (centerError) {
+      toast.error(centerError.message || 'Error creating center');
       setLoading(false);
       return;
     }
 
     setLoading(false);
-    toast.success(t('registerCenter.success'));
+    toast.success(t('registerCenter.pendingApproval'));
     window.location.href = '/admin';
   };
 

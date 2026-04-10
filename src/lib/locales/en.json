@@ -359,5 +359,35 @@
 
   "notFound.title": "404",
   "notFound.message": "Oops! Page not found",
-  "notFound.returnHome": "Return to Home"
+  "notFound.returnHome": "Return to Home",
+
+  "registerCenter.pendingApproval": "Registration submitted! Your center is pending approval.",
+
+  "admin.pendingApproval.title": "Pending Approval",
+  "admin.pendingApproval.description": "Your dive center is under review. You won't be able to create trips until it's approved.",
+
+  "roleSwitcher.superAdmin": "Admin",
+  "roleSwitcher.diveCenter": "Center",
+  "roleSwitcher.diver": "Diver",
+
+  "superAdmin.title": "Dive Center Management",
+  "superAdmin.subtitle": "Review and manage dive center registrations",
+  "superAdmin.nav.dashboard": "Dashboard",
+  "superAdmin.approve": "Approve",
+  "superAdmin.reject": "Reject",
+  "superAdmin.approved": "Dive center approved",
+  "superAdmin.rejected": "Dive center rejected",
+  "superAdmin.confirmApprove": "Approve this dive center?",
+  "superAdmin.confirmApproveDesc": "The center will be able to create and publish trips.",
+  "superAdmin.confirmReject": "Reject this dive center?",
+  "superAdmin.confirmRejectDesc": "The center will not be able to create trips.",
+  "superAdmin.noCenters": "No dive centers found",
+  "superAdmin.filter.all": "All",
+  "superAdmin.filter.pending": "Pending",
+  "superAdmin.filter.approved": "Approved",
+  "superAdmin.filter.rejected": "Rejected",
+  "superAdmin.notification.approvedTitle": "Center Approved!",
+  "superAdmin.notification.approvedBody": "Your dive center has been approved. You can now create trips!",
+  "superAdmin.notification.rejectedTitle": "Center Not Approved",
+  "superAdmin.notification.rejectedBody": "Your dive center registration was not approved."
 }

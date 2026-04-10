@@ -28,15 +28,7 @@ const Landing = () => {
   const { user, role, loading } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!loading && user && role) {
-      if (role === 'diver') {
-        navigate('/app/discover', { replace: true });
-      } else {
-        navigate('/admin', { replace: true });
-      }
-    }
-  }, [loading, user, role, navigate]);
+  // No auto-redirect. Users can stay on the landing page and use the Navbar 'Dashboard' button instead.
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
