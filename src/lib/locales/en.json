@@ -221,6 +221,7 @@
   "diver.bookings.cancelTitle": "Cancel Booking",
   "diver.bookings.cancelDescription": "Are you sure you want to cancel this booking request?",
   "diver.bookings.cancelConfirm": "Yes, cancel",
+  "diver.bookings.withdrawRequest": "Withdraw Request",
   "diver.trip.statusCancelled": "Cancelled",
   "diver.trip.statusCancellationRequested": "Cancellation Requested",
   "diver.trip.addToCalendar": "Add to Calendar",

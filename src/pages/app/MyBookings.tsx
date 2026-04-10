@@ -11,8 +11,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,17 +22,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Calendar, MapPin, ChevronRight, X, MessageCircle } from 'lucide-react';
-import { format } from 'date-fns';
-import { parseLocalDate } from '@/lib/utils';
+import { X, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
-
-
-
-/* Status styling consolidated in src/lib/statusColors.ts */
-import { BOOKING_STATUS_CLASSES as statusBadge } from '@/lib/statusColors';
+import TripCard, { TripWithCenter } from '@/components/TripCard';
 
 const MyBookings = () => {
+  const [activeTab, setActiveTab] = useState<'confirmed' | 'pending' | 'other'>('confirmed');
   const { user } = useAuth();
   const { t } = useI18n();
   const queryClient = useQueryClient();
@@ -75,79 +69,61 @@ const MyBookings = () => {
   const renderList = (statuses: string[]) => {
     const filtered = bookings.filter(b => statuses.includes(b.status));
     if (filtered.length === 0) {
-      return <p className="text-center text-muted-foreground py-12">{t('diver.bookings.empty')}</p>;
+      return (
+        <div className="flex flex-col items-center justify-center py-20 px-6 text-center">
+          <p className="text-muted-foreground">{t('diver.bookings.empty')}</p>
+        </div>
+      );
     }
     return (
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 pb-20">
         {filtered.map(b => (
-          <div key={b.id} className="relative">
-            <Link to={`/app/trip/${b.trips?.id}`}>
-              <Card className="shadow-card hover:shadow-card-hover transition-shadow">
-                <CardContent className="p-4 flex items-center gap-4">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground truncate">{b.trips?.title}</h3>
-                    <p className="text-sm text-muted-foreground truncate">{b.trips?.dive_centers?.name}</p>
-                    <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{b.trips?.dive_site}</span>
-                      <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{b.trips?.trip_date ? format(parseLocalDate(b.trips.trip_date), 'dd MMM') : ''}</span>
-                    </div>
-                    {b.rejection_reason && (
-                      <p className="text-xs text-destructive mt-1">{b.rejection_reason}</p>
-                    )}
-                    {b.status === 'confirmed' && (
-                      <div className="mt-2">
-                        {b.trips?.whatsapp_group_url ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            /* AUDIT FIX: Replaced hardcoded green with semantic success tokens */
-                            className="gap-1.5 text-success border-success/30 hover:bg-success/5 hover:text-success h-7 text-xs"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              window.open(b.trips!.whatsapp_group_url!, '_blank');
-                            }}
-                          >
-                            <MessageCircle className="w-3.5 h-3.5" />
-                            {t('diver.trip.joinWhatsApp')}
-                          </Button>
-                        ) : (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-1.5 h-7 text-xs"
-                            disabled
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                          >
-                            <MessageCircle className="w-3.5 h-3.5" />
-                            {t('diver.trip.whatsAppPending')}
-                          </Button>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Badge className={statusBadge[b.status]}>{t(`diver.trip.status${b.status.charAt(0).toUpperCase() + b.status.slice(1)}`)}</Badge>
-                    {b.status === 'pending' && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                        aria-label={t('diver.bookings.cancelConfirm')}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          setCancelId(b.id);
-                        }}
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    )}
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+          <div key={b.id} className="flex flex-col">
+            {b.trips && (
+              <div className="w-full">
+                <TripCard 
+                  trip={b.trips as unknown as TripWithCenter} 
+                  linkTo={`/app/trip/${b.trips.id}`}
+                  bookingStatus={b.status}
+                />
+              </div>
+            )}
+            
+            {/* Context Action Bar */}
+            <div className="mt-3 flex flex-col gap-2">
+              {b.rejection_reason && (
+                <p className="text-sm text-destructive">{b.rejection_reason}</p>
+              )}
+              
+              <div className="flex gap-2">
+                {b.status === 'confirmed' && (
+                  <Button
+                    variant="outline"
+                    className="flex-1 gap-2 text-success border-success/30 hover:bg-success/5 hover:text-success h-12 rounded-xl transition-all shadow-sm"
+                    disabled={!b.trips?.whatsapp_group_url}
+                    onClick={(e) => {
+                      if (b.trips?.whatsapp_group_url) {
+                        window.open(b.trips.whatsapp_group_url, '_blank');
+                      }
+                    }}
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    {b.trips?.whatsapp_group_url ? t('diver.trip.joinWhatsApp') : t('diver.trip.whatsAppPending')}
+                  </Button>
+                )}
+                
+                {b.status === 'pending' && (
+                  <Button
+                    variant="outline"
+                    className="flex-1 gap-2 text-warning border-warning/30 hover:bg-warning/5 hover:text-warning h-12 rounded-xl transition-all shadow-sm"
+                    onClick={() => setCancelId(b.id)}
+                  >
+                    <X className="w-5 h-5" />
+                    {t('diver.bookings.withdrawRequest')}
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         ))}
       </div>
@@ -159,21 +135,44 @@ const MyBookings = () => {
       <h1 className="text-2xl font-bold font-headline text-foreground mb-1">{t('nav.myBookings')}</h1>
       <p className="text-muted-foreground text-sm mb-6">{t('diver.bookings.subtitle')}</p>
 
+      <div className="mt-6 mb-2">
+        <div className="w-full overflow-x-auto scrollbar-hide pb-2">
+          <div className="flex w-max space-x-3 p-1">
+            <Button
+              variant="outline"
+              className={`rounded-full px-6 transition-all ${activeTab === 'confirmed' ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' : 'bg-card/50 backdrop-blur-md text-muted-foreground hover:text-foreground'}`}
+              onClick={() => setActiveTab('confirmed')}
+            >
+              {t('admin.bookings.confirmedTab')}
+            </Button>
+            <Button
+              variant="outline"
+              className={`rounded-full px-6 transition-all ${activeTab === 'pending' ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' : 'bg-card/50 backdrop-blur-md text-muted-foreground hover:text-foreground'}`}
+              onClick={() => setActiveTab('pending')}
+            >
+              {t('admin.bookings.pending')}
+            </Button>
+            <Button
+              variant="outline"
+              className={`rounded-full px-6 transition-all ${activeTab === 'other' ? 'bg-primary text-primary-foreground border-primary hover:bg-primary/90' : 'bg-card/50 backdrop-blur-md text-muted-foreground hover:text-foreground'}`}
+              onClick={() => setActiveTab('other')}
+            >
+              {t('diver.bookings.otherTab')}
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => <Skeleton key={i} className="h-24 rounded-xl" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {[1, 2, 3].map(i => <div key={i} className="aspect-[4/5] bg-muted animate-pulse rounded-xl" />)}
         </div>
       ) : (
-        <Tabs defaultValue="confirmed">
-          <TabsList className="w-full">
-            <TabsTrigger value="confirmed" className="flex-1">{t('admin.bookings.confirmedTab')}</TabsTrigger>
-            <TabsTrigger value="pending" className="flex-1">{t('admin.bookings.pending')}</TabsTrigger>
-            <TabsTrigger value="other" className="flex-1">{t('diver.bookings.otherTab')}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="confirmed" className="mt-4">{renderList(['confirmed'])}</TabsContent>
-          <TabsContent value="pending" className="mt-4">{renderList(['pending'])}</TabsContent>
-          <TabsContent value="other" className="mt-4">{renderList(['rejected', 'cancelled', 'cancellation_requested'])}</TabsContent>
-        </Tabs>
+        <div>
+          {activeTab === 'confirmed' && renderList(['confirmed'])}
+          {activeTab === 'pending' && renderList(['pending'])}
+          {activeTab === 'other' && renderList(['rejected', 'cancelled', 'cancellation_requested'])}
+        </div>
       )}
 
       <AlertDialog open={!!cancelId} onOpenChange={(open) => !open && setCancelId(null)}>
