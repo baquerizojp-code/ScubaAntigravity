@@ -18,13 +18,14 @@ npx vitest run src/components/__tests__/TripCard.test.tsx  # Run a single test f
 
 ScubaTrip is a React 18 + Vite SPA for scuba diving trip management. Backend is Supabase (PostgreSQL + Auth + Storage + Realtime). Deployed on Vercel with an SPA rewrite rule (`vercel.json`).
 
-### Dual-Role System
+### Role System
 
-Two main user roles with separate route trees:
+Three main user roles with separate route trees:
 - **Divers** (`/app/*`) — browse trips, book, manage profile, cancel bookings
-- **Dive Center Admin/Staff** (`/admin/*`) — manage trips, approve/reject bookings, manage staff, center settings
+- **Dive Centers** (`/admin/*`) — manage trips, approve/reject bookings, center settings (single-owner model)
+- **Super Admin** (`/super-admin/*`) — platform management, approve/reject dive center registrations
 
-Routes are protected via `ProtectedRoute` component which checks role from `AuthContext`. Role is stored in the `user_roles` table, not Supabase auth metadata. Staff can have either `admin` or `staff` sub-role within a dive center (stored in `staff_members`).
+Routes are protected via `ProtectedRoute` component which checks role from `AuthContext`. Role is stored in the `user_roles` table. Dive centers default to a `pending` status upon creation and must be approved by a `super_admin` before they can publish trips. Access to the `/admin` dashboard strictly requires a valid `diveCenterId`.
 
 ### Data Flow
 
@@ -43,7 +44,7 @@ AuthContext (session, role, diveCenterId)
 ### Route Map
 
 ```
-/                      Landing page (public)
+/                      Landing page (public viewable by both logged-in and guests)
 /explore               Browse all published trips (public)
 /explore/:id           Public trip detail page
 /login                 Login + Signup (tabbed, single page)
@@ -53,14 +54,15 @@ AuthContext (session, role, diveCenterId)
 /complete-profile      Post-signup profile setup (protected, no role check)
 /register-center       Dive center registration
 
-/admin                 Admin Dashboard (protected: dive_center_admin | dive_center_staff)
+/super-admin           Super Admin Dashboard (protected: super_admin)
+
+/admin                 Admin Dashboard (protected: dive_center | super_admin)
 /admin/trips           Trip management list
 /admin/trips/:id       Trip detail + booking management
 /admin/bookings        All bookings for the center
-/admin/staff           Staff management + invite flow
 /admin/settings        Dive center profile settings
 
-/app                   Diver Dashboard (protected: diver)
+/app                   Diver Dashboard (protected: diver | super_admin)
 /app/discover          Discover published trips
 /app/trip/:id          Trip detail + booking flow
 /app/bookings          My bookings
@@ -77,17 +79,15 @@ Supabase PostgreSQL with RLS enabled on all tables. Migrations live in `supabase
 
 | Table | Description |
 |---|---|
-| `user_roles` | Maps `user_id` → `app_role` (diver, dive_center_admin, dive_center_staff) |
+| `user_roles` | Maps `user_id` → `app_role` (diver, dive_center, super_admin) |
 | `diver_profiles` | Diver profile data (full_name, avatar_url, certification, logged_dives, emergency_contact) |
-| `dive_centers` | Dive center profile (name, description, whatsapp, social links, location, hours) |
-| `staff_members` | Links users to dive centers with a `staff_role` (admin \| staff) |
-| `staff_invites` | Email-based invite tokens for staff onboarding (48h expiry) |
-| `trips` | Trip listings; includes `image_url` (Supabase Storage URL) added in migration `20260319` |
+| `dive_centers` | Dive center profile (name, description, whatsapp, location). Includes `center_status` (pending/approved/rejected) and `created_by` (owner reference) |
+| `trips` | Trip listings; includes `image_url` (Supabase Storage URL) |
 | `bookings` | Booking records; status enum: pending → confirmed/rejected/cancelled/cancellation_requested |
-| `notifications` | In-app notifications for both divers and admin staff |
+| `notifications` | In-app notifications for both divers and admins |
 | `group_messages` | Trip-level group chat messages (table exists, UI TBD) |
 
-**Custom enums:** `app_role`, `booking_status`, `certification_level`, `trip_status`, `trip_difficulty`, `staff_role`
+**Custom enums:** `app_role`, `booking_status`, `certification_level`, `trip_status`, `trip_difficulty`, `center_status`
 
 **Database automation:** A `handle_new_user()` trigger on `auth.users` (AFTER INSERT) automatically inserts a `diver` role into `user_roles` and a default row into `diver_profiles`. This prevents race conditions between frontend and backend profile creation.
 

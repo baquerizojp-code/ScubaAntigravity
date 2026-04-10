@@ -30,8 +30,9 @@ import type { TripStatus } from '@/types';
 import type { TripFormEditData } from '@/components/Admin/TripFormModal';
 
 const AdminTrips = () => {
-  const { diveCenterId } = useAuth();
+  const { diveCenterId, centerStatus } = useAuth();
   const { t } = useI18n();
+  const canCreateTrips = centerStatus === 'approved';
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -120,7 +121,7 @@ const AdminTrips = () => {
               {t('admin.nav.trips')}
             </Button>
           )}
-          <Button onClick={openCreate} className="gap-2">
+          <Button onClick={openCreate} className="gap-2" disabled={!canCreateTrips}>
             <Plus className="h-4 w-4" /> {t('admin.trips.create')}
           </Button>
         </div>
@@ -132,7 +133,7 @@ const AdminTrips = () => {
         <Card className="flex flex-col items-center justify-center py-16">
           <Ship className="h-12 w-12 text-muted-foreground/40 mb-4" />
           <p className="text-muted-foreground">{t('admin.trips.empty')}</p>
-          <Button onClick={openCreate} className="mt-4 gap-2">
+          <Button onClick={openCreate} className="mt-4 gap-2" disabled={!canCreateTrips}>
             <Plus className="h-4 w-4" /> {t('admin.trips.create')}
           </Button>
         </Card>

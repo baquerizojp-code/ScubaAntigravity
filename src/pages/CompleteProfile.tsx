@@ -41,8 +41,10 @@ const CompleteProfile = () => {
       const dest = pendingRedirect || '/app/discover';
       localStorage.removeItem('pending_redirect');
       navigate(dest, { replace: true });
-    } else if (role === 'dive_center_admin' || role === 'dive_center_staff') {
+    } else if (role === 'dive_center') {
       navigate('/admin', { replace: true });
+    } else if (role === 'super_admin') {
+      navigate('/super-admin', { replace: true });
     }
   }, [role, navigate, pendingRedirect]);
 

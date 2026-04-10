@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.4"
   }
   public: {
     Tables: {
@@ -64,6 +64,9 @@ export type Database = {
       }
       dive_centers: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
+          center_status: string
           created_at: string
           created_by: string | null
           description: string | null
@@ -80,6 +83,9 @@ export type Database = {
           whatsapp_number: string | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          center_status?: string
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -96,6 +102,9 @@ export type Database = {
           whatsapp_number?: string | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          center_status?: string
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -231,79 +240,6 @@ export type Database = {
           },
         ]
       }
-      staff_invites: {
-        Row: {
-          accepted: boolean
-          created_at: string
-          dive_center_id: string
-          expires_at: string
-          id: string
-          invite_token: string
-          invited_email: string
-          role: Database["public"]["Enums"]["staff_role"]
-        }
-        Insert: {
-          accepted?: boolean
-          created_at?: string
-          dive_center_id: string
-          expires_at?: string
-          id?: string
-          invite_token?: string
-          invited_email: string
-          role?: Database["public"]["Enums"]["staff_role"]
-        }
-        Update: {
-          accepted?: boolean
-          created_at?: string
-          dive_center_id?: string
-          expires_at?: string
-          id?: string
-          invite_token?: string
-          invited_email?: string
-          role?: Database["public"]["Enums"]["staff_role"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "staff_invites_dive_center_id_fkey"
-            columns: ["dive_center_id"]
-            isOneToOne: false
-            referencedRelation: "dive_centers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      staff_members: {
-        Row: {
-          created_at: string
-          dive_center_id: string
-          id: string
-          role: Database["public"]["Enums"]["staff_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          dive_center_id: string
-          id?: string
-          role?: Database["public"]["Enums"]["staff_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          dive_center_id?: string
-          id?: string
-          role?: Database["public"]["Enums"]["staff_role"]
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "staff_members_dive_center_id_fkey"
-            columns: ["dive_center_id"]
-            isOneToOne: false
-            referencedRelation: "dive_centers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       trips: {
         Row: {
           available_spots: number
@@ -315,6 +251,7 @@ export type Database = {
           dive_site: string
           gear_rental_available: boolean | null
           id: string
+          image_url: string | null
           min_certification:
             | Database["public"]["Enums"]["certification_level"]
             | null
@@ -326,7 +263,6 @@ export type Database = {
           trip_time: string
           updated_at: string
           whatsapp_group_url: string | null
-          image_url: string | null
         }
         Insert: {
           available_spots: number
@@ -338,6 +274,7 @@ export type Database = {
           dive_site: string
           gear_rental_available?: boolean | null
           id?: string
+          image_url?: string | null
           min_certification?:
             | Database["public"]["Enums"]["certification_level"]
             | null
@@ -349,7 +286,6 @@ export type Database = {
           trip_time: string
           updated_at?: string
           whatsapp_group_url?: string | null
-          image_url?: string | null
         }
         Update: {
           available_spots?: number
@@ -361,6 +297,7 @@ export type Database = {
           dive_site?: string
           gear_rental_available?: boolean | null
           id?: string
+          image_url?: string | null
           min_certification?:
             | Database["public"]["Enums"]["certification_level"]
             | null
@@ -372,7 +309,6 @@ export type Database = {
           trip_time?: string
           updated_at?: string
           whatsapp_group_url?: string | null
-          image_url?: string | null
         }
         Relationships: [
           {
@@ -410,23 +346,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      approve_cancellation: { Args: { _booking_id: string }; Returns: boolean }
-      assign_dive_center_admin_role: {
+      assign_dive_center_role: {
         Args: { _user_id: string }
         Returns: undefined
       }
       auto_complete_past_trips: { Args: never; Returns: undefined }
       confirm_booking: { Args: { _booking_id: string }; Returns: boolean }
-      create_notification: {
-        Args: {
-          _body: string
-          _title: string
-          _trip_id?: string
-          _type: string
-          _user_id: string
-        }
-        Returns: string
-      }
       get_user_dive_center_id: { Args: { _user_id: string }; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
@@ -443,21 +368,23 @@ export type Database = {
         Args: { _trip_id: string; _user_id: string }
         Returns: boolean
       }
-      is_dive_center_admin: {
+      is_dive_center_owner: {
         Args: { _center_id: string; _user_id: string }
         Returns: boolean
       }
-      is_dive_center_staff: {
-        Args: { _center_id: string; _user_id: string }
-        Returns: boolean
-      }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
       staff_can_view_diver: {
         Args: { _diver_profile_id: string; _staff_user_id: string }
         Returns: boolean
       }
     }
     Enums: {
-      app_role: "diver" | "dive_center_admin" | "dive_center_staff"
+      app_role:
+        | "diver"
+        | "dive_center_admin"
+        | "dive_center_staff"
+        | "dive_center"
+        | "super_admin"
       booking_status:
         | "pending"
         | "confirmed"
@@ -471,7 +398,6 @@ export type Database = {
         | "divemaster"
         | "instructor"
         | "none"
-      staff_role: "admin" | "staff"
       trip_difficulty: "beginner" | "intermediate" | "advanced"
       trip_status: "draft" | "published" | "completed" | "cancelled"
     }
@@ -601,7 +527,13 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["diver", "dive_center_admin", "dive_center_staff"],
+      app_role: [
+        "diver",
+        "dive_center_admin",
+        "dive_center_staff",
+        "dive_center",
+        "super_admin",
+      ],
       booking_status: [
         "pending",
         "confirmed",
@@ -617,7 +549,6 @@ export const Constants = {
         "instructor",
         "none",
       ],
-      staff_role: ["admin", "staff"],
       trip_difficulty: ["beginner", "intermediate", "advanced"],
       trip_status: ["draft", "published", "completed", "cancelled"],
     },

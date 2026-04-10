@@ -12,7 +12,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login', skipRoleCheck = false }: ProtectedRouteProps) => {
-  const { user, role, loading } = useAuth();
+  const { user, role, activeView, loading, diveCenterId } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -32,7 +32,31 @@ const ProtectedRoute = ({ children, allowedRoles, redirectTo = '/login', skipRol
     return <Navigate to="/complete-profile" replace />;
   }
 
-  // Check allowed roles
+  // Force users in dive_center view without a dive center to register one
+  if ((activeView === 'dive_center' || role === 'dive_center') && !diveCenterId && location.pathname !== '/register-center') {
+    return <Navigate to="/register-center" replace />;
+  }
+
+  // Super admin can access everything — route based on activeView
+  if (role === 'super_admin') {
+    if (allowedRoles) {
+      // Check if the active view matches the allowed roles
+      const viewMatchesRoles =
+        (activeView === 'diver' && allowedRoles.includes('diver')) ||
+        (activeView === 'dive_center' && allowedRoles.includes('dive_center')) ||
+        (activeView === 'super_admin' && allowedRoles.includes('super_admin'));
+      
+      if (!viewMatchesRoles) {
+        // Redirect based on active view
+        if (activeView === 'diver') return <Navigate to="/app/discover" replace />;
+        if (activeView === 'dive_center') return <Navigate to="/admin" replace />;
+        return <Navigate to="/super-admin" replace />;
+      }
+    }
+    return <>{children}</>;
+  }
+
+  // Check allowed roles for non-super-admin users
   if (allowedRoles && (!role || !allowedRoles.includes(role))) {
     // Redirect based on their actual role
     if (role === 'diver') {
