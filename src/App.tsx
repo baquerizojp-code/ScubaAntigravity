@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Landing from "./pages/Landing";
 
 // Lazy-loaded routes
@@ -110,6 +111,7 @@ const App = () => (
           </Suspense>
           </ErrorBoundary>
         </BrowserRouter>
+        <SpeedInsights />
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
