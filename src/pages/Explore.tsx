@@ -48,38 +48,38 @@ const Explore = () => {
 
         {/* Search & Filter Bar */}
         <section className="mb-12">
-          <div className="bg-background p-2 rounded-full shadow-card border border-border flex flex-wrap md:flex-nowrap items-center gap-2">
-            <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
-              <MapPin className="w-5 h-5 text-primary" />
+          <div className="bg-background p-4 md:p-2 rounded-3xl md:rounded-full shadow-card border border-border flex flex-col md:flex-row items-center gap-4 md:gap-2">
+            <div className="w-full md:flex-1 flex items-center px-2 md:px-6 gap-3">
+              <MapPin className="w-5 h-5 text-primary shrink-0" />
               <div className="flex flex-col w-full">
                 {/* AUDIT FIX: Internationalized search bar labels */}
                 <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.location')}</label>
                 <input 
                   type="text" 
                   placeholder={t('explore.locationPlaceholder')}
-                  className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 placeholder:text-muted-foreground text-sm w-full"
+                  className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 placeholder:text-muted-foreground text-sm w-full outline-none"
                 />
               </div>
             </div>
             
-            <div className="w-px h-10 bg-border hidden md:block"></div>
+            <div className="w-full h-px md:w-px md:h-10 bg-border"></div>
             
-            <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
-              <Calendar className="w-5 h-5 text-primary" />
+            <div className="w-full md:flex-1 flex items-center px-2 md:px-6 gap-3">
+              <Calendar className="w-5 h-5 text-primary shrink-0" />
               <div className="flex flex-col w-full">
                 <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.dateRange')}</label>
                 <input 
                   type="text" 
                   placeholder={t('explore.datePlaceholder')}
-                  className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 placeholder:text-muted-foreground text-sm w-full"
+                  className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 placeholder:text-muted-foreground text-sm w-full outline-none"
                 />
               </div>
             </div>
             
-            <div className="w-px h-10 bg-border hidden md:block"></div>
+            <div className="w-full h-px md:w-px md:h-10 bg-border"></div>
             
-            <div className="flex-1 flex items-center px-4 md:px-6 gap-3 min-w-[180px]">
-              <Compass className="w-5 h-5 text-primary" />
+            <div className="w-full md:flex-1 flex items-center px-2 md:px-6 gap-3">
+              <Compass className="w-5 h-5 text-primary shrink-0" />
               <div className="flex flex-col w-full">
                 <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.diverLevel')}</label>
                 <select className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 text-sm appearance-none flex-1 w-full outline-none ring-0 focus:border-none focus:outline-none">
@@ -93,9 +93,9 @@ const Explore = () => {
               </div>
             </div>
             
-            <button className="bg-primary text-primary-foreground h-12 w-12 md:h-14 md:w-40 rounded-full flex items-center justify-center gap-2 hover:bg-primary-container transition-all active:scale-95 shrink-0">
+            <button className="bg-primary text-primary-foreground h-12 md:h-14 w-full md:w-40 rounded-full flex items-center justify-center gap-2 hover:brightness-110 shadow-lg shadow-primary/20 transition-all active:scale-95 shrink-0 mt-2 md:mt-0 font-bold">
               <Compass className="w-5 h-5 md:hidden" />
-              <span className="hidden md:block font-bold">{t('explore.search')}</span>
+              <span className="md:block">{t('explore.search')}</span>
             </button>
           </div>
         </section>
