@@ -87,8 +87,8 @@ describe('AuthProvider', () => {
     expect(screen.getByTestId('loading').textContent).toBe('false');
   });
 
-  it('fetches diveCenterId for admin roles', async () => {
-    const mockUser = { id: 'admin-1', email: 'admin@center.com' };
+  it('fetches diveCenterId for dive_center role via dive_centers.created_by', async () => {
+    const mockUser = { id: 'owner-1', email: 'owner@center.com' };
     const mockSession = { user: mockUser };
 
     onAuthStateChangeImpl.mockImplementation(
@@ -99,13 +99,12 @@ describe('AuthProvider', () => {
     );
     mockAuth.getSession.mockResolvedValue({ data: { session: null } });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test-mock boundary
     mockFrom.mockImplementation((table: string) => {
       if (table === 'user_roles') {
-        return testChain({ data: { role: 'dive_center_admin' } }) as any;
+        return testChain({ data: { role: 'dive_center' } }) as any;
       }
-      if (table === 'staff_members') {
-        return testChain({ data: { dive_center_id: 'dc-42' } }) as any;
+      if (table === 'dive_centers') {
+        return testChain({ data: { id: 'dc-42', center_status: 'approved' } }) as any;
       }
       return testChain({ data: null }) as any;
     });
@@ -117,10 +116,12 @@ describe('AuthProvider', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByTestId('role').textContent).toBe('dive_center_admin');
+      expect(screen.getByTestId('role').textContent).toBe('dive_center');
     });
 
-    expect(screen.getByTestId('centerId').textContent).toBe('dc-42');
+    await waitFor(() => {
+      expect(screen.getByTestId('centerId').textContent).toBe('dc-42');
+    });
   });
 
   it('clears role and centerId on sign out', async () => {
