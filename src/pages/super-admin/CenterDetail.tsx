@@ -6,7 +6,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
@@ -210,7 +209,7 @@ const CenterDetail = () => {
           )}
           {center.description && (
             <>
-              <Separator />
+              <div className="border-t border-border" />
               <p className="text-foreground leading-relaxed">{center.description}</p>
             </>
           )}
