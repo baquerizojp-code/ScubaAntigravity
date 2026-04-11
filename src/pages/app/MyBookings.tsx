@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
 import {
   fetchBookingsForDiver,
@@ -8,8 +7,6 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 import {
@@ -101,7 +98,7 @@ const MyBookings = () => {
                     variant="outline"
                     className="flex-1 gap-2 text-success border-success/30 hover:bg-success/5 hover:text-success h-12 rounded-xl transition-all shadow-sm"
                     disabled={!b.trips?.whatsapp_group_url}
-                    onClick={(e) => {
+                    onClick={() => {
                       if (b.trips?.whatsapp_group_url) {
                         window.open(b.trips.whatsapp_group_url, '_blank');
                       }

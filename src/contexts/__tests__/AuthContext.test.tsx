@@ -137,7 +137,6 @@ describe('AuthProvider', () => {
     );
     mockAuth.getSession.mockResolvedValue({ data: { session: null } });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test-mock boundary
     mockFrom.mockImplementation((_table: string) => {
       return testChain({ data: { role: 'diver' } }) as any;
     });
@@ -176,7 +175,6 @@ describe('AuthProvider', () => {
     );
     mockAuth.getSession.mockResolvedValue({ data: { session: null } });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- test-mock boundary
     mockFrom.mockImplementation(() => {
       return testChain({ data: null }) as any;
     });

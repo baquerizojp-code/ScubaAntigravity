@@ -91,11 +91,6 @@ export async function deleteTrip(id: string) {
  */
 export async function fetchDashboardStats(diveCenterId: string) {
   const today = getTodayDateString();
-  const monthStart = new Date(
-    new Date().getFullYear(),
-    new Date().getMonth(),
-    1
-  ).toISOString().split('T')[0];
 
   const [tripsRes, tripsUpcoming] = await Promise.all([
     supabase

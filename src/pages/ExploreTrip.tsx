@@ -6,7 +6,7 @@ import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MapPin, Calendar, Clock, Users, Shield, Wrench, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
 import Navbar from '@/components/Navbar';

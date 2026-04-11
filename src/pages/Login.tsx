@@ -91,17 +91,6 @@ const Login = () => {
     if (error) toast.error(error.message);
   };
 
-  const handleAppleAuth = async () => {
-    if (from) localStorage.setItem('pending_redirect', from);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: window.location.origin,
-      }
-    });
-    if (error) toast.error(error.message);
-  };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted px-4">
       <div className="w-full max-w-md">

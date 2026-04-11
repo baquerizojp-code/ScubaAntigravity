@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Globe, User } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,8 +24,6 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
   }, [transparent]);
 
   const dashboardPath = role === 'diver' ? '/app/discover' : role ? '/admin' : '/login';
-
-  const isTransparent = transparent && !scrolled;
 
   return (
     <nav

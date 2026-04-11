@@ -4,10 +4,10 @@ import { useI18n } from '@/lib/i18n';
 import { fetchTripsByCenter } from '@/services/trips';
 import { fetchBookingsForCenter, type AdminBookingWithDetails } from '@/services/bookings';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Ship, Users, CalendarCheck, DollarSign, TrendingUp, Clock, ChevronRight, Plus, ArrowUpRight } from 'lucide-react';
+import { Ship, CalendarCheck, DollarSign, Clock, ChevronRight, Plus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getTodayDateString } from '@/lib/utils';
 
@@ -34,11 +34,6 @@ const AdminDashboard = () => {
   /* AUDIT FIX: Replaced 'active' var name with 'confirmedBookings' for clarity */
   const confirmedBookings = bookings.filter(b => b.status === 'confirmed');
   const totalRevenue = confirmedBookings.reduce((sum: number, b: AdminBookingWithDetails) => sum + (Number(b.trips?.price_usd) || 0), 0);
-  const occupancyPct = trips.length > 0
-    ? Math.round(
-        trips.reduce((s: number, t) => s + ((t.total_spots - t.available_spots) / t.total_spots) * 100, 0) / trips.length
-      )
-    : 0;
 
     // Get recent trips for the table (latest 5)
   const recentTrips = [...trips].sort((a, b) => new Date(b.trip_date).getTime() - new Date(a.trip_date).getTime()).slice(0, 5);

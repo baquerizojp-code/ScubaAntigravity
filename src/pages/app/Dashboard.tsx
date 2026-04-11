@@ -5,7 +5,7 @@ import { useI18n } from '@/lib/i18n';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Compass, CalendarCheck, Award, ChevronRight, Shield } from 'lucide-react';
+import { Compass, CalendarCheck, ChevronRight, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';

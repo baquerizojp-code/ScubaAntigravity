@@ -52,17 +52,6 @@ const RegisterCenter = () => {
     if (error) toast.error(error.message);
   };
 
-  const handleAppleSignup = async () => {
-    localStorage.setItem(PENDING_CENTER_KEY, 'true');
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: window.location.origin + '/register-center',
-      }
-    });
-    if (error) toast.error(error.message);
-  };
-
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

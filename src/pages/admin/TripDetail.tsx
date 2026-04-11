@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchTripById } from '@/services/trips';
@@ -23,7 +22,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import {
-  ArrowLeft, Edit, Check, X, Clock, Users, Ship, Calendar, MapPin, Anchor, Info, Ban, Image as ImageIcon,
+  ArrowLeft, Edit, Check, X, Clock, Users, Calendar, MapPin, Anchor, Info, Ban, Image as ImageIcon,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
@@ -31,7 +30,6 @@ import { parseLocalDate } from '@/lib/utils';
 const AdminTripDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { diveCenterId } = useAuth();
   const { t } = useI18n();
   const queryClient = useQueryClient();
 

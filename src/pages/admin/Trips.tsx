@@ -2,13 +2,11 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
-import { fetchTripsByCenter, createTrip, updateTrip, deleteTrip } from '@/services/trips';
-import { tripSchema } from '@/lib/schemas';
-import ImageUpload from '@/components/ImageUpload';
+import { fetchTripsByCenter, deleteTrip } from '@/services/trips';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getTodayDateString } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TripFormModal } from '@/components/Admin/TripFormModal';
 import { useNavigate } from 'react-router-dom';
@@ -23,7 +21,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Eye, Ship, FileText, Send } from 'lucide-react';
+import { Plus, Edit, Trash2, Ship } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
 import type { TripStatus } from '@/types';
