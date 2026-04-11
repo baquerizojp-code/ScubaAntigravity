@@ -67,16 +67,14 @@ const Landing = () => {
             </p>
             
             {/* CTA buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 animate-slide-up" style={{ animationDelay: '0.3s' }}>
+            <div className="flex flex-col items-start gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
               <Link to="/explore" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground px-8 sm:px-10 py-6 sm:py-7 rounded-full font-headline font-bold text-lg hover:brightness-110 transition-all flex items-center justify-center gap-2 shadow-xl shadow-primary/20">
                   {t('landing.hero.cta.diver')} <ChevronRight className="w-5 h-5"/>
                 </Button>
               </Link>
-              <Link to="/register-center" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto bg-white/5 backdrop-blur-lg border-white/20 text-white px-8 sm:px-10 py-6 sm:py-7 rounded-full font-headline font-bold text-lg hover:bg-white/10 transition-all">
-                  {t('landing.hero.cta.center')}
-                </Button>
+              <Link to="/register-center" className="text-sm text-ocean-200/70 hover:text-ocean-200 transition-colors flex items-center gap-1 ml-1">
+                {t('landing.hero.cta.centerLink')} <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
           </div>
@@ -168,16 +166,14 @@ const Landing = () => {
                 {t('landing.cta.subtitle')}
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <div className="flex flex-col items-start gap-4 pt-4">
                 <Link to="/explore" className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto bg-primary text-primary-foreground hover:brightness-110 font-bold font-headline px-8 py-6 sm:py-7 rounded-full shadow-lg shadow-primary/20 transition-all text-base">
                     {t('landing.cta.diver')} <ChevronRight className="w-5 h-5 ml-2"/>
                   </Button>
                 </Link>
-                <Link to="/register-center" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto px-8 py-6 sm:py-7 rounded-full font-bold font-headline border-primary/20 text-foreground hover:bg-primary/5 transition-all text-base">
-                    {t('landing.cta.center')}
-                  </Button>
+                <Link to="/register-center" className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 ml-1">
+                  {t('landing.cta.centerLink')} <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>

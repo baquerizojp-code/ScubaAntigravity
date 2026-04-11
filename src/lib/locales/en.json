@@ -389,5 +389,20 @@
   "superAdmin.notification.approvedTitle": "Center Approved!",
   "superAdmin.notification.approvedBody": "Your dive center has been approved. You can now create trips!",
   "superAdmin.notification.rejectedTitle": "Center Not Approved",
-  "superAdmin.notification.rejectedBody": "Your dive center registration was not approved."
+  "superAdmin.notification.rejectedBody": "Your dive center registration was not approved.",
+  "superAdmin.filter.archived": "Archived",
+  "superAdmin.archive": "Archive",
+  "superAdmin.archived": "Dive center archived",
+  "superAdmin.delete": "Delete Center",
+  "superAdmin.deleted": "Dive center deleted",
+  "superAdmin.confirmArchive": "Archive this dive center?",
+  "superAdmin.confirmArchiveDesc": "The center will be hidden from active listings but not permanently deleted.",
+  "superAdmin.confirmDelete": "Permanently delete this dive center?",
+  "superAdmin.confirmDeleteDesc": "This action cannot be undone. All data for this center will be permanently removed.",
+  "superAdmin.backToDashboard": "Back to Dashboard",
+  "superAdmin.centerDetail.owner": "Owner",
+  "superAdmin.centerDetail.registeredOn": "Registered",
+  "superAdmin.centerDetail.approvedOn": "Approved",
+  "landing.hero.cta.centerLink": "Are you a dive center? Register here",
+  "landing.cta.centerLink": "Register your dive center"
 }
