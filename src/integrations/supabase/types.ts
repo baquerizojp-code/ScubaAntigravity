@@ -129,7 +129,8 @@ export type Database = {
             | Database["public"]["Enums"]["certification_level"]
             | null
           created_at: string
-          emergency_contact: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           full_name: string
           id: string
           logged_dives: number | null
@@ -142,7 +143,8 @@ export type Database = {
             | Database["public"]["Enums"]["certification_level"]
             | null
           created_at?: string
-          emergency_contact?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           full_name: string
           id?: string
           logged_dives?: number | null
@@ -155,7 +157,8 @@ export type Database = {
             | Database["public"]["Enums"]["certification_level"]
             | null
           created_at?: string
-          emergency_contact?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           full_name?: string
           id?: string
           logged_dives?: number | null
@@ -346,6 +349,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_cancellation: { Args: { _booking_id: string }; Returns: boolean }
       assign_dive_center_role: {
         Args: { _user_id: string }
         Returns: undefined

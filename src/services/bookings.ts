@@ -108,19 +108,29 @@ export async function fetchBookingsByTripId(tripId: string) {
 }
 
 /**
- * Create a new booking.
+ * Create a new booking, or re-activate a previously cancelled/rejected one.
+ * Uses upsert on the unique (trip_id, diver_id) constraint to handle both
+ * fresh bookings and rebookings atomically.
  */
 export async function createBooking(tripId: string, diverId: string, notes?: string) {
-  const { error } = await supabase.from('bookings').insert({
-    trip_id: tripId,
-    diver_id: diverId,
-    notes: notes || null,
-  });
+  const { error } = await supabase
+    .from('bookings')
+    .upsert(
+      {
+        trip_id: tripId,
+        diver_id: diverId,
+        notes: notes || null,
+        status: 'pending' as const,
+        rejection_reason: null,
+      },
+      { onConflict: 'trip_id,diver_id' }
+    );
   if (error) throw error;
 }
 
 /**
- * Fetch a diver's booking for a specific trip.
+ * Fetch a diver's active booking for a specific trip.
+ * Excludes cancelled and rejected bookings so the diver can rebook.
  */
 export async function fetchBookingForTrip(tripId: string, diverId: string) {
   const { data, error } = await supabase
@@ -128,6 +138,7 @@ export async function fetchBookingForTrip(tripId: string, diverId: string) {
     .select('*')
     .eq('trip_id', tripId)
     .eq('diver_id', diverId)
+    .not('status', 'in', '("cancelled","rejected")')
     .maybeSingle();
   if (error) throw error;
   return data;

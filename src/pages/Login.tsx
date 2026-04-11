@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { ChevronLeft } from 'lucide-react';
 
 const isSafeRedirect = (url: string): boolean => {
   return url.startsWith('/') && !url.startsWith('//');
@@ -92,8 +93,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-muted px-4 relative">
+      <Link to="/" className="absolute top-6 left-6 inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+        <ChevronLeft className="h-4 w-4 mr-1" />
+        {t('common.cancel')}
+      </Link>
+
+      <div className="w-full max-w-md my-8">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <ScubaMaskLogo className="h-10 w-8 text-primary" />

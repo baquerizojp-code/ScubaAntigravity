@@ -44,36 +44,38 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
           <span className="text-2xl font-black text-white tracking-tighter font-headline">ScubaTrip</span>
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1 sm:gap-2">
           <ThemeToggle className="text-ocean-200 hover:text-white hover:bg-white/10" />
-          <div className="hidden sm:block">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}
-              aria-label={locale === 'es' ? 'Switch to English' : 'Cambiar a Español'}
-              className="gap-2 text-ocean-200 hover:text-white hover:bg-white/10 px-3 min-h-[44px] rounded-full font-headline font-semibold text-xs uppercase tracking-widest"
-            >
-              <Globe className="w-4 h-4" />
-              <span>{locale === 'es' ? 'EN' : 'ES'}</span>
-            </Button>
-          </div>
+          
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}
+            aria-label={locale === 'es' ? 'Switch to English' : 'Cambiar a Español'}
+            className="text-ocean-200 hover:text-white hover:bg-white/10 px-2 min-h-[40px] rounded-full font-headline font-semibold text-xs uppercase tracking-widest gap-1.5"
+          >
+            <Globe className="w-4 h-4" />
+            <span>{locale === 'es' ? 'EN' : 'ES'}</span>
+          </Button>
+
           {user && role ? (
             <Link to={dashboardPath}>
               <Button
                 size="sm"
-                className="bg-primary text-primary-foreground hover:brightness-110 font-bold font-headline text-sm px-6 py-2.5 rounded-full shadow-lg shadow-primary/20 transition-all"
+                className="bg-primary text-primary-foreground hover:brightness-110 h-9 w-9 p-0 rounded-full shadow-lg shadow-primary/20 transition-all flex items-center justify-center ml-1"
+                aria-label={t('nav.dashboard')}
               >
-                {t('nav.dashboard')}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
               </Button>
             </Link>
           ) : (
             <Link to="/login">
               <Button
                 size="sm"
-                className="bg-primary text-primary-foreground hover:brightness-110 font-bold font-headline text-sm px-6 py-2.5 rounded-full shadow-lg shadow-primary/20 transition-all"
+                className="bg-primary text-primary-foreground hover:brightness-110 h-9 w-9 p-0 rounded-full shadow-lg shadow-primary/20 transition-all flex items-center justify-center ml-1"
+                aria-label={t('nav.enter')}
               >
-                {t('nav.enter')}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
               </Button>
             </Link>
           )}

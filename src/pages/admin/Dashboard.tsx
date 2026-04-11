@@ -132,11 +132,11 @@ const statCards = [
          <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
                <thead>
-                  <tr className="bg-muted/40 text-[10px] uppercase tracking-widest text-muted-foreground">
-                     <th className="p-4 font-bold border-b border-border">{t('admin.dashboard.colExpedition')}</th>
-                     <th className="p-4 font-bold border-b border-border">{t('admin.dashboard.colDate')}</th>
-                     <th className="p-4 font-bold border-b border-border text-center">{t('admin.dashboard.colCapacity')}</th>
-                     <th className="p-4 font-bold border-b border-border text-right">{t('admin.dashboard.colStatus')}</th>
+                  <tr className="bg-muted/40 text-[9px] sm:text-[10px] uppercase tracking-widest text-muted-foreground">
+                     <th className="px-2 py-3 sm:p-4 font-bold border-b border-border">{t('admin.dashboard.colExpedition')}</th>
+                     <th className="px-2 py-3 sm:p-4 font-bold border-b border-border">{t('admin.dashboard.colDate')}</th>
+                     <th className="px-2 py-3 sm:p-4 font-bold border-b border-border text-center">{t('admin.dashboard.colCapacity')}</th>
+                     <th className="px-2 py-3 sm:p-4 font-bold border-b border-border text-right">{t('admin.dashboard.colStatus')}</th>
                   </tr>
                </thead>
                <tbody className="divide-y divide-border/50">
@@ -147,24 +147,24 @@ const statCards = [
                   ) : (
                      recentTrips.map(trip => (
                         <tr key={trip.id} className="hover:bg-muted/30 transition-colors group cursor-pointer" onClick={() => navigate(`/admin/trips/${trip.id}`)}>
-                           <td className="p-4">
-                              <p className="font-bold text-foreground text-sm group-hover:text-primary transition-colors">{trip.title}</p>
-                              <p className="text-xs text-muted-foreground truncate max-w-[200px]">{trip.dive_site}</p>
+                           <td className="px-2 py-3 sm:p-4 max-w-[120px] sm:max-w-[200px]">
+                              <p className="font-bold text-foreground text-xs sm:text-sm group-hover:text-primary transition-colors truncate">{trip.title}</p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{trip.dive_site}</p>
                            </td>
-                           <td className="p-4">
-                              <p className="text-sm font-medium">{format(new Date(trip.trip_date), 'MMM dd, yyyy')}</p>
-                              <p className="text-xs text-muted-foreground">{trip.trip_time.slice(0,5)}</p>
+                           <td className="px-2 py-3 sm:p-4">
+                              <p className="text-xs sm:text-sm font-medium">{format(new Date(trip.trip_date), 'dd/MM/yy')}</p>
+                              <p className="text-[10px] sm:text-xs text-muted-foreground">{trip.trip_time.slice(0,5)}</p>
                            </td>
-                           <td className="p-4">
+                           <td className="px-2 py-3 sm:p-4">
                               <div className="flex flex-col items-center">
-                                 <span className="text-sm font-bold">{trip.total_spots - trip.available_spots}/{trip.total_spots}</span>
-                                 <div className="w-full max-w-[60px] h-1.5 bg-muted rounded-full overflow-hidden mt-1">
+                                 <span className="text-xs sm:text-sm font-bold">{trip.total_spots - trip.available_spots}/{trip.total_spots}</span>
+                                 <div className="w-full max-w-[40px] sm:max-w-[60px] h-1.5 bg-muted rounded-full overflow-hidden mt-1">
                                     <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${((trip.total_spots - trip.available_spots)/trip.total_spots)*100}%` }}></div>
                                  </div>
                               </div>
                            </td>
-                           <td className="p-4 text-right">
-                              <Badge variant="outline" className={`px-3 py-1 text-[10px] uppercase tracking-widest border-0 ${trip.status === 'published' ? 'bg-success/10 text-success' : trip.status === 'draft' ? 'bg-warning/10 text-warning' : 'bg-muted text-muted-foreground'}`}>
+                           <td className="px-2 py-3 sm:p-4 text-right">
+                              <Badge variant="outline" className={`px-2 py-1 sm:px-3 sm:py-1 text-[9px] sm:text-[10px] uppercase tracking-widest border-0 ${trip.status === 'published' ? 'bg-success/10 text-success' : trip.status === 'draft' ? 'bg-warning/10 text-warning' : 'bg-muted text-muted-foreground'}`}>
                                  {trip.status}
                               </Badge>
                            </td>

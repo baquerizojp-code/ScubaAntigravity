@@ -5,6 +5,7 @@ import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import PhoneInput from '@/components/PhoneInput';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
@@ -33,7 +34,8 @@ const DiverProfile = () => {
     last_name: '',
     certification: 'none' as string,
     logged_dives: 0,
-    emergency_contact: '',
+    emergency_contact_name: '',
+    emergency_contact_phone: '',
   });
 
   useEffect(() => {
@@ -54,7 +56,8 @@ const DiverProfile = () => {
             last_name: last,
             certification: data.certification || 'none',
             logged_dives: data.logged_dives || 0,
-            emergency_contact: data.emergency_contact || '',
+            emergency_contact_name: data.emergency_contact_name || '',
+            emergency_contact_phone: data.emergency_contact_phone || '',
           });
         }
         setLoading(false);
@@ -71,7 +74,8 @@ const DiverProfile = () => {
         full_name,
         certification: form.certification as CertificationLevel,
         logged_dives: form.logged_dives,
-        emergency_contact: form.emergency_contact || null,
+        emergency_contact_name: form.emergency_contact_name || null,
+        emergency_contact_phone: form.emergency_contact_phone || null,
       })
       .eq('user_id', user.id);
 
@@ -150,14 +154,27 @@ const DiverProfile = () => {
             />
           </div>
 
-          {/* Emergency contact */}
+          {/* Emergency contact — name on top, phone below */}
           <div className="space-y-1.5">
-            <Label htmlFor="emergency_contact">{t('diver.profile.emergency')}</Label>
-            <Input
-              id="emergency_contact"
-              value={form.emergency_contact}
-              onChange={e => setForm(f => ({ ...f, emergency_contact: e.target.value }))}
-            />
+            <Label>{t('diver.profile.emergency')}</Label>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="emergency_contact_name" className="text-xs text-muted-foreground">{t('diver.profile.emergencyName')}</Label>
+                <Input
+                  id="emergency_contact_name"
+                  value={form.emergency_contact_name}
+                  onChange={e => setForm(f => ({ ...f, emergency_contact_name: e.target.value }))}
+                  placeholder="Juan Pérez"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="emergency_contact_phone" className="text-xs text-muted-foreground">{t('diver.profile.emergencyPhone')}</Label>
+                <PhoneInput
+                  value={form.emergency_contact_phone}
+                  onChange={v => setForm(f => ({ ...f, emergency_contact_phone: v }))}
+                />
+              </div>
+            </div>
           </div>
 
           <Button onClick={handleSave} disabled={saving} className="w-full bg-primary text-primary-foreground hover:brightness-110">

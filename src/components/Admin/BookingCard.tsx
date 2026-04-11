@@ -27,8 +27,8 @@ function StatusBadge({ status }: { status: string }) {
   const Icon = STATUS_ICON_MAP[status] || Clock;
   const className = BOOKING_STATUS_CLASSES_WITH_BORDER[status] || BOOKING_STATUS_CLASSES_WITH_BORDER.pending;
   return (
-    <Badge variant="outline" className={className}>
-      <Icon className="h-3 w-3 mr-1" />{status}
+    <Badge variant="outline" className={`capitalize ${className}`}>
+      <Icon className="h-3 w-3 mr-1" />{status.replace(/_/g, ' ')}
     </Badge>
   );
 }

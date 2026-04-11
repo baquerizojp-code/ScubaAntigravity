@@ -33,10 +33,10 @@ const TripDetail = () => {
     cancelling,
     showProfileDialog,
     setShowProfileDialog,
-    dialogFullName,
-    setDialogFullName,
-    dialogCertification,
-    setDialogCertification,
+    profileFields,
+    handleFieldChange,
+    missingFields,
+    isUpdate,
     creatingProfile,
     isPending,
     isConfirmed,
@@ -354,12 +354,12 @@ const TripDetail = () => {
       <ProfileCompletionDialog
         open={showProfileDialog}
         onOpenChange={setShowProfileDialog}
-        fullName={dialogFullName}
-        onFullNameChange={setDialogFullName}
-        certification={dialogCertification}
-        onCertificationChange={setDialogCertification}
+        fields={profileFields}
+        onFieldChange={handleFieldChange}
+        missingFields={missingFields}
         creating={creatingProfile}
         onSubmit={handleCompleteProfileAndBook}
+        isUpdate={isUpdate}
       />
     </div>
   );

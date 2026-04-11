@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { stripPhoneFormat } from '@/lib/phoneFormat';
 import PhoneInput from '@/components/PhoneInput';
+import { ChevronLeft } from 'lucide-react';
 
 const PENDING_CENTER_KEY = 'pending_center_signup';
 
@@ -24,6 +25,9 @@ const RegisterCenter = () => {
   const [centerName, setCenterName] = useState('');
   const [centerWhatsapp, setCenterWhatsapp] = useState('');
   const [whatsappError, setWhatsappError] = useState('');
+  const [centerInstagram, setCenterInstagram] = useState('');
+  const [instagramError, setInstagramError] = useState('');
+  const [centerLocation, setCenterLocation] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -97,6 +101,8 @@ const RegisterCenter = () => {
       .insert({
         name: centerName,
         whatsapp_number: centerWhatsapp ? stripPhoneFormat(centerWhatsapp) : null,
+        instagram: centerInstagram.trim(),
+        location: centerLocation.trim(),
         created_by: user.id,
       });
 
@@ -112,20 +118,35 @@ const RegisterCenter = () => {
   };
 
   const validateWhatsapp = (value: string) => {
-    if (!value) { setWhatsappError(''); return true; }
+    if (!value) { setWhatsappError(t('validation.required') || 'Requerido'); return false; }
     const valid = /^\+[1-9]\d{6,14}$/.test(value.replace(/\s/g, ''));
     setWhatsappError(valid ? '' : t('validation.whatsapp'));
     return valid;
   };
 
+  const validateInstagram = (value: string) => {
+    if (!value) { setInstagramError(t('validation.required') || 'Requerido'); return false; }
+    const valid = /^@?[a-zA-Z0-9_\.]{1,30}$/.test(value.trim());
+    setInstagramError(valid ? '' : t('validation.invalidFormat') || 'Formato inválido');
+    return valid;
+  };
+
   const handleCenterSetup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (centerWhatsapp && !validateWhatsapp(centerWhatsapp)) return;
+    const isWhatsappValid = validateWhatsapp(centerWhatsapp);
+    const isInstaValid = validateInstagram(centerInstagram);
+    
+    if (!isWhatsappValid || !isInstaValid || !centerLocation.trim()) return;
     await setupCenter();
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-muted px-4 py-8 relative">
+      <Link to="/" className="absolute top-6 left-6 inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+        <ChevronLeft className="h-4 w-4 mr-1" />
+        {t('common.cancel')}
+      </Link>
+
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
@@ -178,11 +199,30 @@ const RegisterCenter = () => {
           ) : (
             <form onSubmit={handleCenterSetup} className="space-y-4">
               <div>
-                <Label>{t('admin.settings.name')}</Label>
+                <Label>{t('admin.settings.name')} <span className="text-destructive">*</span></Label>
                 <Input value={centerName} onChange={e => setCenterName(e.target.value)} required placeholder="Dive Center Cancún" />
               </div>
               <div>
-                <Label>WhatsApp</Label>
+                <Label>{t('admin.settings.location')} <span className="text-destructive">*</span></Label>
+                <Input value={centerLocation} onChange={e => setCenterLocation(e.target.value)} required placeholder="Cancún, México" />
+              </div>
+              <div>
+                <Label>Instagram <span className="text-destructive">*</span></Label>
+                <Input 
+                  value={centerInstagram} 
+                  onChange={e => {
+                    setCenterInstagram(e.target.value);
+                    if (instagramError) setInstagramError('');
+                  }}
+                  onBlur={() => validateInstagram(centerInstagram)}
+                  required 
+                  placeholder="@divecentercancun" 
+                  className={instagramError ? 'border-destructive' : ''}
+                />
+                {instagramError && <p className="text-xs text-destructive mt-1">{instagramError}</p>}
+              </div>
+              <div>
+                <Label>WhatsApp <span className="text-destructive">*</span></Label>
                 <PhoneInput
                   value={centerWhatsapp}
                   onChange={setCenterWhatsapp}

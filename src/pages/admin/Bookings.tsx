@@ -14,9 +14,17 @@ import { useBookingFilters } from '@/hooks/useBookingFilters';
 import { BookingCard, type BookingCardActions } from '@/components/Admin/BookingCard';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Check, Clock, Ban, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
@@ -34,6 +42,13 @@ const AdminBookings = () => {
   const tabParam = searchParams.get('tab');
   const validTabs = ['confirmed', 'pending', 'cancellation_requested', 'rejected'];
   const defaultTab = validTabs.includes(tabParam as string) ? (tabParam as string) : 'confirmed';
+
+  const [activeTab, setActiveTab] = useState(defaultTab);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSearchParams({ tab: value }, { replace: true });
+  };
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ['admin-bookings', diveCenterId],
@@ -141,21 +156,54 @@ const AdminBookings = () => {
         <p className="text-sm text-muted-foreground">{t('admin.bookings.subtitle')}</p>
       </div>
 
-      <Tabs defaultValue={defaultTab}>
-        <TabsList className="flex-wrap h-auto">
-          <TabsTrigger value="confirmed" className="gap-1">
-            <Check className="h-3.5 w-3.5" /> {t('admin.bookings.confirmedTab')} ({confirmedBookings.length})
-          </TabsTrigger>
-          <TabsTrigger value="pending" className="gap-1">
-            <Clock className="h-3.5 w-3.5" /> {t('admin.bookings.pending')} ({pendingBookings.length})
-          </TabsTrigger>
-          <TabsTrigger value="cancellation_requested" className="gap-1">
-            <AlertTriangle className="h-3.5 w-3.5" /> {t('admin.bookings.cancellationRequests')} ({cancellationRequestedBookings.length})
-          </TabsTrigger>
-          <TabsTrigger value="rejected" className="gap-1">
-            <Ban className="h-3.5 w-3.5" /> {t('admin.bookings.rejectedTab')} ({rejectedBookings.length})
-          </TabsTrigger>
-        </TabsList>
+      {/* Mobile Select */}
+      <div className="sm:hidden mb-4">
+        <Select value={activeTab} onValueChange={handleTabChange}>
+          <SelectTrigger className="w-full bg-muted/30 border-border h-12 rounded-xl px-4 shadow-sm text-sm font-medium">
+            <SelectValue placeholder={t('admin.bookings.selectTab')} />
+          </SelectTrigger>
+          <SelectContent className="rounded-xl border-border/50 shadow-lg">
+            <SelectItem value="confirmed" className="py-3 rounded-lg focus:bg-muted">
+              <div className="flex items-center gap-2">
+                <Check className="h-4 w-4 opacity-70" /> {t('admin.bookings.confirmedTab')} ({confirmedBookings.length})
+              </div>
+            </SelectItem>
+            <SelectItem value="pending" className="py-3 rounded-lg focus:bg-muted">
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 opacity-70" /> {t('admin.bookings.pending')} ({pendingBookings.length})
+              </div>
+            </SelectItem>
+            <SelectItem value="cancellation_requested" className="py-3 rounded-lg focus:bg-muted">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 opacity-70" /> {t('admin.bookings.cancellationRequests')} ({cancellationRequestedBookings.length})
+              </div>
+            </SelectItem>
+            <SelectItem value="rejected" className="py-3 rounded-lg focus:bg-muted">
+              <div className="flex items-center gap-2">
+                <Ban className="h-4 w-4 opacity-70" /> {t('admin.bookings.rejectedTab')} ({rejectedBookings.length})
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+        <div className="hidden sm:block mb-6">
+          <TabsList className="flex justify-start w-max bg-muted/50 p-1 rounded-xl">
+            <TabsTrigger value="confirmed" className="gap-1.5 rounded-lg text-sm transition-all focus-visible:ring-0 px-4 py-2">
+              <Check className="h-4 w-4 shrink-0" /> {t('admin.bookings.confirmedTab')} <Badge variant="secondary" className="ml-1 opacity-70 px-1.5">{confirmedBookings.length}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="pending" className="gap-1.5 rounded-lg text-sm transition-all focus-visible:ring-0 px-4 py-2">
+              <Clock className="h-4 w-4 shrink-0" /> {t('admin.bookings.pending')} {pendingBookings.length > 0 && <Badge variant="default" className="ml-1 bg-warning hover:bg-warning text-warning-foreground border-transparent px-1.5">{pendingBookings.length}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="cancellation_requested" className="gap-1.5 rounded-lg text-sm transition-all focus-visible:ring-0 px-4 py-2">
+              <AlertTriangle className="h-4 w-4 shrink-0" /> {t('admin.bookings.cancellationRequests')} {cancellationRequestedBookings.length > 0 && <Badge variant="destructive" className="ml-1 px-1.5">{cancellationRequestedBookings.length}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="rejected" className="gap-1.5 rounded-lg text-sm transition-all focus-visible:ring-0 px-4 py-2">
+              <Ban className="h-4 w-4 shrink-0" /> {t('admin.bookings.rejectedTab')} <Badge variant="secondary" className="ml-1 opacity-70 px-1.5">{rejectedBookings.length}</Badge>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="confirmed">{renderTabContent(confirmedBookings, false)}</TabsContent>
         <TabsContent value="pending">{renderTabContent(pendingBookings, true)}</TabsContent>

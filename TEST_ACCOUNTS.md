@@ -12,7 +12,7 @@
 
 | Email | Password | Full Name | Status | Notes |
 |---|---|---|---|---|
-| jpbaquerizo@guiatrabajoremoto.com | — | TBD | — | To be recreated for diver booking flow test |
+| jpbaquerizo@guiatrabajoremoto.com | Test1234! | TBD | active | Diver account for booking flow test |
 
 ## Super Admin
 

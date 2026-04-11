@@ -5,7 +5,7 @@
  * Extracted from pages/app/TripDetail.tsx to reduce that component's
  * responsibilities from 10+ down to pure rendering.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchTripById, type TripWithCenter } from '@/services/trips';
 import {
@@ -17,6 +17,7 @@ import {
 import {
   fetchDiverProfile,
   createDiverProfile,
+  updateDiverProfile,
   assignDiverRole,
 } from '@/services/profiles';
 import { useAuth } from '@/contexts/AuthContext';
@@ -25,8 +26,58 @@ import { DEFAULT_TRIP_DURATION_HOURS } from '@/lib/constants';
 import { downloadICSFile, getGoogleCalendarUrl } from '@/lib/calendar';
 import { toast } from 'sonner';
 import type { Tables, Database } from '@/integrations/supabase/types';
+import type { ProfileFieldValues, MissingFields } from '@/components/app/ProfileCompletionDialog';
 
 type CertificationLevel = Database['public']['Enums']['certification_level'];
+type DiverProfile = Tables<'diver_profiles'>;
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Split a stored full_name into first / last */
+function splitFullName(fullName: string | null | undefined): { first: string; last: string } {
+  const parts = (fullName || '').trim().split(/\s+/);
+  return { first: parts[0] ?? '', last: parts.slice(1).join(' ') };
+}
+
+/** Determine which profile fields are incomplete */
+function detectMissingFields(profile: DiverProfile | null): MissingFields {
+  if (!profile) {
+    return {
+      firstName: true,
+      lastName: true,
+      certification: true,
+      loggedDives: true,
+      emergencyContactName: true,
+      emergencyContactPhone: true,
+    };
+  }
+
+  const { first, last } = splitFullName(profile.full_name);
+  const missing: MissingFields = {};
+
+  if (!first) missing.firstName = true;
+  if (!last) missing.lastName = true;
+  // certification defaults to 'none' on creation, which is valid — but if it's
+  // null for some reason, treat it as missing
+  if (profile.certification === null || profile.certification === undefined) missing.certification = true;
+  if (profile.logged_dives === null || profile.logged_dives === undefined) missing.loggedDives = true;
+  if (!profile.emergency_contact_name?.trim()) missing.emergencyContactName = true;
+  if (!profile.emergency_contact_phone?.trim()) missing.emergencyContactPhone = true;
+
+  return missing;
+}
+
+/** Returns true if a profile has all required fields filled */
+function isProfileComplete(profile: DiverProfile | null): boolean {
+  if (!profile) return false;
+  return Object.keys(detectMissingFields(profile)).length === 0;
+}
+
+// ---------------------------------------------------------------------------
+// Hook
+// ---------------------------------------------------------------------------
 
 export function useTripBooking(tripId: string | undefined) {
   const navigate = useNavigate();
@@ -40,16 +91,43 @@ export function useTripBooking(tripId: string | undefined) {
   const [existingBooking, setExistingBooking] = useState<Tables<'bookings'> | null>(null);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+
+  // Profile completion dialog state
   const [showProfileDialog, setShowProfileDialog] = useState(false);
-  const [dialogFullName, setDialogFullName] = useState('');
-  const [dialogCertification, setDialogCertification] = useState('none');
+  const [profileFields, setProfileFields] = useState<ProfileFieldValues>({
+    firstName: '',
+    lastName: '',
+    certification: 'none',
+    loggedDives: 0,
+    emergencyContactName: '',
+    emergencyContactPhone: '',
+  });
+  const [missingFields, setMissingFields] = useState<MissingFields>({});
   const [creatingProfile, setCreatingProfile] = useState(false);
+  /** Track whether the existing profile needs updating vs creating */
+  const [existingProfile, setExistingProfile] = useState<DiverProfile | null>(null);
+
+  // Legacy pass-through props (for backward compat with TripDetail.tsx render)
+  const dialogFullName = `${profileFields.firstName} ${profileFields.lastName}`.trim();
+  const dialogCertification = profileFields.certification;
+
+  const handleFieldChange = useCallback(<K extends keyof ProfileFieldValues>(
+    key: K, value: ProfileFieldValues[K]
+  ) => {
+    setProfileFields(prev => ({ ...prev, [key]: value }));
+  }, []);
 
   // Pre-fill name from user metadata
   useEffect(() => {
     if (user) {
       const meta = user.user_metadata;
-      setDialogFullName(meta?.full_name || meta?.name || '');
+      const name = meta?.full_name || meta?.name || '';
+      const { first, last } = splitFullName(name);
+      setProfileFields(prev => ({
+        ...prev,
+        firstName: prev.firstName || first,
+        lastName: prev.lastName || last,
+      }));
     }
   }, [user]);
 
@@ -63,6 +141,7 @@ export function useTripBooking(tripId: string | undefined) {
       ]);
       setTrip(tripData);
       if (profile) {
+        setExistingProfile(profile);
         const bk = await fetchBookingForTrip(tripId, profile.id);
         setExistingBooking(bk);
       }
@@ -85,28 +164,80 @@ export function useTripBooking(tripId: string | undefined) {
   const handleBook = async () => {
     if (!trip || !user) return;
     setBooking(true);
+
     const profile = await fetchDiverProfile(user.id);
+    setExistingProfile(profile);
+
     if (!profile) {
+      // No profile at all → show dialog with all fields
+      setMissingFields({
+        firstName: true,
+        lastName: true,
+        certification: true,
+        loggedDives: true,
+        emergencyContactName: true,
+        emergencyContactPhone: true,
+      });
       setShowProfileDialog(true);
       setBooking(false);
       return;
     }
+
+    if (!isProfileComplete(profile)) {
+      // Profile exists but incomplete → pre-fill known values, show missing
+      const { first, last } = splitFullName(profile.full_name);
+      setProfileFields({
+        firstName: first,
+        lastName: last,
+        certification: profile.certification || 'none',
+        loggedDives: profile.logged_dives ?? 0,
+        emergencyContactName: profile.emergency_contact_name || '',
+        emergencyContactPhone: profile.emergency_contact_phone || '',
+      });
+      setMissingFields(detectMissingFields(profile));
+      setShowProfileDialog(true);
+      setBooking(false);
+      return;
+    }
+
+    // Profile is complete → book immediately
     await insertBooking(trip.id, profile.id);
     setBooking(false);
   };
 
   const handleCompleteProfileAndBook = async () => {
-    if (!trip || !user || !dialogFullName.trim()) return;
+    if (!trip || !user) return;
+    if (!profileFields.firstName.trim() || !profileFields.lastName.trim()) return;
+
     setCreatingProfile(true);
     try {
-      await assignDiverRole(user.id);
-      const newProfile = await createDiverProfile({
-        user_id: user.id,
-        full_name: dialogFullName.trim(),
-        certification: dialogCertification as CertificationLevel,
-      });
-      await refreshRole();
-      await insertBooking(trip.id, newProfile.id);
+      const fullName = [profileFields.firstName.trim(), profileFields.lastName.trim()].filter(Boolean).join(' ');
+      const profileData = {
+        full_name: fullName,
+        certification: profileFields.certification as CertificationLevel,
+        logged_dives: profileFields.loggedDives,
+        emergency_contact_name: profileFields.emergencyContactName.trim() || null,
+        emergency_contact_phone: profileFields.emergencyContactPhone.trim() || null,
+      };
+
+      let profileId: string;
+
+      if (existingProfile) {
+        // Update existing profile
+        const updated = await updateDiverProfile(existingProfile.id, profileData);
+        profileId = updated.id;
+      } else {
+        // Create new profile (first-time diver)
+        await assignDiverRole(user.id);
+        const newProfile = await createDiverProfile({
+          user_id: user.id,
+          ...profileData,
+        });
+        await refreshRole();
+        profileId = newProfile.id;
+      }
+
+      await insertBooking(trip.id, profileId);
       setShowProfileDialog(false);
     } catch (err) {
       console.error('[TripDetail] handleCompleteProfileAndBook failed:', err);
@@ -122,7 +253,8 @@ export function useTripBooking(tripId: string | undefined) {
     try {
       await cancelBooking(existingBooking.id);
       toast.success(t('diver.bookings.cancelled'));
-      setExistingBooking({ ...existingBooking, status: 'cancelled' });
+      // Clear the booking so the diver can rebook immediately
+      setExistingBooking(null);
     } catch (err) {
       console.error('[TripDetail] handleCancelPending failed:', err);
       toast.error(t('diver.trip.bookError'));
@@ -181,10 +313,19 @@ export function useTripBooking(tripId: string | undefined) {
     cancelling,
     showProfileDialog,
     setShowProfileDialog,
+    // New profile completion fields
+    profileFields,
+    handleFieldChange,
+    missingFields,
+    isUpdate: !!existingProfile,
+    // Legacy compat
     dialogFullName,
-    setDialogFullName,
+    setDialogFullName: (name: string) => {
+      const { first, last } = splitFullName(name);
+      setProfileFields(prev => ({ ...prev, firstName: first, lastName: last }));
+    },
     dialogCertification,
-    setDialogCertification,
+    setDialogCertification: (cert: string) => setProfileFields(prev => ({ ...prev, certification: cert })),
     creatingProfile,
     isPending,
     isConfirmed,

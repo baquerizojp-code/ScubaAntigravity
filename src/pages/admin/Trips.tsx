@@ -146,7 +146,7 @@ const AdminTrips = () => {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h3 className="font-semibold text-foreground truncate">{trip.title}</h3>
-                  <Badge variant="outline" className={statusColor(trip.status)}>{trip.status}</Badge>
+                  <Badge variant="outline" className={`capitalize ${statusColor(trip.status)}`}>{trip.status}</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {trip.dive_site} · {format(parseLocalDate(trip.trip_date), 'dd/MM/yyyy')} · {trip.trip_time?.slice(0, 5)}

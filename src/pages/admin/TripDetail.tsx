@@ -124,7 +124,7 @@ const AdminTripDetail = () => {
           <div className="min-w-0">
             <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mb-1">
               <h1 className="text-xl sm:text-3xl font-bold text-foreground leading-tight">{trip.title}</h1>
-              <Badge variant="outline" className={statusColor(trip.status)}>{trip.status}</Badge>
+              <Badge variant="outline" className={`capitalize ${statusColor(trip.status)}`}>{trip.status}</Badge>
             </div>
             <p className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1">
               <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 shrink-0" /> {trip.dive_site}</span>
