@@ -14,7 +14,7 @@ import PhoneInput from '@/components/PhoneInput';
 const PENDING_CENTER_KEY = 'pending_center_signup';
 
 const RegisterCenter = () => {
-  const { user, role } = useAuth();
+  const { user, role, diveCenterId } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
 
@@ -29,7 +29,7 @@ const RegisterCenter = () => {
   useEffect(() => {
     if (user && role) {
       if (role === 'diver') navigate('/app/discover', { replace: true });
-      else if (role === 'super_admin' && diveCenterId) navigate('/super-admin', { replace: true });
+      else if (role === 'super_admin') navigate('/super-admin', { replace: true });
       else if (role === 'dive_center' && diveCenterId) navigate('/admin', { replace: true });
     }
   }, [user, role, navigate]);

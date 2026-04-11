@@ -1,21 +1,12 @@
-import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
-} from '@/components/ui/alert-dialog';
-import { toast } from 'sonner';
-import { CheckCircle, XCircle, Clock, Building2, Globe, ChevronRight } from 'lucide-react';
+import { Clock, Building2, Globe, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-type ActionTarget = { centerId: string; action: 'approve' | 'reject' } | null;
 
 const statusBadgeClasses: Record<string, string> = {
   pending: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
@@ -25,11 +16,8 @@ const statusBadgeClasses: Record<string, string> = {
 };
 
 const SuperAdminDashboard = () => {
-  const { user } = useAuth();
   const { t } = useI18n();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [actionTarget, setActionTarget] = useState<ActionTarget>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'archived'>('all');
 
   const { data: centers, isLoading } = useQuery({
@@ -44,53 +32,7 @@ const SuperAdminDashboard = () => {
     },
   });
 
-  const updateStatusMutation = useMutation({
-    mutationFn: async ({ centerId, action }: { centerId: string; action: 'approve' | 'reject' }) => {
-      const newStatus = action === 'approve' ? 'approved' : 'rejected';
-      
-      const { error } = await supabase
-        .from('dive_centers')
-        .update({
-          center_status: newStatus,
-          approved_at: action === 'approve' ? new Date().toISOString() : null,
-          approved_by: action === 'approve' ? user?.id : null,
-        })
-        .eq('id', centerId);
-      if (error) throw error;
-
-      // Create in-app notification for the center owner
-      const { data: center } = await supabase
-        .from('dive_centers')
-        .select('created_by, name')
-        .eq('id', centerId)
-        .single();
-
-      if (center?.created_by) {
-        const title = action === 'approve' 
-          ? t('superAdmin.notification.approvedTitle')
-          : t('superAdmin.notification.rejectedTitle');
-        const body = action === 'approve'
-          ? t('superAdmin.notification.approvedBody')
-          : t('superAdmin.notification.rejectedBody');
-
-        await supabase.from('notifications').insert({
-          user_id: center.created_by,
-          type: action === 'approve' ? 'center_approved' : 'center_rejected',
-          title,
-          body: `${center.name} — ${body}`,
-        });
-      }
-    },
-    onSuccess: (_, { action }) => {
-      queryClient.invalidateQueries({ queryKey: ['super-admin-centers'] });
-      toast.success(action === 'approve' ? t('superAdmin.approved') : t('superAdmin.rejected'));
-    },
-    onError: (err: Error) => {
-      toast.error(err.message);
-    },
-  });
-
-  const filteredCenters = centers?.filter(c => 
+  const filteredCenters = centers?.filter(c =>
     statusFilter === 'all' ? true : c.center_status === statusFilter
   );
 
@@ -116,8 +58,8 @@ const SuperAdminDashboard = () => {
             key={status}
             onClick={() => setStatusFilter(status)}
             className={`p-4 rounded-xl text-left transition-all ${
-              statusFilter === status 
-                ? 'bg-primary/10 border border-primary/30 ring-1 ring-primary/20' 
+              statusFilter === status
+                ? 'bg-primary/10 border border-primary/30 ring-1 ring-primary/20'
                 : 'bg-card border border-white/5 hover:border-white/10'
             }`}
           >
@@ -151,7 +93,7 @@ const SuperAdminDashboard = () => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-semibold text-foreground truncate">{center.name}</h3>
-                    <Badge variant="outline" className={`capitalize ${statusBadgeClasses[center.center_status] ?? ''}`}>
+                    <Badge variant="outline" className={`capitalize flex-shrink-0 ${statusBadgeClasses[center.center_status] ?? ''}`}>
                       {center.center_status}
                     </Badge>
                   </div>
@@ -169,70 +111,12 @@ const SuperAdminDashboard = () => {
                     <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{center.description}</p>
                   )}
                 </div>
-
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  {center.center_status === 'pending' && (
-                    <>
-                      <Button
-                        size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
-                        onClick={(e) => { e.stopPropagation(); setActionTarget({ centerId: center.id, action: 'approve' }); }}
-                      >
-                        <CheckCircle className="h-3.5 w-3.5" />
-                        {t('superAdmin.approve')}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-red-500 border-red-500/30 hover:bg-red-500/10 gap-1.5"
-                        onClick={(e) => { e.stopPropagation(); setActionTarget({ centerId: center.id, action: 'reject' }); }}
-                      >
-                        <XCircle className="h-3.5 w-3.5" />
-                        {t('superAdmin.reject')}
-                      </Button>
-                    </>
-                  )}
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
               </div>
             </Card>
           ))}
         </div>
       )}
-
-      {/* Confirmation Dialog */}
-      <AlertDialog open={!!actionTarget} onOpenChange={() => setActionTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {actionTarget?.action === 'approve' 
-                ? t('superAdmin.confirmApprove') 
-                : t('superAdmin.confirmReject')}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {actionTarget?.action === 'approve'
-                ? t('superAdmin.confirmApproveDesc')
-                : t('superAdmin.confirmRejectDesc')}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              className={actionTarget?.action === 'approve' 
-                ? 'bg-emerald-600 hover:bg-emerald-700' 
-                : 'bg-destructive text-destructive-foreground hover:bg-destructive/90'}
-              onClick={() => {
-                if (actionTarget) {
-                  updateStatusMutation.mutate(actionTarget);
-                  setActionTarget(null);
-                }
-              }}
-            >
-              {t('common.confirm')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
