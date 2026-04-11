@@ -35,7 +35,8 @@ const MyBookings = () => {
     queryKey: ['my-bookings', user?.id],
     queryFn: () => fetchBookingsForDiver(user!.id),
     enabled: !!user,
-    refetchInterval: 30000,
+    // No refetchInterval — the realtime subscription below handles live updates
+    // without polling the DB every 30 s on every open tab.
   });
 
   // Realtime subscription for instant booking status updates (replaced manual useEffect)

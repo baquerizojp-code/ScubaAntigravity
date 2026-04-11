@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { format } from 'date-fns';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
@@ -29,14 +30,27 @@ const AdminDashboard = () => {
   });
 
   const today = getTodayDateString();
-  const upcomingTrips = trips.filter(t => t.status === 'published' && t.trip_date >= today);
-  const pending = bookings.filter(b => b.status === 'pending');
-  /* AUDIT FIX: Replaced 'active' var name with 'confirmedBookings' for clarity */
-  const confirmedBookings = bookings.filter(b => b.status === 'confirmed');
-  const totalRevenue = confirmedBookings.reduce((sum: number, b: AdminBookingWithDetails) => sum + (Number(b.trips?.price_usd) || 0), 0);
 
-    // Get recent trips for the table (latest 5)
-  const recentTrips = [...trips].sort((a, b) => new Date(b.trip_date).getTime() - new Date(a.trip_date).getTime()).slice(0, 5);
+  const upcomingTrips = useMemo(
+    () => trips.filter(t => t.status === 'published' && t.trip_date >= today),
+    [trips, today]
+  );
+  const pending = useMemo(
+    () => bookings.filter(b => b.status === 'pending'),
+    [bookings]
+  );
+  const confirmedBookings = useMemo(
+    () => bookings.filter(b => b.status === 'confirmed'),
+    [bookings]
+  );
+  const totalRevenue = useMemo(
+    () => confirmedBookings.reduce((sum: number, b: AdminBookingWithDetails) => sum + (Number(b.trips?.price_usd) || 0), 0),
+    [confirmedBookings]
+  );
+  const recentTrips = useMemo(
+    () => [...trips].sort((a, b) => new Date(b.trip_date).getTime() - new Date(a.trip_date).getTime()).slice(0, 5),
+    [trips]
+  );
 
 const statCards = [
     {

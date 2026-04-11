@@ -8,7 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-import Landing from "./pages/Landing";
+const Landing = lazy(() => import("./pages/Landing"));
 import { Analytics } from "@vercel/analytics/react";
 
 // Lazy-loaded routes
@@ -39,7 +39,16 @@ const SuperAdminLayout = lazy(() => import("@/components/SuperAdminLayout"));
 const SuperAdminDashboard = lazy(() => import("./pages/super-admin/Dashboard"));
 const SuperAdminCenterDetail = lazy(() => import("./pages/super-admin/CenterDetail"));
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,        // 1 min — data is fresh; no refetch on window focus
+      gcTime: 5 * 60 * 1000,       // 5 min — keep unused cache in memory
+      retry: 1,                     // one retry on network error (default 3 is excessive)
+      refetchOnWindowFocus: false,  // avoids jarring refetches when the user alt-tabs back
+    },
+  },
+});
 
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">

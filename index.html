@@ -1,9 +1,19 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <!-- Preconnect: googleapis does not serve cross-origin resources so no crossorigin attr -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <!-- Preconnect: gstatic serves font binary files cross-origin — crossorigin is required -->
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Work+Sans:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'" />
+    <!-- dns-prefetch as fallback for browsers that do not support preconnect -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <!-- Non-render-blocking font load: media=print trick swaps to all once loaded -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" media="print" onload="this.media='all'" />
+    <!-- noscript fallback for users with JS disabled -->
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" />
+    </noscript>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ScubaTrip — Discover & Book Dive Trips</title>

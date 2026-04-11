@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,10 @@ const Navbar = ({ transparent = false }: NavbarProps) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [transparent]);
 
-  const dashboardPath = role === 'diver' ? '/app/discover' : role ? '/admin' : '/login';
+  const dashboardPath = useMemo(
+    () => (role === 'diver' ? '/app/discover' : role ? '/admin' : '/login'),
+    [role]
+  );
 
   return (
     <nav
