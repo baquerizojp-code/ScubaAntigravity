@@ -37,6 +37,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 // Super Admin
 const SuperAdminLayout = lazy(() => import("@/components/SuperAdminLayout"));
 const SuperAdminDashboard = lazy(() => import("./pages/super-admin/Dashboard"));
+const SuperAdminCenterDetail = lazy(() => import("./pages/super-admin/CenterDetail"));
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ const App = () => (
                 </ProtectedRoute>
               }>
                 <Route index element={<SuperAdminDashboard />} />
+                <Route path="centers/:id" element={<SuperAdminCenterDetail />} />
               </Route>
 
               {/* Admin routes with shared layout */}

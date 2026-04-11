@@ -389,5 +389,20 @@
   "superAdmin.notification.approvedTitle": "¡Centro Aprobado!",
   "superAdmin.notification.approvedBody": "Tu centro de buceo ha sido aprobado. ¡Ya puedes crear trips!",
   "superAdmin.notification.rejectedTitle": "Centro No Aprobado",
-  "superAdmin.notification.rejectedBody": "El registro de tu centro de buceo no fue aprobado."
+  "superAdmin.notification.rejectedBody": "El registro de tu centro de buceo no fue aprobado.",
+  "superAdmin.filter.archived": "Archivados",
+  "superAdmin.archive": "Archivar",
+  "superAdmin.archived": "Centro de buceo archivado",
+  "superAdmin.delete": "Eliminar Centro",
+  "superAdmin.deleted": "Centro de buceo eliminado",
+  "superAdmin.confirmArchive": "¿Archivar este centro de buceo?",
+  "superAdmin.confirmArchiveDesc": "El centro quedará oculto de los listados activos pero no se eliminará permanentemente.",
+  "superAdmin.confirmDelete": "¿Eliminar permanentemente este centro de buceo?",
+  "superAdmin.confirmDeleteDesc": "Esta acción no se puede deshacer. Todos los datos del centro serán eliminados permanentemente.",
+  "superAdmin.backToDashboard": "Volver al Panel",
+  "superAdmin.centerDetail.owner": "Propietario",
+  "superAdmin.centerDetail.registeredOn": "Registrado",
+  "superAdmin.centerDetail.approvedOn": "Aprobado",
+  "landing.hero.cta.centerLink": "¿Eres un centro de buceo? Regístrate aquí",
+  "landing.cta.centerLink": "Registra tu centro de buceo"
 }

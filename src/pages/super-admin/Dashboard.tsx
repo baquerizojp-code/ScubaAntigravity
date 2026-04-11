@@ -5,14 +5,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle 
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { CheckCircle, XCircle, Clock, Building2, Globe } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, Building2, Globe, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 type ActionTarget = { centerId: string; action: 'approve' | 'reject' } | null;
 
@@ -20,14 +21,16 @@ const statusBadgeClasses: Record<string, string> = {
   pending: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
   approved: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
   rejected: 'bg-red-500/10 text-red-500 border-red-500/20',
+  archived: 'bg-muted text-muted-foreground border-muted-foreground/20',
 };
 
 const SuperAdminDashboard = () => {
   const { user } = useAuth();
   const { t } = useI18n();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [actionTarget, setActionTarget] = useState<ActionTarget>(null);
-  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'rejected' | 'archived'>('all');
 
   const { data: centers, isLoading } = useQuery({
     queryKey: ['super-admin-centers'],
@@ -96,6 +99,7 @@ const SuperAdminDashboard = () => {
     pending: centers?.filter(c => c.center_status === 'pending').length ?? 0,
     approved: centers?.filter(c => c.center_status === 'approved').length ?? 0,
     rejected: centers?.filter(c => c.center_status === 'rejected').length ?? 0,
+    archived: centers?.filter(c => c.center_status === 'archived').length ?? 0,
   };
 
   return (
@@ -106,8 +110,8 @@ const SuperAdminDashboard = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        {(['all', 'pending', 'approved', 'rejected'] as const).map(status => (
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        {(['all', 'pending', 'approved', 'rejected', 'archived'] as const).map(status => (
           <button
             key={status}
             onClick={() => setStatusFilter(status)}
@@ -138,7 +142,11 @@ const SuperAdminDashboard = () => {
       ) : (
         <div className="grid gap-3">
           {filteredCenters.map(center => (
-            <Card key={center.id} className="p-5">
+            <Card
+              key={center.id}
+              className="p-5 cursor-pointer hover:border-white/20 transition-all"
+              onClick={() => navigate(`/super-admin/centers/${center.id}`)}
+            >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -162,38 +170,30 @@ const SuperAdminDashboard = () => {
                   )}
                 </div>
 
-                {center.center_status === 'pending' && (
-                  <div className="flex gap-2 flex-shrink-0">
-                    <Button
-                      size="sm"
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
-                      onClick={() => setActionTarget({ centerId: center.id, action: 'approve' })}
-                    >
-                      <CheckCircle className="h-3.5 w-3.5" />
-                      {t('superAdmin.approve')}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-red-500 border-red-500/30 hover:bg-red-500/10 gap-1.5"
-                      onClick={() => setActionTarget({ centerId: center.id, action: 'reject' })}
-                    >
-                      <XCircle className="h-3.5 w-3.5" />
-                      {t('superAdmin.reject')}
-                    </Button>
-                  </div>
-                )}
-
-                {center.center_status === 'rejected' && (
-                  <Button
-                    size="sm"
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 flex-shrink-0"
-                    onClick={() => setActionTarget({ centerId: center.id, action: 'approve' })}
-                  >
-                    <CheckCircle className="h-3.5 w-3.5" />
-                    {t('superAdmin.approve')}
-                  </Button>
-                )}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {center.center_status === 'pending' && (
+                    <>
+                      <Button
+                        size="sm"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
+                        onClick={(e) => { e.stopPropagation(); setActionTarget({ centerId: center.id, action: 'approve' }); }}
+                      >
+                        <CheckCircle className="h-3.5 w-3.5" />
+                        {t('superAdmin.approve')}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-red-500 border-red-500/30 hover:bg-red-500/10 gap-1.5"
+                        onClick={(e) => { e.stopPropagation(); setActionTarget({ centerId: center.id, action: 'reject' }); }}
+                      >
+                        <XCircle className="h-3.5 w-3.5" />
+                        {t('superAdmin.reject')}
+                      </Button>
+                    </>
+                  )}
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                </div>
               </div>
             </Card>
           ))}
