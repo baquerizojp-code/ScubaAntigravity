@@ -1,9 +1,7 @@
-import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, CalendarCheck, Users, Settings, ChevronRight, Anchor, Fish, MapPin, Star } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Search, CalendarCheck, Users, Settings, ChevronRight, Fish, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
-import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import heroImageWebp from '@/assets/hero-ocean.webp';
@@ -25,10 +23,6 @@ const steps = [
 
 const Landing = () => {
   const { t } = useI18n();
-  const { user, role, loading } = useAuth();
-  const navigate = useNavigate();
-
-  // No auto-redirect. Users can stay on the landing page and use the Navbar 'Dashboard' button instead.
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">

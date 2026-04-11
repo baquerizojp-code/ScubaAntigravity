@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- test utility file: fast-refresh doesn't apply */
 /**
  * Shared test utilities: custom render with providers, mock auth context, etc.
  */

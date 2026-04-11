@@ -205,7 +205,7 @@ export async function denyCancellation(bookingId: string) {
  * We can reuse approve_cancellation RPC since it handles the spot incrementing logic.
  */
 export async function removeConfirmedBooking(bookingId: string) {
-  const { data, error } = await supabase.rpc('approve_cancellation', {
+  const { error } = await supabase.rpc('approve_cancellation', {
     _booking_id: bookingId,
   });
   if (error) throw error;

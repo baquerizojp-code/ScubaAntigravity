@@ -112,7 +112,7 @@ export const TripFormModal = ({ open, onOpenChange, trip, onSuccess }: TripFormM
       };
 
       if (trip?.id) {
-        const { dive_center_id, ...updatePayload } = payload;
+        const { dive_center_id: _dive_center_id, ...updatePayload } = payload;
         await updateTrip(trip.id, updatePayload);
       } else {
         await createTrip({ ...payload, available_spots: formData.total_spots });
