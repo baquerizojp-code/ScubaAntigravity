@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Clock, Users, Heart } from 'lucide-react';
@@ -27,18 +28,22 @@ interface TripCardProps {
   trip: TripWithCenter;
   linkTo: string;
   bookingStatus?: string;
+  /** Pass true for cards in the first visible row to avoid lazy-loading the LCP image */
+  eager?: boolean;
 }
 
-const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
+const TripCard = memo(({ trip, linkTo, bookingStatus, eager = false }: TripCardProps) => {
   const { t, locale } = useI18n();
 
   return (
     <Link to={linkTo} className="block group relative aspect-[4/5] sm:aspect-[3/4] rounded-xl overflow-hidden shadow-xl transition-transform duration-500 hover:-translate-y-2">
       {trip.image_url ? (
-        <img 
-          src={trip.image_url} 
-          alt={trip.title} 
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+        <img
+          src={trip.image_url}
+          alt={trip.title}
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
         />
       ) : (
         <div className="absolute inset-0 w-full h-full bg-ocean-900 transition-transform duration-700 group-hover:scale-110" />
@@ -108,6 +113,8 @@ const TripCard = ({ trip, linkTo, bookingStatus }: TripCardProps) => {
       </div>
     </Link>
   );
-};
+});
+
+TripCard.displayName = 'TripCard';
 
 export default TripCard;

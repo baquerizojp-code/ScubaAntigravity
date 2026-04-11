@@ -53,13 +53,15 @@ export function useTripBooking(tripId: string | undefined) {
     }
   }, [user]);
 
-  // Fetch trip + existing booking
+  // Fetch trip + profile in parallel, then booking if profile exists
   useEffect(() => {
     if (!tripId) return;
     const fetchData = async () => {
-      const tripData = await fetchTripById(tripId);
+      const [tripData, profile] = await Promise.all([
+        fetchTripById(tripId),
+        fetchDiverProfile(user!.id),
+      ]);
       setTrip(tripData);
-      const profile = await fetchDiverProfile(user!.id);
       if (profile) {
         const bk = await fetchBookingForTrip(tripId, profile.id);
         setExistingBooking(bk);
