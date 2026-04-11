@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
-import { Compass, CalendarCheck, User, LogOut, Globe, Home } from 'lucide-react';
+import { Compass, CalendarCheck, User, LogOut, Globe, Home, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
@@ -12,6 +13,12 @@ const DiverLayout = () => {
   const { pathname } = useLocation();
   const { signOut, role } = useAuth();
   const { t, locale, setLocale } = useI18n();
+  const [drawerOpen, _setDrawerOpen] = useState(() => sessionStorage.getItem('sidebarOpen') === 'true');
+  const setDrawerOpen = (open: boolean) => {
+    if (open) sessionStorage.setItem('sidebarOpen', 'true');
+    else sessionStorage.removeItem('sidebarOpen');
+    _setDrawerOpen(open);
+  };
 
   const navItems = [
     { to: '/app', exact: true, icon: Home, label: 'Dashboard' },
@@ -22,22 +29,70 @@ const DiverLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="sticky top-0 z-50 bg-secondary/95 backdrop-blur-xl border-b border-white/10 shadow-lg px-4">
-        <div className="container mx-auto h-14 sm:h-16 flex items-center justify-between max-w-7xl">
-          <div className="flex items-center gap-2.5 min-h-[48px]">
-            <ScubaMaskLogo className="w-8 h-10 text-primary" />
-            <span className="text-2xl font-black text-white tracking-tighter font-headline">ScubaTrip</span>
+      {/* Super-admin role-switcher drawer */}
+      {role === 'super_admin' && drawerOpen && (
+        <div
+          className="fixed inset-0 bg-foreground/20 z-[55]"
+          onClick={() => setDrawerOpen(false)}
+        />
+      )}
+      {role === 'super_admin' && (
+        <aside className={`fixed inset-y-0 left-0 z-[60] w-64 bg-muted flex flex-col transition-transform ${drawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          {/* Drawer header */}
+          <div className="px-4 py-5 flex items-center justify-between border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <ScubaMaskLogo className="h-8 w-6 text-primary" />
+              <span className="text-lg font-bold text-foreground">ScubaTrip</span>
+            </div>
+            <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(false)} aria-label="Close menu">
+              <X className="h-5 w-5" />
+            </Button>
           </div>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <ThemeToggle className="text-ocean-200 hover:text-white hover:bg-white/10" />
+          <div className="px-4 pt-4">
+            <RoleSwitcher />
+          </div>
+          <div className="flex-1" />
+          {/* Drawer bottom: language, theme, logout */}
+          <div className="p-4 space-y-1 border-t border-white/10">
+            <div className="flex items-center gap-2 px-1 py-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex-1 justify-start gap-2 text-muted-foreground hover:text-foreground text-xs"
+                onClick={() => setLocale(locale === 'es' ? 'en' : 'es')}
+              >
+                <Globe className="h-3.5 w-3.5" />
+                {locale === 'es' ? 'English' : 'Español'}
+              </Button>
+              <ThemeToggle />
+            </div>
+            <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive" onClick={signOut}>
+              <LogOut className="h-4 w-4" />
+              {t('nav.logout')}
+            </Button>
+          </div>
+        </aside>
+      )}
+
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-secondary/95 backdrop-blur-xl border-b border-white/10 shadow-lg">
+        <div className="relative h-14 sm:h-16 flex items-center px-4">
+          {/* Left: hamburger (super_admin only) */}
+          <div className="w-11">
+            {role === 'super_admin' && (
+              <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px] text-ocean-200 hover:text-white hover:bg-white/10" onClick={() => setDrawerOpen(true)} aria-label="Open menu">
+                <Menu className="w-5 h-5" />
+              </Button>
+            )}
+          </div>
+          {/* Center: logo always centered */}
+          <Link to="/app" className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
+            <ScubaMaskLogo className="w-6 h-8 text-primary" />
+            <span className="text-xl font-black text-white tracking-tighter font-headline">ScubaTrip</span>
+          </Link>
+          {/* Right: notification only */}
+          <div className="ml-auto">
             <NotificationBell className="text-ocean-200 hover:text-white hover:bg-white/10" />
-            {role === 'super_admin' && <RoleSwitcher compact />}
-            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px] text-ocean-200 hover:text-white hover:bg-white/10 rounded-full" onClick={() => setLocale(locale === 'es' ? 'en' : 'es')} aria-label={t('nav.language')}>
-              <Globe className="w-5 h-5" />
-            </Button>
-            <Button variant="ghost" size="icon" className="min-h-[44px] min-w-[44px] text-ocean-200 hover:text-white hover:bg-white/10 rounded-full" onClick={signOut} aria-label={t('nav.logout')}>
-              <LogOut className="w-5 h-5" />
-            </Button>
           </div>
         </div>
       </header>
@@ -47,7 +102,7 @@ const DiverLayout = () => {
         <Outlet />
       </main>
 
-      {/* AUDIT FIX: Added glassmorphism to bottom nav — backdrop-blur-xl bg-card/80 border-white/10 */}
+      {/* Bottom nav */}
       <nav className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-card/80 border-t border-white/10 px-safe">
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
           {navItems.map(({ to, icon: Icon, label, exact }) => {

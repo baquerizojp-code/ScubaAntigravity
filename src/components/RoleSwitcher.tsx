@@ -31,15 +31,15 @@ const RoleSwitcher = ({ className, compact = false }: RoleSwitcherProps) => {
   };
 
   return (
-    <div className={cn('flex items-center gap-1 p-1 rounded-lg bg-muted/50', className)}>
+    <div className={cn('flex items-center gap-1 p-1 rounded-lg bg-muted/50 w-full overflow-hidden', className)}>
       {viewConfig.map(({ view, icon: Icon, labelKey, path }) => (
         <button
           key={view}
           onClick={() => handleSwitch(view, path)}
           className={cn(
-            'flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-all duration-200',
+            'flex flex-1 items-center justify-center gap-1.5 px-2 py-1.5 rounded-md text-xs font-medium transition-all duration-200',
             activeView === view
-              ? 'bg-primary text-primary-foreground shadow-sm'
+              ? 'bg-primary text-primary-foreground'
               : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           )}
           title={t(labelKey)}
