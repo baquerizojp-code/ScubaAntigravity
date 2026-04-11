@@ -114,7 +114,7 @@ const AdminTripDetail = () => {
   const statusColor = (s: string) => TRIP_STATUS_CLASSES[s] || TRIP_STATUS_CLASSES.draft;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 pb-12">
+    <div className="max-w-5xl mx-auto w-full space-y-6 pb-12 overflow-x-hidden">
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3 min-w-0">
@@ -199,17 +199,19 @@ const AdminTripDetail = () => {
         {/* Right Column: Bookings */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               <Tabs defaultValue="confirmed">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="confirmed" className="gap-2">
-                    <Check className="h-4 w-4" /> {t('admin.tripDetail.confirmedDivers')}
-                    <Badge variant="secondary" className="px-1.5 min-w-[1.25rem]">{confirmedBookings.length}</Badge>
+                <TabsList className="mb-4 w-full">
+                  <TabsTrigger value="confirmed" className="flex-1 gap-1.5">
+                    <Check className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{t('admin.tripDetail.confirmedDivers')}</span>
+                    <Badge variant="secondary" className="px-1.5 min-w-[1.25rem] shrink-0">{confirmedBookings.length}</Badge>
                   </TabsTrigger>
-                  <TabsTrigger value="pending" className="gap-2">
-                    <Clock className="h-4 w-4" /> {t('admin.tripDetail.pendingRequests')}
+                  <TabsTrigger value="pending" className="flex-1 gap-1.5">
+                    <Clock className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{t('admin.tripDetail.pendingRequests')}</span>
                     {pendingBookings.length > 0 && (
-                      <Badge variant="default" className="px-1.5 min-w-[1.25rem] bg-warning hover:bg-warning/90 border-none text-warning-foreground">
+                      <Badge variant="default" className="px-1.5 min-w-[1.25rem] shrink-0 bg-warning hover:bg-warning/90 border-none text-warning-foreground">
                         {pendingBookings.length}
                       </Badge>
                     )}
