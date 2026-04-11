@@ -116,22 +116,22 @@ const AdminTripDetail = () => {
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/admin/trips')} className="hidden sm:flex">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3 min-w-0">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/admin/trips')} className="shrink-0 mt-0.5">
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{trip.title}</h1>
+          <div className="min-w-0">
+            <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mb-1">
+              <h1 className="text-xl sm:text-3xl font-bold text-foreground leading-tight">{trip.title}</h1>
               <Badge variant="outline" className={statusColor(trip.status)}>{trip.status}</Badge>
             </div>
-            <p className="text-sm text-muted-foreground flex items-center gap-2">
-              <MapPin className="h-4 w-4" /> {trip.dive_site}
+            <p className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5 shrink-0" /> {trip.dive_site}</span>
               <span className="opacity-50">•</span>
-              <Calendar className="h-4 w-4" /> {format(parseLocalDate(trip.trip_date), 'MMMM d, yyyy')}
+              <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5 shrink-0" /> {format(parseLocalDate(trip.trip_date), 'MMMM d, yyyy')}</span>
               <span className="opacity-50">•</span>
-              <Clock className="h-4 w-4" /> {trip.trip_time?.slice(0, 5)}
+              <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5 shrink-0" /> {trip.trip_time?.slice(0, 5)}</span>
             </p>
           </div>
         </div>
