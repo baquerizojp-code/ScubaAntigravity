@@ -81,6 +81,8 @@
   "common.price": "Precio",
   "common.date": "Fecha",
   "common.time": "Hora",
+  "common.clear": "Limpiar",
+  "common.done": "Listo",
 
   "auth.login.title": "Bienvenido de vuelta",
   "auth.login.subtitle": "Inicia sesión para continuar",

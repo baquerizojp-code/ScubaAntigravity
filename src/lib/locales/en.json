@@ -81,6 +81,8 @@
   "common.price": "Price",
   "common.date": "Date",
   "common.time": "Time",
+  "common.clear": "Clear",
+  "common.done": "Done",
 
   "auth.login.title": "Welcome back",
   "auth.login.subtitle": "Sign in to continue",
