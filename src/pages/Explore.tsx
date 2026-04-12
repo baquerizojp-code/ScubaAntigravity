@@ -2,7 +2,7 @@ import { useI18n } from '@/lib/i18n';
 import { useQuery } from '@tanstack/react-query';
 import { fetchPublishedTrips } from '@/services/trips';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Compass, MapPin, Calendar } from 'lucide-react';
+import { Compass, Calendar } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import TripCard from '@/components/TripCard';
 import type { TripWithCenter } from '@/components/TripCard';
@@ -41,49 +41,17 @@ const Explore = () => {
         <section className="mb-12">
           <div className="bg-background p-4 md:p-2 rounded-3xl md:rounded-full shadow-card border border-border flex flex-col md:flex-row items-center gap-4 md:gap-2">
             <div className="w-full md:flex-1 flex items-center px-2 md:px-6 gap-3">
-              <MapPin className="w-5 h-5 text-primary shrink-0" />
-              <div className="flex flex-col w-full">
-                {/* AUDIT FIX: Internationalized search bar labels */}
-                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.location')}</label>
-                <input 
-                  type="text" 
-                  placeholder={t('explore.locationPlaceholder')}
-                  className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 placeholder:text-muted-foreground text-sm w-full outline-none"
-                />
-              </div>
-            </div>
-            
-            <div className="w-full h-px md:w-px md:h-10 bg-border"></div>
-            
-            <div className="w-full md:flex-1 flex items-center px-2 md:px-6 gap-3">
               <Calendar className="w-5 h-5 text-primary shrink-0" />
               <div className="flex flex-col w-full">
                 <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.dateRange')}</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   placeholder={t('explore.datePlaceholder')}
                   className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 placeholder:text-muted-foreground text-sm w-full outline-none"
                 />
               </div>
             </div>
-            
-            <div className="w-full h-px md:w-px md:h-10 bg-border"></div>
-            
-            <div className="w-full md:flex-1 flex items-center px-2 md:px-6 gap-3">
-              <Compass className="w-5 h-5 text-primary shrink-0" />
-              <div className="flex flex-col w-full">
-                <label className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground">{t('explore.diverLevel')}</label>
-                <select className="bg-transparent border-none p-0 text-foreground font-semibold focus:ring-0 text-sm appearance-none flex-1 w-full outline-none ring-0 focus:border-none focus:outline-none">
-                  {/* AUDIT FIX: Internationalized select options */}
-                  <option value="">{t('explore.anyLevel')}</option>
-                  <option value="open_water">{t('profile.cert.openWater')}</option>
-                  <option value="advanced">{t('profile.cert.advanced')}</option>
-                  <option value="rescue">{t('profile.cert.rescue')}</option>
-                  <option value="divemaster">{t('profile.cert.divemaster')}</option>
-                </select>
-              </div>
-            </div>
-            
+
             <button className="bg-primary text-primary-foreground h-12 md:h-14 w-full md:w-40 rounded-full flex items-center justify-center gap-2 hover:brightness-110 shadow-lg shadow-primary/20 transition-all active:scale-95 shrink-0 mt-2 md:mt-0 font-bold">
               <Compass className="w-5 h-5 md:hidden" />
               <span className="md:block">{t('explore.search')}</span>
