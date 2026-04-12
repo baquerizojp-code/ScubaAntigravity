@@ -69,8 +69,8 @@ export function DateRangePicker({
             </div>
           </button>
         </PopoverTrigger>
-        <PopoverContent 
-          className="w-auto p-0 border-white/10 shadow-ocean bg-ocean-900/95 backdrop-blur-2xl" 
+        <PopoverContent
+          className="w-auto p-0 border-border shadow-lg bg-popover text-popover-foreground"
           align="start"
         >
           <div className="flex flex-col">
@@ -85,12 +85,12 @@ export function DateRangePicker({
               classNames={{
                 day_range_start: "bg-primary text-primary-foreground rounded-l-full",
                 day_range_end: "bg-primary text-primary-foreground rounded-r-full",
-                day_range_middle: "bg-primary/20 text-primary-foreground aria-selected:bg-primary/20",
+                day_range_middle: "aria-selected:bg-primary/15 aria-selected:text-foreground",
                 day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                day_today: "bg-accent/20 text-cyan-electric font-bold",
+                day_today: "ring-2 ring-inset ring-primary bg-transparent text-foreground font-semibold",
               }}
             />
-            <div className="p-4 pt-0 border-t border-white/5 flex items-center justify-between gap-2">
+            <div className="p-4 pt-0 border-t border-border flex items-center justify-between gap-2">
               <Button
                 variant="ghost"
                 size="sm"
