@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
-import { Mail } from 'lucide-react';
+import { Mail, Moon, Sun, LogOut, Globe } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 type CertificationLevel = Database['public']['Enums']['certification_level'];
 
@@ -24,8 +25,9 @@ const certOptions = [
 ] as const;
 
 const DiverProfile = () => {
-  const { user } = useAuth();
-  const { t } = useI18n();
+  const { user, signOut } = useAuth();
+  const { t, locale, setLocale } = useI18n();
+  const { theme, setTheme } = useTheme();
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -182,6 +184,98 @@ const DiverProfile = () => {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Preferences */}
+      <Card className="shadow-card mt-4">
+        <CardHeader>
+          <CardTitle className="text-lg">{t('profile.preferences')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+
+          {/* Theme toggle */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {theme === 'dark' ? (
+                <Moon className="w-4 h-4 text-muted-foreground" />
+              ) : (
+                <Sun className="w-4 h-4 text-muted-foreground" />
+              )}
+              <span className="text-sm font-medium">{t('profile.theme')}</span>
+            </div>
+            <div className="flex items-center gap-1 p-1 rounded-full bg-muted">
+              <button
+                onClick={() => setTheme('light')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  theme === 'light'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                aria-label="Light mode"
+              >
+                <Sun className="w-3.5 h-3.5" />
+                Light
+              </button>
+              <button
+                onClick={() => setTheme('dark')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  theme === 'dark'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                aria-label="Dark mode"
+              >
+                <Moon className="w-3.5 h-3.5" />
+                Dark
+              </button>
+            </div>
+          </div>
+
+          {/* Language toggle */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium">{t('profile.language')}</span>
+            </div>
+            <div className="flex items-center gap-1 p-1 rounded-full bg-muted">
+              <button
+                onClick={() => setLocale('en')}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  locale === 'en'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                aria-label="English"
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLocale('es')}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  locale === 'es'
+                    ? 'bg-background text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                aria-label="Español"
+              >
+                ES
+              </button>
+            </div>
+          </div>
+
+        </CardContent>
+      </Card>
+
+      {/* Log out */}
+      <div className="mt-4 mb-8">
+        <Button
+          variant="outline"
+          className="w-full border-destructive/40 text-destructive hover:bg-destructive/10 hover:border-destructive gap-2"
+          onClick={signOut}
+        >
+          <LogOut className="w-4 h-4" />
+          {t('nav.logout')}
+        </Button>
+      </div>
     </div>
   );
 };
