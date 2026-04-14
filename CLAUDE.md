@@ -5,7 +5,7 @@ This file provides guidance to AI coding assistants when working with code in th
 ## Commands
 
 ```bash
-npm run dev          # Start Vite dev server (default port, usually 5173 or 8080)
+npm run dev          # export PATH=$PATH:/opt/homebrew/bin && npm run dev (port 8080)
 npm run build        # Production build to dist/
 npm run build:dev    # Development-mode production build
 npm run lint         # ESLint
