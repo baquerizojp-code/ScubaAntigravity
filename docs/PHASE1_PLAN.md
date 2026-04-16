@@ -1187,7 +1187,7 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 | 2 | Posthog analytics events | 4h | ✅ commit 477733e |
 | 3 | Fix mobile bottom-nav overlap | 2h | ✅ commit c61a5fe |
 | 4 | Add noindex to private routes | 30min | ✅ commit fcb7ce4 |
-| 5 | Image optimization (srcset + WebP) | 3h | ☐ |
+| 5 | Image optimization (srcset + WebP) | 3h | ✅ commit 9697f61 |
 | 6 | Trip slugs (DB migration + URL update) | 1 day | ☐ |
 | 7 | Emergency contact enforcement | 3h | ☐ |
 | 8 | Reviews & ratings | 3–4 days | ☐ |
@@ -1206,4 +1206,6 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 
 **Item 4 — Noindex:** Installed `react-helmet-async`. Wrapped app root in `<HelmetProvider>` in `src/main.tsx`. Added `<Helmet><meta name="robots" content="noindex, nofollow" /></Helmet>` to `DiverLayout`, `AdminLayout`, and `SuperAdminLayout`.
 
-**Next session starts at item 5 (Image Optimization).**
+**Item 5 — Image Optimization:** Added `getImageUrl()` to `src/lib/utils.ts` — appends Supabase Storage transform params (`?width=&quality=`) to image URLs, passes non-Supabase URLs through unchanged. `TripCard` now serves 400w/800w/1200w srcSet with correct `sizes` attribute so mobile downloads the small variant. Hero images in `TripDetail` (app) and `ExploreTrip` serve 800w/1600w with `fetchPriority="high"` for LCP. No CDN/Cloudflare config needed — Supabase Storage handles transforms natively.
+
+**Next session starts at item 6 (Trip Slugs).**
