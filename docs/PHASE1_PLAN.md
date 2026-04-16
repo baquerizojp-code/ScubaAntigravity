@@ -1188,7 +1188,7 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 | 3 | Fix mobile bottom-nav overlap | 2h | ✅ commit c61a5fe |
 | 4 | Add noindex to private routes | 30min | ✅ commit fcb7ce4 |
 | 5 | Image optimization (srcset + WebP) | 3h | ✅ commit 9697f61 |
-| 6 | Trip slugs (DB migration + URL update) | 1 day | ☐ |
+| 6 | Trip slugs (DB migration + URL update) | 1 day | ✅ commit c2615e1 |
 | 7 | Emergency contact enforcement | 3h | ☐ |
 | 8 | Reviews & ratings | 3–4 days | ☐ |
 | 9 | Playwright e2e tests | 2 days | ☐ |
@@ -1208,4 +1208,6 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 
 **Item 5 — Image Optimization:** Added `getImageUrl()` to `src/lib/utils.ts` — appends Supabase Storage transform params (`?width=&quality=`) to image URLs, passes non-Supabase URLs through unchanged. `TripCard` now serves 400w/800w/1200w srcSet with correct `sizes` attribute so mobile downloads the small variant. Hero images in `TripDetail` (app) and `ExploreTrip` serve 800w/1600w with `fetchPriority="high"` for LCP. No CDN/Cloudflare config needed — Supabase Storage handles transforms natively.
 
-**Next session starts at item 6 (Trip Slugs).**
+**Item 6 — Trip Slugs:** Migration `20260416000001_add_trip_slugs.sql` applied via Supabase MCP. Adds `slug text NOT NULL` to `trips`, a `slugify()` DB function, backfill of existing rows (`title-YYYY-MM-DD-id6chars`), and a `BEFORE INSERT` trigger for new trips. `fetchTripById` now detects UUID vs slug by regex and queries accordingly — old UUID links continue to work. `Explore.tsx` and `Discover.tsx` link cards via `trip.slug`. `ExploreTrip.tsx` now uses `fetchTripById` from the service layer instead of an inline supabase query. TypeScript types regenerated. Pre-existing no-useless-escape lint error in `RegisterCenter.tsx` also fixed.
+
+**Next session starts at item 7 (Emergency Contact Enforcement).**
