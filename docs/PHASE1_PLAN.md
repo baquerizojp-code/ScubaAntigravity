@@ -1190,7 +1190,7 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 | 5 | Image optimization (srcset + WebP) | 3h | ✅ commit 9697f61 |
 | 6 | Trip slugs (DB migration + URL update) | 1 day | ✅ commit c2615e1 |
 | 7 | Emergency contact enforcement | 3h | ✅ commit 036765f |
-| 8 | Reviews & ratings | 3–4 days | ☐ |
+| 8 | Reviews & ratings | 3–4 days | ✅ commit 2182579 |
 | 9 | Playwright e2e tests | 2 days | ☐ |
 | 10 | Next.js App Router migration | 3–4 weeks | ☐ |
 
@@ -1212,4 +1212,6 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 
 **Item 7 — Emergency Contact Enforcement:** `AdminBookingWithDetails` extended with `emergency_contact_name` and `emergency_contact_phone`. Both `fetchBookingsByTripId` and `fetchBookingsForCenter` now include those fields. `BookingCard` shows a yellow warning badge (`AlertTriangle` icon) when either field is missing. Admin `TripDetail` intercepts the Confirm button — if the diver has no emergency contact, shows an `AlertDialog` requiring an explicit "Confirm Anyway" click before proceeding. Four i18n keys added to both `en.json` and `es.json`. No schema changes needed.
 
-**Next session starts at item 8 (Reviews & Ratings).**
+**Item 8 — Reviews & Ratings:** Migration `20260416000002_add_reviews.sql` applied via Supabase MCP. Creates `reviews` table (trip_id, dive_center_id, diver_id, booking_id UNIQUE, rating 1–5 CHECK, title, body, is_published, created_at) with RLS (public read published, divers read own, attendees-only insert gated by confirmed booking + completed trip). Adds `avg_rating numeric(3,2)` + `review_count integer` to `dive_centers`, maintained by an INSERT/UPDATE/DELETE trigger over published reviews. New `src/services/reviews.ts` exposes `fetchReviewsForTrip`, `fetchReviewsForCenter`, `createReview`, `fetchReviewByBooking`. New components: `StarRating` (interactive + read-only modes), `app/ReviewForm` (rating + optional title/body with char limits), `ReviewsList` (first-name-only privacy, "Verified Attendee" label). Diver `TripDetail` shows the review form when the trip is completed and the diver has a confirmed booking without an existing review, otherwise renders their submitted review and the list of others. `TripCard` and `ExploreTrip` hero show `⭐ avg (count)` when the center has reviews. Admin `TripDetail` gets a read-only "Reviews" card below bookings. 10 new tests in `reviews.test.ts` (153 total passing). 11 new i18n keys in both `en.json` and `es.json`.
+
+**Next session starts at item 9 (Playwright E2E Tests).**
