@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { track } from '@/lib/analytics';
 import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -83,6 +84,7 @@ const CompleteProfile = () => {
       return;
     }
 
+    track('profile_completed');
     await refreshRole();
     toast.success(t('completeProfile.success'));
     const dest = pendingRedirect || '/app/discover';

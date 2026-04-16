@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { track } from '@/lib/analytics';
 import { getTodayDateString } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
@@ -94,9 +95,9 @@ const DiverDiscover = () => {
       <section className="mb-12 animate-slide-up" style={{ animationDelay: '0.2s' }}>
         <div className="bg-card/50 backdrop-blur-xl p-4 md:p-2 rounded-3xl md:rounded-full shadow-card border border-border/50 flex flex-col md:flex-row items-center gap-4 md:gap-2">
           <div className="w-full md:flex-1">
-            <DateRangePicker 
-              date={dateRange} 
-              setDate={setDateRange} 
+            <DateRangePicker
+              date={dateRange}
+              setDate={(range) => { setDateRange(range); if (range?.from) track('search_performed', { has_end_date: !!range.to }); }}
             />
           </div>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { track } from '@/lib/analytics';
 import { useAuth } from '@/contexts/AuthContext';
 import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,8 @@ const Login = () => {
     setLoading(false);
     if (error) {
       toast.error(error.message);
+    } else {
+      track('login_completed');
     }
   };
 
@@ -130,7 +133,7 @@ const Login = () => {
             </button>
             <button
               type="button"
-              onClick={() => setIsSignup(true)}
+              onClick={() => { setIsSignup(true); track('signup_started'); }}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-colors ${
                 isSignup
                   ? 'bg-card text-foreground shadow-sm'

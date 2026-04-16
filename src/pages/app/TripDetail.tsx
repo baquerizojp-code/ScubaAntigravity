@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTripBooking } from '@/hooks/useTripBooking';
+import { track } from '@/lib/analytics';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,6 +49,11 @@ const TripDetail = () => {
     handleRequestCancellation,
     handleAddToCalendar,
   } = useTripBooking(id);
+
+  const tripId = trip?.id;
+  useEffect(() => {
+    if (tripId) track('trip_viewed', { trip_id: tripId });
+  }, [tripId]);
 
   if (loading) {
     return (

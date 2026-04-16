@@ -7,6 +7,7 @@
  */
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { track } from '@/lib/analytics';
 import { fetchTripById, type TripWithCenter } from '@/services/trips';
 import {
   createBooking,
@@ -201,6 +202,7 @@ export function useTripBooking(tripId: string | undefined) {
     }
 
     // Profile is complete → book immediately
+    track('booking_requested', { trip_id: trip.id, trip_price: trip.price_usd });
     await insertBooking(trip.id, profile.id);
     setBooking(false);
   };
@@ -252,6 +254,7 @@ export function useTripBooking(tripId: string | undefined) {
     setCancelling(true);
     try {
       await cancelBooking(existingBooking.id);
+      track('booking_cancelled', { booking_id: existingBooking.id });
       toast.success(t('diver.bookings.cancelled'));
       // Clear the booking so the diver can rebook immediately
       setExistingBooking(null);
@@ -269,6 +272,7 @@ export function useTripBooking(tripId: string | undefined) {
     setCancelling(true);
     try {
       await requestCancellation(existingBooking.id);
+      track('booking_cancelled', { booking_id: existingBooking.id, type: 'cancellation_request' });
       toast.success(t('diver.trip.cancellationRequested'));
       setExistingBooking({ ...existingBooking, status: 'cancellation_requested' });
     } catch (err) {

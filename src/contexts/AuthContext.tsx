@@ -1,7 +1,9 @@
+import * as Sentry from '@sentry/react';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import type { AppRole, ActiveView, CenterStatus } from '@/types';
+import { identifyUser, resetUser } from '@/lib/analytics';
 
 interface AuthContextType {
   user: User | null;
@@ -50,7 +52,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (data) {
       setRole(data.role);
-      
+      Sentry.setUser({ id: userId });
+      identifyUser(userId, { role: data.role });
+
       if (data.role === 'super_admin') {
         // Super admin: set default view and check if they own a center
         setActiveView('super_admin');
@@ -132,6 +136,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    Sentry.setUser(null);
+    resetUser();
     setRole(null);
     setDiveCenterId(null);
     setCenterStatus(null);

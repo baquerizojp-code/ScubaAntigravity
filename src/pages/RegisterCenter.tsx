@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { track } from '@/lib/analytics';
 import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -112,6 +113,7 @@ const RegisterCenter = () => {
       return;
     }
 
+    track('center_registered');
     setLoading(false);
     toast.success(t('registerCenter.pendingApproval'));
     window.location.href = '/admin';

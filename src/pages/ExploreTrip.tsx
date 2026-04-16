@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { track } from '@/lib/analytics';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
@@ -21,6 +22,10 @@ const ExploreTrip = () => {
   const { t } = useI18n();
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) track('trip_viewed_public', { trip_id: id });
+  }, [id]);
 
   useEffect(() => {
     if (!id) return;
