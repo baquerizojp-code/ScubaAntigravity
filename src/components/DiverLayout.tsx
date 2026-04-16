@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Outlet, useLocation, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Compass, CalendarCheck, User, LogOut, Globe, Home, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,6 +30,9 @@ const DiverLayout = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Super-admin role-switcher drawer */}
       {role === 'super_admin' && drawerOpen && (
         <div

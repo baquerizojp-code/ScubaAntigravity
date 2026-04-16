@@ -7,6 +7,7 @@ import {
   matchRoutes,
 } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
 import App from './App.tsx';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { initAnalytics } from '@/lib/analytics';
@@ -31,7 +32,9 @@ Sentry.init({
 initAnalytics();
 
 createRoot(document.getElementById('root')!).render(
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-    <App />
-  </ThemeProvider>
+  <HelmetProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <App />
+    </ThemeProvider>
+  </HelmetProvider>
 );
