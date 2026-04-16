@@ -196,7 +196,7 @@ const TripDetail = () => {
           
           {/* Right Column - Booking Card Sticky */}
           <div className="xl:col-span-5 relative">
-            <div className="sticky top-28">
+            <div className="xl:sticky xl:top-28">
               <div className="bg-card rounded-3xl p-8 border border-white/5 shadow-2xl shadow-black/5 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-secondary to-primary"></div>
                 

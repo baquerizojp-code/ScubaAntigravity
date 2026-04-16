@@ -98,12 +98,15 @@ const DiverLayout = () => {
       </header>
 
       {/* Content */}
-      <main className="flex-1 pb-20">
+      <main className="flex-1 pb-24" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 6rem)' }}>
         <Outlet />
       </main>
 
       {/* Bottom nav */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-card/80 border-t border-white/10 px-safe">
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl bg-card/80 border-t border-white/10 px-safe"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
           {navItems.map(({ to, icon: Icon, label, exact }) => {
             const active = exact ? pathname === to : pathname.startsWith(to);
