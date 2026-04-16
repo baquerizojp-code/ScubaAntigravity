@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { track } from '@/lib/analytics';
 import { supabase } from '@/integrations/supabase/client';
+import { getImageUrl } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
@@ -86,7 +87,18 @@ const ExploreTrip = () => {
       <section className="relative h-[65vh] min-h-[500px] w-full mt-0 overflow-hidden">
         <div className="absolute inset-0">
           {trip.image_url ? (
-            <img src={trip.image_url} alt={trip.title} className="w-full h-full object-cover scale-105 transform hover:scale-100 transition-transform duration-[20s] ease-out" />
+            <img
+              src={getImageUrl(trip.image_url, { width: 800, quality: 80 }) ?? trip.image_url}
+              srcSet={[
+                `${getImageUrl(trip.image_url, { width: 800, quality: 80 })} 800w`,
+                `${getImageUrl(trip.image_url, { width: 1600, quality: 75 })} 1600w`,
+              ].join(', ')}
+              sizes="100vw"
+              alt={trip.title}
+              className="w-full h-full object-cover scale-105 transform hover:scale-100 transition-transform duration-[20s] ease-out"
+              fetchPriority="high"
+              decoding="async"
+            />
           ) : (
             <div className="w-full h-full bg-ocean-900 object-cover" />
           )}

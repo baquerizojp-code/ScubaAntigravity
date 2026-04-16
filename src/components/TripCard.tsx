@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Clock, Users, Heart } from 'lucide-react';
 import { format } from 'date-fns';
-import { parseLocalDate } from '@/lib/utils';
+import { parseLocalDate, getImageUrl } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -39,10 +39,17 @@ const TripCard = memo(({ trip, linkTo, bookingStatus, eager = false }: TripCardP
     <Link to={linkTo} className="block group relative aspect-[4/5] sm:aspect-[3/4] rounded-xl overflow-hidden shadow-xl transition-transform duration-500 hover:-translate-y-2">
       {trip.image_url ? (
         <img
-          src={trip.image_url}
+          src={getImageUrl(trip.image_url, { width: 400, quality: 80 }) ?? trip.image_url}
+          srcSet={[
+            `${getImageUrl(trip.image_url, { width: 400, quality: 80 })} 400w`,
+            `${getImageUrl(trip.image_url, { width: 800, quality: 75 })} 800w`,
+            `${getImageUrl(trip.image_url, { width: 1200, quality: 70 })} 1200w`,
+          ].join(', ')}
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           alt={trip.title}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           loading={eager ? 'eager' : 'lazy'}
+          fetchPriority={eager ? 'high' : 'auto'}
           decoding="async"
         />
       ) : (

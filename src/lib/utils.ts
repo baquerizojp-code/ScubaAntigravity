@@ -28,3 +28,27 @@ export function parseLocalDate(dateStr: string): Date {
 export function getTodayDateString(): string {
   return new Date().toISOString().split('T')[0];
 }
+
+/**
+ * Returns a Supabase Storage image URL with optional transform params.
+ * Supabase Storage supports image transforms via query params:
+ *   ?width=400&quality=80&format=webp
+ * Falls back to the original URL for non-Supabase URLs or null/undefined input.
+ */
+export function getImageUrl(
+  url: string | null | undefined,
+  options: { width?: number; quality?: number; format?: 'webp' | 'origin' } = {}
+): string | null {
+  if (!url) return null;
+  if (!url.includes('supabase')) return url;
+
+  const params = new URLSearchParams();
+  if (options.width) params.set('width', String(options.width));
+  if (options.quality) params.set('quality', String(options.quality));
+  if (options.format) params.set('format', options.format);
+
+  const qs = params.toString();
+  if (!qs) return url;
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}${qs}`;
+}

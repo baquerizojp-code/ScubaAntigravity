@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MapPin, Calendar, Clock, Users, ArrowLeft, CalendarPlus, XCircle, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
-import { parseLocalDate } from '@/lib/utils';
+import { parseLocalDate, getImageUrl } from '@/lib/utils';
 
 import { BookingStatusBadge } from '@/components/app/BookingStatusBadge';
 import { CancellationDialog } from '@/components/app/CancellationDialog';
@@ -87,7 +87,18 @@ const TripDetail = () => {
       <section className="relative h-[55vh] min-h-[450px] w-full mt-0 overflow-hidden">
         <div className="absolute inset-0">
           {trip.image_url ? (
-            <img src={trip.image_url} alt={trip.title} className="w-full h-full object-cover scale-105 transform hover:scale-100 transition-transform duration-[20s] ease-out" />
+            <img
+              src={getImageUrl(trip.image_url, { width: 800, quality: 80 }) ?? trip.image_url}
+              srcSet={[
+                `${getImageUrl(trip.image_url, { width: 800, quality: 80 })} 800w`,
+                `${getImageUrl(trip.image_url, { width: 1600, quality: 75 })} 1600w`,
+              ].join(', ')}
+              sizes="100vw"
+              alt={trip.title}
+              className="w-full h-full object-cover scale-105 transform hover:scale-100 transition-transform duration-[20s] ease-out"
+              fetchPriority="high"
+              decoding="async"
+            />
           ) : (
             <div className="w-full h-full bg-ocean-900 object-cover" />
           )}
