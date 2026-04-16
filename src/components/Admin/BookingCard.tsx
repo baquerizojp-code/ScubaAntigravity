@@ -78,6 +78,12 @@ export function BookingCard({
           <p className="text-xs text-muted-foreground mt-1">
             Cert: {booking.diver_profiles?.certification || '-'} · {booking.diver_profiles?.logged_dives ?? 0} dives
           </p>
+          {(!booking.diver_profiles?.emergency_contact_name || !booking.diver_profiles?.emergency_contact_phone) && (
+            <div className="flex items-center gap-1.5 mt-1.5 text-xs text-warning bg-warning/10 rounded-md px-2 py-1 w-fit">
+              <AlertTriangle className="w-3 h-3 shrink-0" />
+              {t('admin.bookings.missingEmergencyContact')}
+            </div>
+          )}
           {booking.notes && <p className="text-xs text-muted-foreground mt-1 italic">"{booking.notes}"</p>}
           {booking.rejection_reason && <p className="text-xs text-destructive mt-1">Reason: {booking.rejection_reason}</p>}
         </div>
