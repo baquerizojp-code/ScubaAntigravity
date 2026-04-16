@@ -37,7 +37,7 @@ const RegisterCenter = () => {
       else if (role === 'super_admin') navigate('/super-admin', { replace: true });
       else if (role === 'dive_center' && diveCenterId) navigate('/admin', { replace: true });
     }
-  }, [user, role, navigate]);
+  }, [user, role, diveCenterId, navigate]);
 
   useEffect(() => {
     if (user && !role) {

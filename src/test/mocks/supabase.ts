@@ -29,7 +29,7 @@ export function testChain(terminal: { data?: unknown; error?: unknown; count?: n
   const b: TestChainBuilder = {};
   const chain = (..._args: unknown[]) => b;
   // Common chainable methods
-  for (const m of ['select', 'insert', 'update', 'delete', 'eq', 'in', 'gte', 'order', 'limit'] as const) {
+  for (const m of ['select', 'insert', 'upsert', 'update', 'delete', 'eq', 'in', 'not', 'gte', 'order', 'limit'] as const) {
     b[m] = vi.fn().mockImplementation(chain);
   }
   // Terminal methods
@@ -44,10 +44,12 @@ export function testChain(terminal: { data?: unknown; error?: unknown; count?: n
 export interface MockQueryBuilder {
   select: ReturnType<typeof vi.fn>;
   insert: ReturnType<typeof vi.fn>;
+  upsert: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
   delete: ReturnType<typeof vi.fn>;
   eq: ReturnType<typeof vi.fn>;
   in: ReturnType<typeof vi.fn>;
+  not: ReturnType<typeof vi.fn>;
   gte: ReturnType<typeof vi.fn>;
   order: ReturnType<typeof vi.fn>;
   single: ReturnType<typeof vi.fn>;
@@ -63,10 +65,12 @@ function createQueryBuilder(resolve?: { data: unknown; error: unknown; count?: n
     _resolve: defaultResolve,
     select: vi.fn(),
     insert: vi.fn(),
+    upsert: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
     eq: vi.fn(),
     in: vi.fn(),
+    not: vi.fn(),
     gte: vi.fn(),
     order: vi.fn(),
     single: vi.fn(),
@@ -75,7 +79,7 @@ function createQueryBuilder(resolve?: { data: unknown; error: unknown; count?: n
 
   // Every method returns the builder itself so calls are chainable.
   // Terminal methods (single, maybeSingle) return the resolved promise.
-  const chainMethods = ['select', 'insert', 'update', 'delete', 'eq', 'in', 'gte', 'order'] as const;
+  const chainMethods = ['select', 'insert', 'upsert', 'update', 'delete', 'eq', 'in', 'not', 'gte', 'order'] as const;
   for (const method of chainMethods) {
     builder[method].mockImplementation(() => builder);
   }

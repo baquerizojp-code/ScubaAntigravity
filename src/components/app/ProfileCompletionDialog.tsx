@@ -69,7 +69,6 @@ export function ProfileCompletionDialog({
 
   const showFirstName = !!missingFields.firstName;
   const showLastName = !!missingFields.lastName;
-  const showCert = !!missingFields.certification;
   const showDives = !!missingFields.loggedDives;
   const showEmergency = !!missingFields.emergencyContactName || !!missingFields.emergencyContactPhone;
   const showNameRow = showFirstName || showLastName;
