@@ -417,5 +417,17 @@
   "superAdmin.centerDetail.registeredOn": "Registered",
   "superAdmin.centerDetail.approvedOn": "Approved",
   "landing.hero.cta.centerLink": "Are you a dive center? Register here",
-  "landing.cta.centerLink": "Register your dive center"
+  "landing.cta.centerLink": "Register your dive center",
+
+  "reviews.title": "Reviews",
+  "reviews.leaveReview": "Leave a Review",
+  "reviews.rating": "Your Rating",
+  "reviews.reviewTitle": "Title (optional)",
+  "reviews.reviewBody": "Tell others about your experience",
+  "reviews.submit": "Submit Review",
+  "reviews.submitted": "Review submitted. Thank you!",
+  "reviews.submitError": "Could not submit review. Please try again.",
+  "reviews.alreadyReviewed": "You've reviewed this trip",
+  "reviews.noReviews": "No reviews yet — be the first!",
+  "reviews.verifiedAttendee": "Verified Attendee"
 }

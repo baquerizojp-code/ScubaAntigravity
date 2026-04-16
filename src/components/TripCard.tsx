@@ -1,14 +1,19 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Clock, Users, Heart } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, Heart, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate, getImageUrl } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n';
 import type { Tables } from '@/integrations/supabase/types';
 
 export type TripWithCenter = Tables<'trips'> & {
-  dive_centers: { name: string; logo_url: string | null } | null;
+  dive_centers: {
+    name: string;
+    logo_url: string | null;
+    avg_rating?: number | null;
+    review_count?: number | null;
+  } | null;
 };
 
 /* AUDIT FIX: Replaced hardcoded Tailwind colors with semantic tokens */
@@ -90,13 +95,20 @@ const TripCard = memo(({ trip, linkTo, bookingStatus, eager = false }: TripCardP
             </div>
           </div>
           
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-4 flex-wrap">
             <Badge className="bg-white/10 hover:bg-white/20 text-white border-white/10 px-2 py-0.5 font-normal tracking-wide flex gap-1.5 items-center">
               {/* AUDIT FIX: Replaced hardcoded bg-[#00f0ff] with bg-cyan-electric */}
               <span className="w-2 h-2 rounded-full bg-cyan-electric"></span>
               {/* AUDIT FIX: Replaced text-slate-200 with text-ocean-200 */}
               <span className="text-xs text-ocean-200 truncate">{trip.dive_centers?.name || 'Independent Center'}</span>
             </Badge>
+            {trip.dive_centers?.avg_rating != null && (trip.dive_centers?.review_count ?? 0) > 0 && (
+              <span className="flex items-center gap-1 text-xs text-white">
+                <Star className="w-3 h-3 fill-warning text-warning" />
+                <span className="font-semibold">{Number(trip.dive_centers.avg_rating).toFixed(1)}</span>
+                <span className="text-ocean-300">({trip.dive_centers.review_count})</span>
+              </span>
+            )}
           </div>
           
           <div className="flex items-center justify-between border-t border-white/10 pt-4 mt-2">

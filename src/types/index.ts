@@ -30,6 +30,16 @@ export interface DiverProfileSummary {
   logged_dives: number | null;
 }
 
+/** A published review, typically joined with the diver's display name. */
+export interface ReviewDisplay {
+  id: string;
+  rating: number;
+  title: string | null;
+  body: string | null;
+  created_at: string;
+  diver_profiles: { full_name: string | null } | null;
+}
+
 /** Booking row with joined trip data for the diver dashboard cards. */
 export interface DiverBooking {
   id: string;

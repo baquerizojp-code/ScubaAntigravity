@@ -66,6 +66,7 @@ export type Database = {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          avg_rating: number | null
           center_status: string
           created_at: string
           created_by: string | null
@@ -77,6 +78,7 @@ export type Database = {
           logo_url: string | null
           name: string
           operating_hours: string | null
+          review_count: number
           tiktok: string | null
           updated_at: string
           website: string | null
@@ -85,6 +87,7 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          avg_rating?: number | null
           center_status?: string
           created_at?: string
           created_by?: string | null
@@ -96,6 +99,7 @@ export type Database = {
           logo_url?: string | null
           name: string
           operating_hours?: string | null
+          review_count?: number
           tiktok?: string | null
           updated_at?: string
           website?: string | null
@@ -104,6 +108,7 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          avg_rating?: number | null
           center_status?: string
           created_at?: string
           created_by?: string | null
@@ -115,6 +120,7 @@ export type Database = {
           logo_url?: string | null
           name?: string
           operating_hours?: string | null
+          review_count?: number
           tiktok?: string | null
           updated_at?: string
           website?: string | null
@@ -236,6 +242,74 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "notifications_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          body: string | null
+          booking_id: string
+          created_at: string
+          dive_center_id: string
+          diver_id: string
+          id: string
+          is_published: boolean
+          rating: number
+          title: string | null
+          trip_id: string
+        }
+        Insert: {
+          body?: string | null
+          booking_id: string
+          created_at?: string
+          dive_center_id: string
+          diver_id: string
+          id?: string
+          is_published?: boolean
+          rating: number
+          title?: string | null
+          trip_id: string
+        }
+        Update: {
+          body?: string | null
+          booking_id?: string
+          created_at?: string
+          dive_center_id?: string
+          diver_id?: string
+          id?: string
+          is_published?: boolean
+          rating?: number
+          title?: string | null
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_dive_center_id_fkey"
+            columns: ["dive_center_id"]
+            isOneToOne: false
+            referencedRelation: "dive_centers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_diver_id_fkey"
+            columns: ["diver_id"]
+            isOneToOne: false
+            referencedRelation: "diver_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_trip_id_fkey"
             columns: ["trip_id"]
             isOneToOne: false
             referencedRelation: "trips"
