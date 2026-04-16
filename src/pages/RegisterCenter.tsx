@@ -128,7 +128,7 @@ const RegisterCenter = () => {
 
   const validateInstagram = (value: string) => {
     if (!value) { setInstagramError(t('validation.required') || 'Requerido'); return false; }
-    const valid = /^@?[a-zA-Z0-9_\.]{1,30}$/.test(value.trim());
+    const valid = /^@?[a-zA-Z0-9_.]{1,30}$/.test(value.trim());
     setInstagramError(valid ? '' : t('validation.invalidFormat') || 'Formato inválido');
     return valid;
   };
