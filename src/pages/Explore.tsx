@@ -101,10 +101,10 @@ const Explore = () => {
                 className="animate-slide-up" 
                 style={{ animationDelay: `${0.3 + (index % 6) * 0.1}s` }}
               >
-                <TripCard 
-                  trip={trip} 
-                  linkTo={`/explore/${trip.id}`} 
-                  eager={index < 3} 
+                <TripCard
+                  trip={trip}
+                  linkTo={`/explore/${trip.slug}`}
+                  eager={index < 3}
                 />
               </div>
             ))}

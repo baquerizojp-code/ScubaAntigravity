@@ -37,6 +37,7 @@ const AdminTripDetail = () => {
   const [rejectDialog, setRejectDialog] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
+  const [confirmWarningId, setConfirmWarningId] = useState<string | null>(null);
 
   // Fetch Trip Details
   const { data: trip, isLoading: isLoadingTrip } = useQuery({
@@ -271,7 +272,14 @@ const AdminTripDetail = () => {
                           <Button
                             size="sm"
                             className="bg-success hover:bg-success/90 text-success-foreground"
-                            onClick={() => confirmMutation.mutate(b.id)}
+                            onClick={() => {
+                              const missingContact = !b.diver_profiles?.emergency_contact_name || !b.diver_profiles?.emergency_contact_phone;
+                              if (missingContact) {
+                                setConfirmWarningId(b.id);
+                              } else {
+                                confirmMutation.mutate(b.id);
+                              }
+                            }}
                             disabled={confirmMutation.isPending || (trip.available_spots <= 0)}
                           >
                             <Check className="h-4 w-4 mr-1" /> {t('common.confirm')}
@@ -325,6 +333,24 @@ const AdminTripDetail = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Without Emergency Contact Warning */}
+      <AlertDialog open={!!confirmWarningId} onOpenChange={() => setConfirmWarningId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('admin.bookings.confirmWithoutEmergencyTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('admin.bookings.confirmWithoutEmergency')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => { if (confirmWarningId) { confirmMutation.mutate(confirmWarningId); setConfirmWarningId(null); } }}
+            >
+              {t('admin.bookings.confirmAnyway')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Remove Diver Confirmation */}
       <AlertDialog open={!!removeConfirmId} onOpenChange={() => setRemoveConfirmId(null)}>

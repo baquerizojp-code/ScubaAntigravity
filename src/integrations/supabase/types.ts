@@ -259,6 +259,7 @@ export type Database = {
             | Database["public"]["Enums"]["certification_level"]
             | null
           price_usd: number
+          slug: string
           status: Database["public"]["Enums"]["trip_status"]
           title: string
           total_spots: number
@@ -282,6 +283,7 @@ export type Database = {
             | Database["public"]["Enums"]["certification_level"]
             | null
           price_usd: number
+          slug: string
           status?: Database["public"]["Enums"]["trip_status"]
           title: string
           total_spots: number
@@ -305,6 +307,7 @@ export type Database = {
             | Database["public"]["Enums"]["certification_level"]
             | null
           price_usd?: number
+          slug?: string
           status?: Database["public"]["Enums"]["trip_status"]
           title?: string
           total_spots?: number
@@ -349,7 +352,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      approve_cancellation: { Args: { _booking_id: string }; Returns: boolean }
       assign_dive_center_role: {
         Args: { _user_id: string }
         Returns: undefined
@@ -377,6 +379,7 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      slugify: { Args: { "": string }; Returns: string }
       staff_can_view_diver: {
         Args: { _diver_profile_id: string; _staff_user_id: string }
         Returns: boolean

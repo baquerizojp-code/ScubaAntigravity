@@ -28,6 +28,7 @@ vi.mock('@/services/bookings', () => ({
 vi.mock('@/services/profiles', () => ({
   fetchDiverProfile: vi.fn(),
   createDiverProfile: vi.fn(),
+  updateDiverProfile: vi.fn(),
   assignDiverRole: vi.fn(),
 }));
 
@@ -62,7 +63,15 @@ import { downloadICSFile, getGoogleCalendarUrl } from '@/lib/calendar';
 import { toast } from 'sonner';
 
 const fakeUser = { id: 'user-1', user_metadata: { full_name: 'Jane Diver' } };
-const fakeProfile = { id: 'profile-1', user_id: 'user-1', full_name: 'Jane Diver' };
+const fakeProfile = {
+  id: 'profile-1',
+  user_id: 'user-1',
+  full_name: 'Jane Diver',
+  certification: 'open_water',
+  logged_dives: 20,
+  emergency_contact_name: 'John Diver',
+  emergency_contact_phone: '+15551234567',
+};
 const fakeTrip = {
   id: 'trip-1',
   title: 'Test Trip',
@@ -179,6 +188,8 @@ describe('useTripBooking', () => {
 
   describe('handleCompleteProfileAndBook', () => {
     it('assigns role, creates profile, refreshes role, and books', async () => {
+      // No existing profile so the hook takes the "create" path
+      vi.mocked(fetchDiverProfile).mockResolvedValue(null);
       const newProfile = { id: 'profile-2' };
       vi.mocked(createDiverProfile).mockResolvedValue(newProfile as never);
       vi.mocked(createBooking).mockResolvedValue({} as never);
@@ -198,6 +209,9 @@ describe('useTripBooking', () => {
         user_id: 'user-1',
         full_name: 'New Diver',
         certification: 'open_water',
+        logged_dives: 0,
+        emergency_contact_name: null,
+        emergency_contact_phone: null,
       });
       expect(refreshRole).toHaveBeenCalled();
       expect(createBooking).toHaveBeenCalledWith('trip-1', 'profile-2', undefined);

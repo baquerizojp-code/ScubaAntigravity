@@ -256,8 +256,7 @@ export function useTripBooking(tripId: string | undefined) {
       await cancelBooking(existingBooking.id);
       track('booking_cancelled', { booking_id: existingBooking.id });
       toast.success(t('diver.bookings.cancelled'));
-      // Clear the booking so the diver can rebook immediately
-      setExistingBooking(null);
+      setExistingBooking(prev => prev ? { ...prev, status: 'cancelled' as const } : null);
     } catch (err) {
       console.error('[TripDetail] handleCancelPending failed:', err);
       toast.error(t('diver.trip.bookError'));

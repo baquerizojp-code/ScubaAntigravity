@@ -37,7 +37,7 @@ const RegisterCenter = () => {
       else if (role === 'super_admin') navigate('/super-admin', { replace: true });
       else if (role === 'dive_center' && diveCenterId) navigate('/admin', { replace: true });
     }
-  }, [user, role, navigate]);
+  }, [user, role, diveCenterId, navigate]);
 
   useEffect(() => {
     if (user && !role) {
@@ -128,7 +128,7 @@ const RegisterCenter = () => {
 
   const validateInstagram = (value: string) => {
     if (!value) { setInstagramError(t('validation.required') || 'Requerido'); return false; }
-    const valid = /^@?[a-zA-Z0-9_\.]{1,30}$/.test(value.trim());
+    const valid = /^@?[a-zA-Z0-9_.]{1,30}$/.test(value.trim());
     setInstagramError(valid ? '' : t('validation.invalidFormat') || 'Formato inválido');
     return valid;
   };

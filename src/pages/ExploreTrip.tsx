@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { track } from '@/lib/analytics';
-import { supabase } from '@/integrations/supabase/client';
+import { fetchTripById } from '@/services/trips';
+import type { TripWithCenter } from '@/services/trips';
 import { getImageUrl } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
@@ -12,16 +13,13 @@ import { MapPin, Calendar, Clock, Users, ArrowLeft, CheckCircle2 } from 'lucide-
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
-import type { Tables } from '@/integrations/supabase/types';
-
-type Trip = Tables<'trips'> & { dive_centers: { name: string } | null; image_url?: string | null };
 
 const ExploreTrip = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { t } = useI18n();
-  const [trip, setTrip] = useState<Trip | null>(null);
+  const [trip, setTrip] = useState<TripWithCenter | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,16 +28,10 @@ const ExploreTrip = () => {
 
   useEffect(() => {
     if (!id) return;
-    const fetch = async () => {
-      const { data } = await supabase
-        .from('trips')
-        .select('id, title, dive_site, departure_point, trip_date, trip_time, available_spots, total_spots, price_usd, difficulty, min_certification, gear_rental_available, description, status, dive_center_id, created_at, updated_at, image_url, dive_centers(name)')
-        .eq('id', id)
-        .single();
-      setTrip(data as Trip);
-      setLoading(false);
-    };
-    fetch();
+    fetchTripById(id)
+      .then((data) => setTrip(data))
+      .catch(() => setTrip(null))
+      .finally(() => setLoading(false));
   }, [id]);
 
   const handleBook = () => {

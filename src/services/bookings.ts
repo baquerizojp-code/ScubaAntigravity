@@ -41,6 +41,8 @@ export interface AdminBookingWithDetails extends Booking {
     full_name: string;
     certification: string | null;
     logged_dives: number | null;
+    emergency_contact_name: string | null;
+    emergency_contact_phone: string | null;
   } | null;
 }
 
@@ -82,7 +84,7 @@ export async function fetchBookingsForCenter(diveCenterId: string) {
   const { data, error } = await supabase
     .from('bookings')
     .select(
-      '*, trips(title, trip_date, trip_time, dive_site, status, price_usd), diver_profiles(full_name, certification, logged_dives)'
+      '*, trips(title, trip_date, trip_time, dive_site, status, price_usd), diver_profiles(full_name, certification, logged_dives, emergency_contact_name, emergency_contact_phone)'
     )
     .in('trip_id', tripIds)
     .order('created_at', { ascending: false });
@@ -98,7 +100,7 @@ export async function fetchBookingsByTripId(tripId: string) {
   const { data, error } = await supabase
     .from('bookings')
     .select(
-      '*, trips(title, trip_date, trip_time, dive_site, status, price_usd), diver_profiles(full_name, certification, logged_dives)'
+      '*, trips(title, trip_date, trip_time, dive_site, status, price_usd), diver_profiles(full_name, certification, logged_dives, emergency_contact_name, emergency_contact_phone)'
     )
     .eq('trip_id', tripId)
     .order('created_at', { ascending: false });

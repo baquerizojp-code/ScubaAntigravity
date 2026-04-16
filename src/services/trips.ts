@@ -21,13 +21,15 @@ export async function fetchTripsByCenter(diveCenterId: string) {
 }
 
 /**
- * Fetch a single trip by ID including dive center name.
+ * Fetch a single trip by UUID or slug, including dive center name.
+ * Detects UUIDs by format; everything else is treated as a slug.
  */
-export async function fetchTripById(id: string) {
+export async function fetchTripById(idOrSlug: string) {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(idOrSlug);
   const { data, error } = await supabase
     .from('trips')
     .select('*, dive_centers(name)')
-    .eq('id', id)
+    .eq(isUuid ? 'id' : 'slug', idOrSlug)
     .single();
   if (error) throw error;
   return data as TripWithCenter;

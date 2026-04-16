@@ -23,7 +23,7 @@ const DiverDiscover = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trips')
-        .select('id, title, dive_site, departure_point, trip_date, trip_time, available_spots, total_spots, price_usd, difficulty, min_certification, gear_rental_available, description, status, dive_center_id, created_at, updated_at, image_url, dive_centers(name, logo_url)')
+        .select('id, slug, title, dive_site, departure_point, trip_date, trip_time, available_spots, total_spots, price_usd, difficulty, min_certification, gear_rental_available, description, status, dive_center_id, created_at, updated_at, image_url, dive_centers(name, logo_url)')
         .eq('status', 'published')
         .gte('trip_date', getTodayDateString())
         .order('trip_date', { ascending: true });
@@ -141,7 +141,7 @@ const DiverDiscover = () => {
             >
               <TripCard
                 trip={trip}
-                linkTo={`/app/trip/${trip.id}`}
+                linkTo={`/app/trip/${trip.slug}`}
                 bookingStatus={bookingsByTrip[trip.id]}
               />
             </div>

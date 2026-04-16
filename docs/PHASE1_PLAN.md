@@ -1188,8 +1188,8 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 | 3 | Fix mobile bottom-nav overlap | 2h | ✅ commit c61a5fe |
 | 4 | Add noindex to private routes | 30min | ✅ commit fcb7ce4 |
 | 5 | Image optimization (srcset + WebP) | 3h | ✅ commit 9697f61 |
-| 6 | Trip slugs (DB migration + URL update) | 1 day | ☐ |
-| 7 | Emergency contact enforcement | 3h | ☐ |
+| 6 | Trip slugs (DB migration + URL update) | 1 day | ✅ commit c2615e1 |
+| 7 | Emergency contact enforcement | 3h | ✅ commit 036765f |
 | 8 | Reviews & ratings | 3–4 days | ☐ |
 | 9 | Playwright e2e tests | 2 days | ☐ |
 | 10 | Next.js App Router migration | 3–4 weeks | ☐ |
@@ -1208,4 +1208,8 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 
 **Item 5 — Image Optimization:** Added `getImageUrl()` to `src/lib/utils.ts` — appends Supabase Storage transform params (`?width=&quality=`) to image URLs, passes non-Supabase URLs through unchanged. `TripCard` now serves 400w/800w/1200w srcSet with correct `sizes` attribute so mobile downloads the small variant. Hero images in `TripDetail` (app) and `ExploreTrip` serve 800w/1600w with `fetchPriority="high"` for LCP. No CDN/Cloudflare config needed — Supabase Storage handles transforms natively.
 
-**Next session starts at item 6 (Trip Slugs).**
+**Item 6 — Trip Slugs:** Migration `20260416000001_add_trip_slugs.sql` applied via Supabase MCP. Adds `slug text NOT NULL` to `trips`, a `slugify()` DB function, backfill of existing rows (`title-YYYY-MM-DD-id6chars`), and a `BEFORE INSERT` trigger for new trips. `fetchTripById` now detects UUID vs slug by regex and queries accordingly — old UUID links continue to work. `Explore.tsx` and `Discover.tsx` link cards via `trip.slug`. `ExploreTrip.tsx` now uses `fetchTripById` from the service layer instead of an inline supabase query. TypeScript types regenerated. Pre-existing no-useless-escape lint error in `RegisterCenter.tsx` also fixed.
+
+**Item 7 — Emergency Contact Enforcement:** `AdminBookingWithDetails` extended with `emergency_contact_name` and `emergency_contact_phone`. Both `fetchBookingsByTripId` and `fetchBookingsForCenter` now include those fields. `BookingCard` shows a yellow warning badge (`AlertTriangle` icon) when either field is missing. Admin `TripDetail` intercepts the Confirm button — if the diver has no emergency contact, shows an `AlertDialog` requiring an explicit "Confirm Anyway" click before proceeding. Four i18n keys added to both `en.json` and `es.json`. No schema changes needed.
+
+**Next session starts at item 8 (Reviews & Ratings).**
