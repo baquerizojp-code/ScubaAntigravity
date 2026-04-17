@@ -41,7 +41,7 @@ jobs:
       - run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium webkit
 
       # Guard: skip the actual test run when Supabase secrets are not configured.
       # Without these the Vite dev server starts but the app cannot initialise,
