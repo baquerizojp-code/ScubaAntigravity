@@ -23,20 +23,18 @@ test.describe('Admin booking management', () => {
 
   test('admin bookings page renders Pending tab', async ({ page }) => {
     await loginAsAdmin(page)
-    await page.goto('/admin/bookings')
-    await expect(page.getByRole('tab', { name: /pending/i })).toBeVisible({
-      timeout: 10_000,
-    })
+    await page.goto('/admin/bookings?tab=pending')
+    // Tabs render as role="tab" on desktop but swap to a <Select> on mobile
+    // (sm: breakpoint), so assert the active tabpanel is visible — same signal,
+    // works in both UIs.
+    await expect(
+      page.locator('[role="tabpanel"][data-state="active"]')
+    ).toBeVisible({ timeout: 10_000 })
   })
 
   test('admin can confirm a pending booking and it moves to Confirmed tab', async ({ page }) => {
     await loginAsAdmin(page)
     await page.goto('/admin/bookings?tab=pending')
-
-    const pendingTab = page.getByRole('tab', { name: /pending/i })
-    if (await pendingTab.count() > 0) await pendingTab.click()
-
-    // Wait for the tab content to settle
     await page.waitForLoadState('networkidle')
 
     const confirmBtn = page.getByRole('button', { name: 'Confirm' }).first()
@@ -57,10 +55,9 @@ test.describe('Admin booking management', () => {
     // The Confirm button for that booking disappears from the Pending tab
     await expect(confirmBtn).not.toBeVisible({ timeout: 10_000 })
 
-    // Switch to Confirmed tab and verify at least one booking card is there.
+    // Switch to Confirmed tab via URL (works for both desktop tabs and mobile Select).
     // BookingCard renders <Card className="p-4"> so .p-4 is unique to cards.
-    const confirmedTab = page.getByRole('tab', { name: /confirmed/i })
-    await confirmedTab.click()
+    await page.goto('/admin/bookings?tab=confirmed')
     await page.waitForLoadState('networkidle')
     await expect(
       page.locator('[role="tabpanel"][data-state="active"] .p-4').first()
