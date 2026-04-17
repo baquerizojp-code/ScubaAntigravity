@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev"],
       "port": 8080,
       "autoPort": true
+    },
+    {
+      "name": "Next Dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:next"],
+      "port": 3000,
+      "autoPort": true
     }
   ]
 }

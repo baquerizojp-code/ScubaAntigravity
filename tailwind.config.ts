@@ -14,11 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Work Sans"', 'system-ui', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        headline: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-        body: ['"Work Sans"', 'system-ui', 'sans-serif'],
-        label: ['"Work Sans"', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-work-sans)', '"Work Sans"', 'system-ui', 'sans-serif'],
+        display: ['var(--font-jakarta)', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        headline: ['var(--font-jakarta)', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+        body: ['var(--font-work-sans)', '"Work Sans"', 'system-ui', 'sans-serif'],
+        label: ['var(--font-work-sans)', '"Work Sans"', 'system-ui', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
