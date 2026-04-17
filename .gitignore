@@ -42,3 +42,6 @@ test-results/
 .next/
 next-env.d.ts
 .vercel/
+
+# Claude Code worktrees (ephemeral)
+.claude/worktrees/
