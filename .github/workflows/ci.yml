@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit:
+    name: Unit tests (vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run vitest
+        run: npm run test
+
+  e2e:
+    name: E2E tests (Playwright)
+    runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # Guard: skip the actual test run when Supabase secrets are not configured.
+      # Without these the Vite dev server starts but the app cannot initialise,
+      # so every test times out waiting for the login form to render.
+      # To enable: add VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY, and
+      # VITE_SUPABASE_PROJECT_ID as repository secrets (Settings → Secrets →
+      # Actions) — they are the same values already in your .env file.
+      - name: Check Supabase secrets are configured
+        id: secrets_check
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ]; then
+            echo "::warning::VITE_SUPABASE_URL secret is not set — e2e tests will be skipped."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run Playwright e2e tests
+        if: steps.secrets_check.outputs.skip == 'false'
+        run: npm run test:e2e
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        if: always() && steps.secrets_check.outputs.skip == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

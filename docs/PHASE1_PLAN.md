@@ -1191,7 +1191,7 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 | 6 | Trip slugs (DB migration + URL update) | 1 day | ✅ commit c2615e1 |
 | 7 | Emergency contact enforcement | 3h | ✅ commit 036765f |
 | 8 | Reviews & ratings | 3–4 days | ✅ commit 2182579 |
-| 9 | Playwright e2e tests | 2 days | ☐ |
+| 9 | Playwright e2e tests | 2 days | ✅ commit b76a5ab |
 | 10 | Next.js App Router migration | 3–4 weeks | ☐ |
 
 ## Progress Log
@@ -1214,4 +1214,10 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 
 **Item 8 — Reviews & Ratings:** Migration `20260416000002_add_reviews.sql` applied via Supabase MCP. Creates `reviews` table (trip_id, dive_center_id, diver_id, booking_id UNIQUE, rating 1–5 CHECK, title, body, is_published, created_at) with RLS (public read published, divers read own, attendees-only insert gated by confirmed booking + completed trip). Adds `avg_rating numeric(3,2)` + `review_count integer` to `dive_centers`, maintained by an INSERT/UPDATE/DELETE trigger over published reviews. New `src/services/reviews.ts` exposes `fetchReviewsForTrip`, `fetchReviewsForCenter`, `createReview`, `fetchReviewByBooking`. New components: `StarRating` (interactive + read-only modes), `app/ReviewForm` (rating + optional title/body with char limits), `ReviewsList` (first-name-only privacy, "Verified Attendee" label). Diver `TripDetail` shows the review form when the trip is completed and the diver has a confirmed booking without an existing review, otherwise renders their submitted review and the list of others. `TripCard` and `ExploreTrip` hero show `⭐ avg (count)` when the center has reviews. Admin `TripDetail` gets a read-only "Reviews" card below bookings. 10 new tests in `reviews.test.ts` (153 total passing). 11 new i18n keys in both `en.json` and `es.json`.
 
-**Next session starts at item 9 (Playwright E2E Tests).**
+### Session: April 16, 2026 — Item 9 completed
+
+**Item 9 — Playwright E2E Tests:** Installed `@playwright/test` as dev dependency; ran `npx playwright install chromium`. Created `playwright.config.ts` (baseURL `http://localhost:8080`, chromium + iPhone 13 projects, webServer auto-starts `npm run dev`, CI-gated retries/workers). Three spec files in `e2e/`:
+- `auth.spec.ts` — verifies login form fields, Sign Up tab toggle, successful diver login (→ `/app/discover`), and logout via profile page.
+- `booking-flow.spec.ts` — public `/explore` page load, trip detail navigation, unauthenticated login redirect, and full diver booking flow (request → pending status in `/app/bookings`). Gracefully skips booking step if the diver already has an active booking on all available trips.
+- `admin-confirm.spec.ts` — admin login, Pending tab UI, confirm-booking flow (→ Confirmed tab). Gracefully skips confirm step if no pending bookings exist for the test center.
+Added `test:e2e`, `test:e2e:ui`, `test:e2e:report` scripts to `package.json` (existing `test` vitest script untouched). Updated `.gitignore` to exclude `playwright-report/`, `test-results/`, `.playwright/`. Created `.github/workflows/ci.yml` with two jobs: `unit` (vitest) and `e2e` (Playwright chromium, uploads report artifact). All 153 vitest tests still pass; `npm run lint` clean; 9/11 Playwright tests pass locally, 2 skip (data-conditional paths).
