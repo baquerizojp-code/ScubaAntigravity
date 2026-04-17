@@ -125,7 +125,7 @@ It is a production SaaS web application (not a demo, not a tutorial clone). Depl
 ScubaTrip/
 ├── instrumentation.ts             # Sentry server/edge init (Next.js 15+ convention)
 ├── instrumentation-client.ts      # Sentry browser init + onRouterTransitionStart
-├── middleware.ts                  # (optional) Supabase session cookie refresh
+├── src/proxy.ts                   # Next.js 16 request proxy (renamed from middleware.ts) — refreshes Supabase session cookie on every request
 ├── next.config.ts                 # Next.js + Turbopack + images.remotePatterns
 ├── next-env.d.ts                  # Next.js auto-generated type shims
 ├── tsconfig.json                  # Strict mode + @/* path alias (single source)

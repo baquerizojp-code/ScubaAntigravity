@@ -38,7 +38,7 @@ Client Component ─→ React Query hook ─→ service fn ─→ Supabase brows
 ```
 
 - **Services layer** (`src/services/trips.ts`, `bookings.ts`, `profiles.ts`, `reviews.ts`) — all Supabase queries live here. Components never call Supabase directly.
-- **Auth** — `getSession()` in `src/app/_lib/auth.ts` is a React-`cache()`d server helper used by every protected layout. The browser side uses a lightweight `AuthProvider` in `src/app/_components/AuthProvider.tsx` that hydrates from server props and subscribes to `onAuthStateChange` for realtime session changes.
+- **Auth** — `getSession()` in `src/app/_lib/auth.ts` is a React-`cache()`d server helper used by every protected layout. `src/proxy.ts` is the Next.js 16 request proxy (the renamed successor to `middleware.ts`) that refreshes the Supabase session cookie on every request so server components see a fresh user. The browser side uses a lightweight `AuthProvider` in `src/app/_components/AuthProvider.tsx` that hydrates from server props and subscribes to `onAuthStateChange` for realtime session changes.
 - **Supabase clients** — `src/integrations/supabase/browser.ts` (client components) and `src/integrations/supabase/server.ts` (RSC / route handlers / server actions), both wrappers around `@supabase/ssr`. `src/integrations/supabase/client.ts` is the runtime-aware re-export.
 - **React Query** wraps client-side service calls for caching and optimistic invalidation. Query keys live in `src/app/_lib/queries.ts`.
 
