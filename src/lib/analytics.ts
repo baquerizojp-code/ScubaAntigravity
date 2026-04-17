@@ -1,9 +1,11 @@
 import posthog from 'posthog-js';
 
 export function initAnalytics() {
-  if (!import.meta.env.VITE_POSTHOG_KEY) return;
-  posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
-    api_host: import.meta.env.VITE_POSTHOG_HOST ?? 'https://app.posthog.com',
+  if (typeof window === 'undefined') return;
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  if (!key) return;
+  posthog.init(key, {
+    api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST ?? 'https://app.posthog.com',
     capture_pageview: true,
     persistence: 'localStorage',
   });
