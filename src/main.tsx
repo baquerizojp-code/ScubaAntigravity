@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
-import App from './App.tsx';
+import App from './App';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { initAnalytics } from '@/lib/analytics';
 import './index.css';

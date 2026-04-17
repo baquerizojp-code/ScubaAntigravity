@@ -8,36 +8,36 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/react";
-const Landing = lazy(() => import("./pages/Landing"));
+const Landing = lazy(() => import("./views/Landing"));
 import { Analytics } from "@vercel/analytics/react";
 
 // Lazy-loaded routes
-const Login = lazy(() => import("./pages/Login"));
+const Login = lazy(() => import("./views/Login"));
 // Signup is now part of Login page
-const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
-const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const CompleteProfile = lazy(() => import("./pages/CompleteProfile"));
-const RegisterCenter = lazy(() => import("./pages/RegisterCenter"));
+const ForgotPassword = lazy(() => import("./views/ForgotPassword"));
+const ResetPassword = lazy(() => import("./views/ResetPassword"));
+const CompleteProfile = lazy(() => import("./views/CompleteProfile"));
+const RegisterCenter = lazy(() => import("./views/RegisterCenter"));
 const AdminLayout = lazy(() => import("@/components/AdminLayout"));
-const AdminDashboard = lazy(() => import("./pages/admin/Dashboard"));
-const AdminTrips = lazy(() => import("./pages/admin/Trips"));
-const AdminTripDetail = lazy(() => import("./pages/admin/TripDetail"));
-const AdminBookings = lazy(() => import("./pages/admin/Bookings"));
-const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+const AdminDashboard = lazy(() => import("./views/admin/Dashboard"));
+const AdminTrips = lazy(() => import("./views/admin/Trips"));
+const AdminTripDetail = lazy(() => import("./views/admin/TripDetail"));
+const AdminBookings = lazy(() => import("./views/admin/Bookings"));
+const AdminSettings = lazy(() => import("./views/admin/Settings"));
 const DiverLayout = lazy(() => import("@/components/DiverLayout"));
-const DiverDiscover = lazy(() => import("./pages/app/Discover"));
-const DiverDashboard = lazy(() => import("./pages/app/Dashboard"));
-const TripDetail = lazy(() => import("./pages/app/TripDetail"));
-const MyBookings = lazy(() => import("./pages/app/MyBookings"));
-const DiverProfile = lazy(() => import("./pages/app/DiverProfile"));
-const Explore = lazy(() => import("./pages/Explore"));
-const ExploreTrip = lazy(() => import("./pages/ExploreTrip"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+const DiverDiscover = lazy(() => import("./views/app/Discover"));
+const DiverDashboard = lazy(() => import("./views/app/Dashboard"));
+const TripDetail = lazy(() => import("./views/app/TripDetail"));
+const MyBookings = lazy(() => import("./views/app/MyBookings"));
+const DiverProfile = lazy(() => import("./views/app/DiverProfile"));
+const Explore = lazy(() => import("./views/Explore"));
+const ExploreTrip = lazy(() => import("./views/ExploreTrip"));
+const NotFound = lazy(() => import("./views/NotFound"));
 
 // Super Admin
 const SuperAdminLayout = lazy(() => import("@/components/SuperAdminLayout"));
-const SuperAdminDashboard = lazy(() => import("./pages/super-admin/Dashboard"));
-const SuperAdminCenterDetail = lazy(() => import("./pages/super-admin/CenterDetail"));
+const SuperAdminDashboard = lazy(() => import("./views/super-admin/Dashboard"));
+const SuperAdminCenterDetail = lazy(() => import("./views/super-admin/CenterDetail"));
 
 const queryClient = new QueryClient({
   defaultOptions: {

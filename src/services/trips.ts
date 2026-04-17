@@ -7,7 +7,7 @@ export type TripInsert = TablesInsert<'trips'>;
 export type TripUpdate = TablesUpdate<'trips'>;
 export type TripWithCenter = Trip & {
   dive_centers:
-    | { name: string; avg_rating: number | null; review_count: number }
+    | { name: string; logo_url: string | null; avg_rating: number | null; review_count: number }
     | null;
 };
 
@@ -32,7 +32,7 @@ export async function fetchTripById(idOrSlug: string) {
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(idOrSlug);
   const { data, error } = await supabase
     .from('trips')
-    .select('*, dive_centers(name, avg_rating, review_count)')
+    .select('*, dive_centers(name, logo_url, avg_rating, review_count)')
     .eq(isUuid ? 'id' : 'slug', idOrSlug)
     .single();
   if (error) throw error;
@@ -46,7 +46,7 @@ export async function fetchPublishedTrips() {
   const today = getTodayDateString();
   const { data, error } = await supabase
     .from('trips')
-    .select('*, dive_centers(name, avg_rating, review_count)')
+    .select('*, dive_centers(name, logo_url, avg_rating, review_count)')
     .eq('status', 'published')
     .gte('trip_date', today)
     .order('trip_date', { ascending: true });
@@ -57,10 +57,12 @@ export async function fetchPublishedTrips() {
 /**
  * Create a new trip.
  */
-export async function createTrip(trip: TripInsert) {
+export async function createTrip(trip: Omit<TripInsert, 'slug'>) {
+  // The DB trigger `generate_trip_slug` fills in the slug when it's empty, so
+  // callers don't need to provide one.
   const { data, error } = await supabase
     .from('trips')
-    .insert(trip)
+    .insert({ ...trip, slug: '' })
     .select()
     .single();
   if (error) throw error;
