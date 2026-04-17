@@ -1191,7 +1191,7 @@ Remove `vercel.json` SPA rewrite rule — Next.js handles routing natively.
 | 6 | Trip slugs (DB migration + URL update) | 1 day | ✅ commit c2615e1 |
 | 7 | Emergency contact enforcement | 3h | ✅ commit 036765f |
 | 8 | Reviews & ratings | 3–4 days | ✅ commit 2182579 |
-| 9 | Playwright e2e tests | 2 days | ✅ commit TBD |
+| 9 | Playwright e2e tests | 2 days | ✅ commit b76a5ab |
 | 10 | Next.js App Router migration | 3–4 weeks | ☐ |
 
 ## Progress Log
