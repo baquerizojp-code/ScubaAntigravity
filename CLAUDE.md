@@ -100,9 +100,11 @@ Auto-generated types: `src/integrations/supabase/types.ts` — **do not edit man
 
 ### UI & Styling
 
+- **Design system:** "Abyssal Coral" — dark-first, cinematic. Full spec lives in the `scubatrip-design` Claude Design skill (invoke with `/scubatrip-design`). Key non-negotiables: coral `#FF7A54` for all primary CTAs in both modes, `rounded-full` pills, tonal section separation (no `<hr>`), ocean-tinted shadows, `font-light` body, cyan `#00EFFF` for HUD labels only.
 - shadcn/ui components in `src/components/ui/` (Radix primitives + Tailwind)
 - `cn()` utility in `src/lib/utils.ts` for class merging (clsx + tailwind-merge)
-- Custom Tailwind color palette: `ocean`, `teal`, `coral`, `cyan-electric` in `tailwind.config.ts`
+- CSS tokens in `src/index.css`; Tailwind mapping in `tailwind.config.ts` — custom palette: `ocean` (10 steps), `teal`, `coral`, `cyan-electric`
+- Semantic type utilities in `src/index.css`: `.hud-label`, `.caption`, `.footer-link`, `.lead`, `.h-hero`, `.shadow-coral-glow`
 - Dark mode via CSS class strategy (`next-themes` provider wrapped in `Providers`)
 - `ThemeToggle` component in layout shells for dark/light switching
 
