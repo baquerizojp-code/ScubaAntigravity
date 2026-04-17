@@ -32,3 +32,8 @@ dist-ssr
 *.timestamp-*.mjs
 *.timestamp-*.mjs
 supabase/.temp/
+
+# Playwright
+playwright-report/
+test-results/
+.playwright/
