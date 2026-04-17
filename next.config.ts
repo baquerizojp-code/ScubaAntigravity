@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: '**.supabase.co' },
     ],
+    formats: ['image/avif', 'image/webp'],
   },
 };
 

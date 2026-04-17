@@ -84,7 +84,7 @@ export default function ExploreFilters({ initialTrips, locale }: ExploreFiltersP
               className="animate-slide-up"
               style={{ animationDelay: `${0.3 + (index % 6) * 0.1}s` }}
             >
-              <TripCard trip={trip} locale={locale} eager={index < 3} />
+              <TripCard trip={trip} locale={locale} eager={index === 0} />
             </div>
           ))}
         </div>

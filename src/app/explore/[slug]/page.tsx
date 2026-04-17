@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -65,17 +66,13 @@ export default async function TripDetailPage({ params }: TripPageProps) {
       <section className="relative h-[65vh] min-h-[500px] w-full mt-0 overflow-hidden">
         <div className="absolute inset-0">
           {trip.image_url ? (
-            <img
-              src={getImageUrl(trip.image_url, { width: 800, quality: 80 }) ?? trip.image_url}
-              srcSet={[
-                `${getImageUrl(trip.image_url, { width: 800, quality: 80 })} 800w`,
-                `${getImageUrl(trip.image_url, { width: 1600, quality: 75 })} 1600w`,
-              ].join(', ')}
-              sizes="100vw"
+            <Image
+              src={trip.image_url}
               alt={trip.title}
-              className="w-full h-full object-cover scale-105 transform hover:scale-100 transition-transform duration-[20s] ease-out"
-              fetchPriority="high"
-              decoding="async"
+              fill
+              sizes="100vw"
+              priority
+              className="object-cover scale-105 transform hover:scale-100 transition-transform duration-[20s] ease-out"
             />
           ) : (
             <div className="w-full h-full bg-ocean-900 object-cover" />
