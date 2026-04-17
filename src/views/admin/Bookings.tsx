@@ -34,7 +34,7 @@ const AdminBookings = () => {
   const { diveCenterId } = useAuth();
   const { t } = useI18n();
   const queryClient = useQueryClient();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [rejectDialog, setRejectDialog] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState('');
 
