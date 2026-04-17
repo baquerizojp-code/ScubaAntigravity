@@ -417,5 +417,17 @@
   "superAdmin.centerDetail.registeredOn": "Registrado",
   "superAdmin.centerDetail.approvedOn": "Aprobado",
   "landing.hero.cta.centerLink": "¿Eres un centro de buceo? Regístrate aquí",
-  "landing.cta.centerLink": "Registra tu centro de buceo"
+  "landing.cta.centerLink": "Registra tu centro de buceo",
+
+  "reviews.title": "Reseñas",
+  "reviews.leaveReview": "Deja tu reseña",
+  "reviews.rating": "Tu calificación",
+  "reviews.reviewTitle": "Título (opcional)",
+  "reviews.reviewBody": "Cuéntale a otros sobre tu experiencia",
+  "reviews.submit": "Enviar reseña",
+  "reviews.submitted": "Reseña enviada. ¡Gracias!",
+  "reviews.submitError": "No se pudo enviar la reseña. Inténtalo de nuevo.",
+  "reviews.alreadyReviewed": "Ya reseñaste este viaje",
+  "reviews.noReviews": "Aún no hay reseñas — ¡sé el primero!",
+  "reviews.verifiedAttendee": "Asistente verificado"
 }

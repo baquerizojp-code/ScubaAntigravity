@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchTripById } from '@/services/trips';
+import { fetchReviewsForTrip } from '@/services/reviews';
+import { ReviewsList } from '@/components/ReviewsList';
 import {
   fetchBookingsByTripId,
   confirmBooking,
@@ -43,6 +45,13 @@ const AdminTripDetail = () => {
   const { data: trip, isLoading: isLoadingTrip } = useQuery({
     queryKey: ['admin-trip', id],
     queryFn: () => fetchTripById(id!),
+    enabled: !!id,
+  });
+
+  // Fetch reviews received for this trip (read-only admin panel)
+  const { data: tripReviews = [] } = useQuery({
+    queryKey: ['admin-trip-reviews', id],
+    queryFn: () => fetchReviewsForTrip(id!),
     enabled: !!id,
   });
 
@@ -299,6 +308,15 @@ const AdminTripDetail = () => {
                 </TabsContent>
               </Tabs>
             </div>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">{t('reviews.title')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ReviewsList reviews={tripReviews} />
+            </CardContent>
           </Card>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTripBooking } from '@/hooks/useTripBooking';
 import { track } from '@/lib/analytics';
 import { useI18n } from '@/lib/i18n';
@@ -13,10 +14,14 @@ import {
 import { MapPin, Calendar, Clock, Users, ArrowLeft, CalendarPlus, XCircle, MessageCircle, CheckCircle2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate, getImageUrl } from '@/lib/utils';
+import { toast } from 'sonner';
 
 import { BookingStatusBadge } from '@/components/app/BookingStatusBadge';
 import { CancellationDialog } from '@/components/app/CancellationDialog';
 import { ProfileCompletionDialog } from '@/components/app/ProfileCompletionDialog';
+import { ReviewForm } from '@/components/app/ReviewForm';
+import { StarRating } from '@/components/StarRating';
+import { fetchReviewByBooking, fetchReviewsForTrip, createReview, type ReviewInsert } from '@/services/reviews';
 
 const TripDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -54,6 +59,33 @@ const TripDetail = () => {
   useEffect(() => {
     if (tripId) track('trip_viewed', { trip_id: tripId });
   }, [tripId]);
+
+  const queryClient = useQueryClient();
+  const isCompletedTrip = trip?.status === 'completed';
+  const isConfirmedBooking = existingBooking?.status === 'confirmed';
+  const canReview = isCompletedTrip && isConfirmedBooking && !!existingBooking;
+
+  const { data: myReview } = useQuery({
+    queryKey: ['review-by-booking', existingBooking?.id],
+    queryFn: () => fetchReviewByBooking(existingBooking!.id),
+    enabled: canReview,
+  });
+
+  const { data: tripReviews = [] } = useQuery({
+    queryKey: ['trip-reviews', tripId],
+    queryFn: () => fetchReviewsForTrip(tripId!),
+    enabled: !!tripId && isCompletedTrip,
+  });
+
+  const submitReviewMutation = useMutation({
+    mutationFn: (payload: ReviewInsert) => createReview(payload),
+    onSuccess: () => {
+      toast.success(t('reviews.submitted'));
+      queryClient.invalidateQueries({ queryKey: ['review-by-booking', existingBooking?.id] });
+      queryClient.invalidateQueries({ queryKey: ['trip-reviews', tripId] });
+    },
+    onError: (err: Error) => toast.error(err.message || t('reviews.submitError')),
+  });
 
   if (loading) {
     return (
@@ -175,6 +207,73 @@ const TripDetail = () => {
                     </div>
                 </div>
              </div>
+
+             {/* Reviews section */}
+             {isCompletedTrip && (
+                <div>
+                  <h2 className="text-2xl font-headline font-bold mb-6 text-foreground flex items-center gap-3">
+                    <div className="w-8 h-1 bg-secondary rounded-full"></div>
+                    {t('reviews.title')}
+                  </h2>
+
+                  {canReview && !myReview && (
+                    <ReviewForm
+                      submitting={submitReviewMutation.isPending}
+                      onSubmit={({ rating, title, body }) => {
+                        if (!trip || !existingBooking) return;
+                        submitReviewMutation.mutate({
+                          rating,
+                          title,
+                          body,
+                          trip_id: trip.id,
+                          dive_center_id: trip.dive_center_id,
+                          diver_id: existingBooking.diver_id,
+                          booking_id: existingBooking.id,
+                        });
+                      }}
+                    />
+                  )}
+
+                  {canReview && myReview && (
+                    <div className="bg-card p-6 rounded-3xl border border-white/5 shadow-card space-y-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-semibold text-success">{t('reviews.alreadyReviewed')}</p>
+                        <StarRating value={myReview.rating} size={18} />
+                      </div>
+                      {myReview.title && <p className="font-semibold">{myReview.title}</p>}
+                      {myReview.body && <p className="text-sm text-muted-foreground whitespace-pre-line">{myReview.body}</p>}
+                    </div>
+                  )}
+
+                  {tripReviews.length > 0 && (
+                    <div className="mt-8 space-y-4">
+                      {tripReviews
+                        .filter((r) => r.id !== myReview?.id)
+                        .map((r) => (
+                          <div key={r.id} className="bg-card p-5 rounded-2xl border border-white/5 shadow-card">
+                            <div className="flex items-center justify-between gap-3 mb-2">
+                              <div>
+                                <p className="font-semibold text-foreground">
+                                  {(r.diver_profiles?.full_name ?? '').trim().split(/\s+/)[0] || t('reviews.verifiedAttendee')}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {t('reviews.verifiedAttendee')} · {format(new Date(r.created_at), 'MMM dd, yyyy')}
+                                </p>
+                              </div>
+                              <StarRating value={r.rating} size={16} />
+                            </div>
+                            {r.title && <p className="font-semibold mt-1">{r.title}</p>}
+                            {r.body && <p className="text-sm text-muted-foreground mt-1 whitespace-pre-line">{r.body}</p>}
+                          </div>
+                        ))}
+                    </div>
+                  )}
+
+                  {tripReviews.length === 0 && !canReview && (
+                    <p className="text-sm text-muted-foreground italic">{t('reviews.noReviews')}</p>
+                  )}
+                </div>
+             )}
 
              {/* Included / Excluded Mock */}
              <div className="grid sm:grid-cols-2 gap-8">

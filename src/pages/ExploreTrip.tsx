@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { track } from '@/lib/analytics';
 import { fetchTripById } from '@/services/trips';
 import type { TripWithCenter } from '@/services/trips';
+import { fetchReviewsForTrip } from '@/services/reviews';
 import { getImageUrl } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MapPin, Calendar, Clock, Users, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { MapPin, Calendar, Clock, Users, ArrowLeft, CheckCircle2, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
+import { ReviewsList } from '@/components/ReviewsList';
 
 const ExploreTrip = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +36,13 @@ const ExploreTrip = () => {
       .catch(() => setTrip(null))
       .finally(() => setLoading(false));
   }, [id]);
+
+  const tripIdForReviews = trip?.id;
+  const { data: reviews = [] } = useQuery({
+    queryKey: ['trip-reviews', tripIdForReviews],
+    queryFn: () => fetchReviewsForTrip(tripIdForReviews!),
+    enabled: !!tripIdForReviews,
+  });
 
   const handleBook = () => {
     if (user) {
@@ -110,6 +120,13 @@ const ExploreTrip = () => {
                   <span className="w-2 h-2 rounded-full bg-secondary"></span>
                   {trip.dive_centers?.name || t('explore.trip.independentCenter')}
                 </Badge>
+                {trip.dive_centers?.avg_rating != null && (trip.dive_centers?.review_count ?? 0) > 0 && (
+                  <Badge className="bg-background/40 backdrop-blur-md text-foreground border border-foreground/20 text-xs px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg">
+                    <Star className="w-3 h-3 fill-warning text-warning" />
+                    <span className="font-semibold">{Number(trip.dive_centers.avg_rating).toFixed(1)}</span>
+                    <span className="opacity-70">({trip.dive_centers.review_count})</span>
+                  </Badge>
+                )}
               </div>
               
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black font-headline text-foreground tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
@@ -166,6 +183,15 @@ const ExploreTrip = () => {
                       </div>
                     </div>
                 </div>
+             </div>
+
+             {/* Reviews */}
+             <div>
+                <h2 className="text-3xl font-headline font-bold mb-6 text-foreground flex items-center gap-3">
+                   <div className="w-8 h-1 bg-secondary rounded-full"></div>
+                   {t('reviews.title')}
+                </h2>
+                <ReviewsList reviews={reviews} />
              </div>
 
              {/* Included / Excluded Mock */}

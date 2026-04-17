@@ -31,3 +31,4 @@ dist-ssr
 # Vite/Vitest timestamp cache files
 *.timestamp-*.mjs
 *.timestamp-*.mjs
+supabase/.temp/

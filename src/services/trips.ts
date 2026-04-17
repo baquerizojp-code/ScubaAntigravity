@@ -5,7 +5,11 @@ import { getTodayDateString } from '@/lib/utils';
 export type Trip = Tables<'trips'>;
 export type TripInsert = TablesInsert<'trips'>;
 export type TripUpdate = TablesUpdate<'trips'>;
-export type TripWithCenter = Trip & { dive_centers: { name: string } | null };
+export type TripWithCenter = Trip & {
+  dive_centers:
+    | { name: string; avg_rating: number | null; review_count: number }
+    | null;
+};
 
 /**
  * Fetch all trips for a specific dive center.
@@ -28,7 +32,7 @@ export async function fetchTripById(idOrSlug: string) {
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-/i.test(idOrSlug);
   const { data, error } = await supabase
     .from('trips')
-    .select('*, dive_centers(name)')
+    .select('*, dive_centers(name, avg_rating, review_count)')
     .eq(isUuid ? 'id' : 'slug', idOrSlug)
     .single();
   if (error) throw error;
@@ -42,7 +46,7 @@ export async function fetchPublishedTrips() {
   const today = getTodayDateString();
   const { data, error } = await supabase
     .from('trips')
-    .select('*, dive_centers(name)')
+    .select('*, dive_centers(name, avg_rating, review_count)')
     .eq('status', 'published')
     .gte('trip_date', today)
     .order('trip_date', { ascending: true });
