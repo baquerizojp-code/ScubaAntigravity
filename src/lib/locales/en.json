@@ -294,6 +294,12 @@
   "admin.trips.status.completed": "Completed",
   "admin.trips.status.cancelled": "Cancelled",
 
+  "landing.destinations.badge": "Top Destinations",
+  "landing.community.badge": "Join the Community",
+  "landing.community.title": "Join the Community",
+  "landing.community.subtitle1": "Connect with thousands of divers and explore the world together.",
+  "landing.community.subtitle2": "Gain access to exclusive trips, connect with fellow divers, and unlock member only benefits. Start your underwater journey today!",
+
   "landing.connection.badge": "Performance Ecosystem",
   "landing.connection.title1": "Elite Divers Meet",
   "landing.connection.title2": "World-Class Centers",

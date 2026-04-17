@@ -294,6 +294,12 @@
   "admin.trips.status.completed": "Completado",
   "admin.trips.status.cancelled": "Cancelado",
 
+  "landing.destinations.badge": "Mejores Destinos",
+  "landing.community.badge": "Únete a la Comunidad",
+  "landing.community.title": "Únete a la Comunidad",
+  "landing.community.subtitle1": "Conecta con miles de buzos y explora el mundo juntos.",
+  "landing.community.subtitle2": "Accede a trips exclusivos, conecta con buzos y desbloquea beneficios exclusivos para miembros. ¡Comienza tu aventura submarina hoy!",
+
   "landing.connection.badge": "Ecosistema de Rendimiento",
   "landing.connection.title1": "Buzos de Élite Conocen",
   "landing.connection.title2": "Centros de Clase Mundial",
