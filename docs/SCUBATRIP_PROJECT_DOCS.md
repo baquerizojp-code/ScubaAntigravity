@@ -1,6 +1,8 @@
 # ScubaTrip — Complete Project Documentation
 
-> **Document purpose:** Comprehensive technical and product reference for the ScubaTrip platform. Covers architecture, database schema, user flows, components, and development patterns. Useful for onboarding engineers, writing PRDs, or understanding any part of the system. Last updated: April 2026 (codebase state: commit `424acdd`).
+> **Document purpose:** Comprehensive technical and product reference for the ScubaTrip platform. Covers architecture, database schema, user flows, components, and development patterns. Useful for onboarding engineers, writing PRDs, or understanding any part of the system.
+>
+> **Last updated:** April 17, 2026 (post-Next.js migration). Major sections (§2–§6, §9, §16–§19) were rewritten for the Next.js App Router cutover ([PR #38](https://github.com/jpbaquerizo/ScubaTrip/pull/38)). Sections §10 (Page-by-Page Breakdown), §11 (User Flows), and §12 (Components) were written pre-migration and reference some now-deleted components (`AuthContext`, `ProtectedRoute`, `DiverLayout` class components, etc.). The current source tree in §3 is authoritative; treat §10–§12 as historical context until they're refreshed in a follow-up pass.
 
 ---
 
@@ -47,15 +49,19 @@ It is a production SaaS web application (not a demo, not a tutorial clone). Depl
 | Diver booking flow | Complete |
 | Dive center trip management | Complete |
 | Super admin approval workflow | Complete |
+| SSR on public pages + trip slugs | ✅ Complete (Phase 1 Item 10, PR #38) |
+| Review/rating system | ✅ Complete (Phase 1 Item 8) |
+| Playwright e2e tests | ✅ Complete (Phase 1 Item 9) |
+| Sentry error tracking + PostHog analytics | ✅ Complete (Phase 1 Items 1–2) |
+| Image optimization (srcset/WebP via next/image) | ✅ Complete (Phase 1 Item 5 + Phase 1 Item 10) |
 | In-app notifications (realtime) | Complete |
 | Dark/light mode | Complete |
 | Bilingual (EN + ES) | Complete |
-| Group messaging UI | Table exists, UI not built |
-| Staff invite flow | Table + invite creation exist, acceptance flow not built |
-| Payment processing | Not built |
-| Review/rating system | Not built |
-| Equipment rental | Not built |
-| Waitlist for full trips | Not built |
+| Group messaging UI | Table exists, UI not built — [PHASE2_PLAN §1](./PHASE2_PLAN.md) |
+| Staff invite flow | Table + invite creation exist, acceptance flow not built — [PHASE2_PLAN §2](./PHASE2_PLAN.md) |
+| Payment processing | Not built — [PHASE2_PLAN §3–4](./PHASE2_PLAN.md) |
+| Waitlist for full trips | Not built — [PHASE2_PLAN §5](./PHASE2_PLAN.md) |
+| Equipment rental | Not built — roadmap Phase 3 |
 
 ### 1.3 Three User Personas
 
@@ -78,15 +84,15 @@ It is a production SaaS web application (not a demo, not a tutorial clone). Depl
 
 | Category | Package | Version |
 |----------|---------|---------|
-| **Framework** | react | ^18.3.1 |
+| **Framework** | next | ^16.x |
+| | react | ^18.3.1 |
 | | react-dom | ^18.3.1 |
-| | react-router-dom | ^6.30.1 |
-| **Build** | vite | ^5.4.19 |
-| | @vitejs/plugin-react-swc | ^3.11.0 |
-| | typescript | ^5.8.3 |
+| **Build** | typescript | ^5.8.3 |
+| | turbopack | bundled with Next |
 | **Backend** | @supabase/supabase-js | ^2.98.0 |
+| | @supabase/ssr | ^0.10.2 |
 | **Server state** | @tanstack/react-query | ^5.83.0 |
-| **Global state** | zustand | ^5.0.11 |
+| **Global state** | zustand | ^5.0.11 (i18n only) |
 | **UI primitives** | ~40× @radix-ui/react-* | ^1.x |
 | **Styling** | tailwindcss | ^3.4.17 |
 | | tailwind-merge | ^2.6.0 |
@@ -100,6 +106,8 @@ It is a production SaaS web application (not a demo, not a tutorial clone). Depl
 | | zod | ^3.25.76 |
 | | @hookform/resolvers | ^3.10.0 |
 | **Dates** | date-fns | ^3.6.0 |
+| **Observability** | @sentry/nextjs | ^10.49.0 |
+| | posthog-js | ^1.x |
 | **Analytics** | @vercel/analytics | ^2.0.1 |
 | | @vercel/speed-insights | ^2.0.0 |
 | **Testing** | vitest | ^3.2.4 |
@@ -107,6 +115,7 @@ It is a production SaaS web application (not a demo, not a tutorial clone). Depl
 | | @testing-library/jest-dom | ^6.6.0 |
 | | @testing-library/user-event | ^14.6.1 |
 | | jsdom | ^20.0.3 |
+| | @playwright/test | ^1.x |
 
 ---
 
@@ -114,70 +123,97 @@ It is a production SaaS web application (not a demo, not a tutorial clone). Depl
 
 ```
 ScubaTrip/
+├── instrumentation.ts             # Sentry server/edge init (Next.js 15+ convention)
+├── instrumentation-client.ts      # Sentry browser init + onRouterTransitionStart
+├── middleware.ts                  # (optional) Supabase session cookie refresh
+├── next.config.ts                 # Next.js + Turbopack + images.remotePatterns
+├── next-env.d.ts                  # Next.js auto-generated type shims
+├── tsconfig.json                  # Strict mode + @/* path alias (single source)
+├── tailwind.config.ts
+├── vercel.json                    # Headers (no SPA rewrite — App Router handles routing)
+├── vitest.config.ts
+├── playwright.config.ts
+├── package.json
+│
 ├── src/
-│   ├── App.tsx                    # Root router configuration (lazy routes + Suspense)
-│   ├── main.tsx                   # Vite entry: React root, QueryClient, ThemeProvider
-│   ├── index.css                  # Tailwind directives + CSS custom properties (all HSL tokens)
+│   ├── index.css                  # Tailwind directives + CSS custom properties (HSL tokens)
 │   │
-│   ├── contexts/
-│   │   └── AuthContext.tsx        # Session, role, diveCenterId, centerStatus, activeView
+│   ├── app/                       # Next.js App Router tree
+│   │   ├── layout.tsx             # Root layout: fonts, Providers, <html lang>
+│   │   ├── page.tsx               # Landing (RSC, public)
+│   │   ├── _components/           # App-Router-scoped shared components
+│   │   │   ├── Providers.tsx      # QueryClient + Theme + Auth + PostHog
+│   │   │   ├── AuthProvider.tsx   # Hydrates server session, subscribes to onAuthStateChange
+│   │   │   ├── DiverLayoutShell.tsx
+│   │   │   ├── AdminLayoutShell.tsx
+│   │   │   ├── SuperAdminLayoutShell.tsx
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── NotificationBell.tsx
+│   │   │   ├── TripCard.tsx       # Server presentational card
+│   │   │   ├── BookButton.tsx     # Client island for booking CTA
+│   │   │   ├── PendingApprovalBanner.tsx
+│   │   │   └── RoleSwitcher.tsx
+│   │   ├── _lib/
+│   │   │   ├── auth.ts            # getSession() — React-cached server helper
+│   │   │   ├── queries.ts         # Shared React Query keys/options
+│   │   │   ├── i18n.ts            # Server-side i18n helpers
+│   │   │   └── server-locale.ts   # Reads locale cookie / Accept-Language
+│   │   ├── explore/
+│   │   │   ├── page.tsx           # RSC + ISR revalidate=60
+│   │   │   └── [slug]/page.tsx    # RSC + generateMetadata + ISR
+│   │   ├── login/
+│   │   ├── signup/
+│   │   ├── forgot-password/
+│   │   ├── reset-password/
+│   │   ├── complete-profile/
+│   │   ├── register-center/
+│   │   ├── app/                   # Diver tree (protected layout)
+│   │   │   ├── layout.tsx         # getSession() + redirect if !diver
+│   │   │   ├── page.tsx
+│   │   │   ├── discover/
+│   │   │   ├── trip/[id]/
+│   │   │   ├── bookings/
+│   │   │   └── profile/
+│   │   ├── admin/                 # Dive center tree
+│   │   │   ├── layout.tsx         # getSession() + redirect if !dive_center
+│   │   │   ├── page.tsx
+│   │   │   ├── trips/[id]/
+│   │   │   ├── bookings/
+│   │   │   └── settings/
+│   │   └── super-admin/
+│   │       ├── layout.tsx
+│   │       ├── page.tsx
+│   │       └── centers/
 │   │
-│   ├── services/                  # Data layer — all Supabase queries live here
+│   ├── services/                  # Data layer — Supabase queries (works from server OR client)
 │   │   ├── trips.ts
 │   │   ├── bookings.ts
-│   │   └── profiles.ts
+│   │   ├── profiles.ts
+│   │   └── reviews.ts
 │   │
-│   ├── hooks/                     # Custom React hooks
-│   │   ├── useTripBooking.ts      # All booking logic for TripDetail page
+│   ├── hooks/
 │   │   ├── useRealtimeSubscription.ts
 │   │   ├── useBookingFilters.ts
 │   │   └── use-toast.ts
 │   │
 │   ├── lib/
-│   │   ├── i18n.ts                # Zustand i18n store + translation function
-│   │   ├── locales/
-│   │   │   ├── en.json            # English translations (~400 keys)
-│   │   │   └── es.json            # Spanish translations (~400 keys)
-│   │   ├── constants.ts           # Magic numbers (MAX_TRIP_SPOTS, etc.)
-│   │   ├── statusColors.ts        # Status badge class maps (single source of truth)
-│   │   ├── schemas.ts             # Shared Zod validation schemas
-│   │   ├── utils.ts               # cn(), parseLocalDate(), getTodayDateString()
-│   │   ├── calendar.ts            # ICS file download + Google Calendar URL
-│   │   └── phoneFormat.ts         # E.164 formatting helpers
+│   │   ├── i18n.ts                # Zustand i18n store (client-side)
+│   │   ├── locales/{en,es}.json
+│   │   ├── constants.ts
+│   │   ├── statusColors.ts
+│   │   ├── schemas.ts             # Shared Zod schemas
+│   │   ├── utils.ts               # cn(), getImageUrl() (Supabase transform), etc.
+│   │   ├── calendar.ts
+│   │   └── phoneFormat.ts
 │   │
-│   ├── types/
-│   │   └── index.ts               # Shared TypeScript types and enum aliases
+│   ├── types/index.ts             # Shared TypeScript types + enum aliases
 │   │
 │   ├── integrations/
 │   │   └── supabase/
-│   │       ├── client.ts          # Supabase client + custom Remember-Me storage proxy
+│   │       ├── browser.ts         # createBrowserClient() (@supabase/ssr)
+│   │       ├── server.ts          # createServerClient() reading Next cookies
+│   │       ├── client.ts          # Runtime-aware re-export (picks server vs browser)
 │   │       └── types.ts           # Auto-generated DB types (DO NOT EDIT)
-│   │
-│   ├── pages/
-│   │   ├── Landing.tsx            # Public home
-│   │   ├── Explore.tsx            # Public trip browse
-│   │   ├── ExploreTrip.tsx        # Public trip detail (pre-login)
-│   │   ├── Login.tsx              # Login + signup tabs
-│   │   ├── ForgotPassword.tsx
-│   │   ├── ResetPassword.tsx
-│   │   ├── CompleteProfile.tsx    # Post-signup diver profile setup
-│   │   ├── RegisterCenter.tsx     # Dive center registration
-│   │   ├── NotFound.tsx
-│   │   ├── app/                   # Diver pages
-│   │   │   ├── Dashboard.tsx
-│   │   │   ├── Discover.tsx
-│   │   │   ├── TripDetail.tsx
-│   │   │   ├── MyBookings.tsx
-│   │   │   └── DiverProfile.tsx
-│   │   ├── admin/                 # Dive center pages
-│   │   │   ├── Dashboard.tsx
-│   │   │   ├── Trips.tsx
-│   │   │   ├── TripDetail.tsx
-│   │   │   ├── Bookings.tsx
-│   │   │   └── Settings.tsx
-│   │   └── super-admin/
-│   │       ├── Dashboard.tsx
-│   │       └── CenterDetail.tsx
 │   │
 │   ├── components/
 │   │   ├── ui/                    # shadcn/ui components (Radix + Tailwind, ~40 files)
@@ -185,62 +221,47 @@ ScubaTrip/
 │   │   │   ├── BookingDialog.tsx
 │   │   │   ├── BookingStatusBadge.tsx
 │   │   │   ├── CancellationDialog.tsx
+│   │   │   ├── ReviewForm.tsx
 │   │   │   └── ProfileCompletionDialog.tsx
-│   │   ├── Admin/                 # Admin-specific components
-│   │   │   ├── TripFormModal.tsx
-│   │   │   └── BookingCard.tsx
-│   │   ├── TripCard.tsx           # Trip discovery card
-│   │   ├── Navbar.tsx
-│   │   ├── DiverLayout.tsx        # Diver app shell (bottom nav)
-│   │   ├── AdminLayout.tsx        # Admin shell (left sidebar)
-│   │   ├── SuperAdminLayout.tsx
+│   │   ├── Admin/BookingCard.tsx
 │   │   ├── DateRangePicker.tsx
-│   │   ├── NotificationBell.tsx
-│   │   ├── ThemeProvider.tsx
-│   │   ├── ThemeToggle.tsx
+│   │   ├── ImageUpload.tsx
+│   │   ├── PhoneInput.tsx
+│   │   ├── ReviewsList.tsx
 │   │   ├── ScubaMaskLogo.tsx
-│   │   ├── ProtectedRoute.tsx
-│   │   ├── ErrorBoundary.tsx
-│   │   ├── PendingApprovalBanner.tsx
-│   │   └── RoleSwitcher.tsx
+│   │   ├── StarRating.tsx
+│   │   └── ThemeToggle.tsx
 │   │
-│   ├── assets/                    # Static images, SVGs
-│   └── test/
-│       ├── mocks/
-│       │   └── supabase.ts        # Chainable Supabase mock
-│       └── test-utils.tsx         # renderWithProviders()
+│   ├── assets/
+│   └── test/mocks/supabase.ts     # Chainable Supabase mock
 │
+├── e2e/                           # Playwright specs (auth, booking-flow, admin-confirm)
 ├── supabase/
-│   └── migrations/                # 22 SQL migration files
+│   └── migrations/                # 24 SQL migration files
 │
-├── public/                        # Static files (favicon, robots.txt, etc.)
-├── docs/                          # This file and SCUBATRIP_ROADMAP.md
-├── BRAND.md                       # Design system documentation
-├── CLAUDE.md                      # AI assistant instructions (quick reference)
-├── vercel.json                    # Vercel SPA rewrite rule
-├── tailwind.config.ts
-├── vite.config.ts
-├── tsconfig.app.json              # Strict mode TypeScript config
-└── package.json
+├── public/
+├── docs/
+├── BRAND.md
+└── CLAUDE.md
 ```
+
+**Files removed in the Next.js migration ([PR #38](https://github.com/jpbaquerizo/ScubaTrip/pull/38)):** `vite.config.ts`, `index.html`, `src/main.tsx`, `src/App.tsx`, `src/contexts/AuthContext.tsx`, `src/components/ProtectedRoute.tsx`, `src/components/{AdminLayout,DiverLayout,SuperAdminLayout,Navbar,NotificationBell,RoleSwitcher,TripCard,ThemeProvider,ErrorBoundary,PendingApprovalBanner}.tsx`, `src/hooks/useTripBooking.ts`, `src/test/test-utils.tsx`, `tsconfig.app.json`, `tsconfig.node.json`, `src/pages/` tree. Their successors all live under `src/app/` (routes) or `src/app/_components/` (shared UI).
 
 ### 3.1 Path Alias
 
-`@/*` maps to `./src/*`. Configured in both `tsconfig.app.json` and `vite.config.ts`.
+`@/*` maps to `./src/*`. Configured once in `tsconfig.json` (Next.js reads it directly — no separate bundler config needed).
 
-### 3.2 Vite Configuration Highlights
+### 3.2 Next.js Configuration Highlights
 
-- **Dev port:** 8080 (IPv6 enabled)
-- **Source maps:** Hidden in production
-- **CSS code splitting:** Enabled — each route loads only its own styles
-- **Manual chunk splitting:**
-  - `vendor` — React, React-DOM, React Router
-  - `ui` — All 27 `@radix-ui/react-*` packages
-  - `supabase` — `@supabase/supabase-js`
-  - `query` — `@tanstack/react-query`
-  - `charts` — `recharts`
-  - `dates` — `date-fns`
-  - `forms` — react-hook-form + zod + resolvers
+- **Dev port:** 3000 (Next.js default)
+- **Bundler:** Turbopack (`next dev --turbo` / `next build` use Turbopack in Next 16)
+- **App Router file conventions:** `layout.tsx`, `page.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`, `generateMetadata`, `generateStaticParams`
+- **Rendering per route segment:**
+  - `/`, `/explore`, `/explore/[slug]` → Server Components with ISR (`revalidate = 60`)
+  - `/app/**`, `/admin/**`, `/super-admin/**` → server layout (`getSession()` redirect guard) wrapping client content
+  - Forms + heavy interactivity remain in `"use client"` components (BookButton, LoginForm, etc.)
+- **Image optimization:** `next/image` with `images.remotePatterns` whitelisting `**.supabase.co`. Replaces the manual Supabase-transform srcset from Phase 1.
+- **Code splitting:** automatic at the route segment level — no manual chunks needed.
 
 ---
 
@@ -249,17 +270,25 @@ ScubaTrip/
 ### 4.1 High-Level Architecture
 
 ```
-Browser (SPA)
+Browser
 │
-├── React 18 + React Router v6
-│   ├── Lazy-loaded page components
-│   ├── React Query (server state cache, staleTime 60s)
-│   ├── AuthContext (session, role, diveCenterId)
-│   └── Zustand (i18n locale store)
+├── Next.js 16 App Router (React 18 + Turbopack)
+│   ├── Server Components   → RSC payload over the wire (public pages pre-rendered)
+│   ├── Client Components   → hydrated islands (forms, realtime, charts)
+│   ├── React Query         → client-only server-state cache (staleTime 60s)
+│   ├── AuthProvider        → hydrates `getSession()` payload, subscribes to auth changes
+│   └── Zustand             → i18n locale store (client-only)
+│
+Vercel (edge/node)
+│
+├── App Router runtime on Fluid Compute
+│   ├── Server Components render with server Supabase client
+│   ├── getSession() — React.cache()'d per-request auth/role lookup
+│   └── ISR revalidation (60s on public trip routes)
 │
 └── Supabase (hosted PostgreSQL)
     ├── Auth (email/password, Google OAuth)
-    ├── PostgreSQL (RLS-secured, 9 tables)
+    ├── PostgreSQL (RLS-secured, 11 tables)
     ├── Realtime (WebSocket postgres_changes)
     └── Storage (avatars, logos, trip-images)
 ```
@@ -267,32 +296,32 @@ Browser (SPA)
 ### 4.2 Data Flow
 
 ```
-Page Component
-    ↓ calls
-Custom Hook (useTripBooking, useBookingFilters, etc.)
-    ↓ calls
-Service Function (src/services/*.ts)
-    ↓ calls
-Supabase Client (src/integrations/supabase/client.ts)
-    ↓ SQL query
-PostgreSQL (with RLS policies applied)
-    ↓ result
-React Query cache → component re-renders
+Server Component                      │  Client Component
+    ↓ calls                           │      ↓ calls
+Service Function (src/services/*)     │  React Query hook
+    ↓ uses                            │      ↓ calls
+Server Supabase client (@supabase/ssr)│  Service Function
+    ↓ SQL query                       │      ↓ uses
+PostgreSQL (RLS applied)              │  Browser Supabase client (@supabase/ssr)
+    ↓ returns                         │      ↓ SQL query
+HTML streamed to browser              │  PostgreSQL (RLS applied)
+                                      │      ↓ returns
+                                      │  React Query cache → re-render
 ```
 
-**Key principle:** Pages never call Supabase directly. The service layer is the single point of data access, making it mockable and testable.
+**Key principle:** Components never call Supabase directly — everything goes through `src/services/*`. Services are runtime-agnostic and work from both server and client callers; the Supabase client they get is chosen by `src/integrations/supabase/client.ts` based on whether code is running on server or browser.
 
 ### 4.3 React Query Configuration
 
 ```typescript
-// From src/main.tsx
+// From src/app/_components/Providers.tsx
 new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000,         // 1 min — data considered fresh
       gcTime: 5 * 60 * 1000,        // 5 min — unused cache retained
-      retry: 1,                      // One retry on network error
-      refetchOnWindowFocus: false,   // No refetch on tab switch
+      retry: 1,
+      refetchOnWindowFocus: false,
     },
   },
 })
@@ -318,8 +347,7 @@ React Query to refetch → component re-renders with fresh data
 
 | Enum | Values |
 |------|--------|
-| `app_role` | `diver`, `dive_center_admin`, `dive_center_staff` |
-| `staff_role` | `admin`, `staff` |
+| `app_role` | `diver`, `dive_center`, `super_admin` |
 | `certification_level` | `open_water`, `advanced_open_water`, `rescue_diver`, `divemaster`, `instructor`, `none` |
 | `trip_status` | `draft`, `published`, `completed`, `cancelled` |
 | `trip_difficulty` | `beginner`, `intermediate`, `advanced` |
@@ -586,63 +614,66 @@ All critical functions are `SECURITY DEFINER` to bypass RLS where needed.
 | 17 | `20260308210346` | Fix infinite RLS recursion via `staff_can_view_diver()` |
 | 18 | `20260308211428` | Enable Realtime for bookings |
 | 19 | `20260319172000` | Add `image_url` to trips + trip-images bucket + `handle_new_user()` trigger |
-| 20 | `20260410000000` | Add `archived` to center_status enum |
+| 20 | `20260319172000_automation_and_features` | `group_messages` table + center approval automation |
+| 21 | `20260410000000` | Add `archived` to center_status enum |
+| 22 | `20260416000001_add_trip_slugs` | Trip slugs (SEO) — `slugify()` fn + insert trigger |
+| 23 | `20260416000002_add_reviews` | `trip_reviews` + `avg_rating`/`review_count` rollup triggers on `dive_centers` |
+
+Current total: **24 migration files** in `supabase/migrations/` as of April 2026.
 
 ---
 
 ## 6. Authentication & Authorization
 
-### 6.1 AuthContext Interface
+Auth was rewritten in Phase 1 Item 10 (PRs [#32](https://github.com/jpbaquerizo/ScubaTrip/pull/32)–[#38](https://github.com/jpbaquerizo/ScubaTrip/pull/38)). There is no longer a single `AuthContext` bridging client state; the source of truth is the server, and the client holds a thin hydrated mirror for UI responsiveness.
+
+### 6.1 Server Session
 
 ```typescript
-interface AuthContextType {
-  user: User | null;              // Supabase auth.users record
-  session: Session | null;        // Active auth session
-  role: AppRole | null;           // From user_roles table
-  diveCenterId: string | null;    // For dive_center_admin users
-  centerStatus: CenterStatus | null; // pending|approved|rejected|archived
-  activeView: ActiveView;         // super_admin|dive_center|diver
-  loading: boolean;
-  signOut: () => Promise<void>;
-  refreshRole: () => Promise<void>;
-  setActiveView: (view: ActiveView) => void;
+// src/app/_lib/auth.ts — React.cache()'d, runs in every protected layout
+export interface ServerSession {
+  user: User | null;                  // Supabase auth.users row
+  role: AppRole | null;               // diver | dive_center | super_admin
+  diveCenterId: string | null;        // present for dive_center + super_admin owners
+  centerStatus: CenterStatus | null;  // pending | approved | rejected | archived
 }
+
+export const getSession = cache(async (): Promise<ServerSession> => { … });
 ```
 
-### 6.2 Session Lifecycle
+Every protected `layout.tsx` calls `getSession()` on the server, and either `redirect()`s unauthorized users or passes the payload down to a client layout shell.
 
-1. `supabase.auth.onAuthStateChange` listener is established
-2. `supabase.auth.getSession()` checks for persisted session (prevents race condition)
-3. On session found: `fetchUserRole(userId)` queries `user_roles` table
-4. If `role = 'dive_center_admin'`: queries `dive_centers WHERE created_by = userId` to get `diveCenterId` and `centerStatus`
-5. `activeView` is set based on role (`super_admin` → `'super_admin'`, etc.)
+### 6.2 Client AuthProvider
 
-### 6.3 Custom Remember-Me Storage Proxy
+`src/app/_components/AuthProvider.tsx` receives the initial server session as a prop (via a root-level read in `Providers.tsx`) and then subscribes to `supabase.auth.onAuthStateChange` in the browser so sign-outs and token refreshes propagate without a page reload.
+
+### 6.3 Session Lifecycle
+
+1. **Server request** — `getSession()` calls `supabase.auth.getUser()` via the server Supabase client (`@supabase/ssr`), which reads the session cookie. `user_roles` + `dive_centers` are looked up in the same request; all three queries are deduped per request by React's `cache()`.
+2. **Protected layout** — redirects to `/login?redirect=…` if `user` is null, or to the correct dashboard if the role is wrong for the segment.
+3. **Client hydration** — AuthProvider seeds React state from the server payload. No visible "flash of unauthenticated content."
+4. **Client sign-out / token refresh** — `onAuthStateChange` fires, AuthProvider updates state, and the next server nav re-reads the session from cookies.
+
+### 6.4 Custom Remember-Me Storage Proxy (Browser Client)
 
 ```typescript
-// src/integrations/supabase/client.ts
-// Reads 'scubatrip-remember-me' flag from localStorage
-// If true  → uses localStorage (session persists across browser restarts)
-// If false → uses sessionStorage (session dies when tab closes)
+// src/integrations/supabase/browser.ts
+// The browser client passes a custom `storage` to createBrowserClient():
+//   - If localStorage['scubatrip-remember-me'] === 'true' → delegate reads/writes to localStorage
+//   - Otherwise → delegate to sessionStorage (session dies when tab closes)
+// getItem() always consults the flag, so toggling "Remember Me" at login changes persistence.
 ```
 
-### 6.4 Role-Based Post-Login Routing
+### 6.5 Role-Based Post-Login Routing
 
 | Role | Redirect target |
 |------|----------------|
 | `diver` | `/app/discover` |
-| `dive_center_admin` | `/admin` |
+| `dive_center` | `/admin` |
 | `super_admin` | `/super-admin` |
 | No role yet | `/complete-profile` (diver) or `/register-center` (center) |
 
-### 6.5 ProtectedRoute Component
-
-```typescript
-// Checks:
-// 1. Is user authenticated? If no → /login?redirect=...
-// 2. Does user have allowedRoles? If no → redirect to their dashboard
-// 3. skipRoleCheck: true → skip role check (used for /complete-profile)
-```
+Role gate enforcement lives in each segment's server `layout.tsx` — there is no `<ProtectedRoute>` component anymore.
 
 ---
 
@@ -760,35 +791,35 @@ assignDiverRole(userId: string) → void
 ## 9. Route Map
 
 ```
-/                        Landing (public, no auth)
-/explore                 Explore trips (public)
-/explore/:id             Public trip detail
+/                        Landing (RSC, public)
+/explore                 Explore trips (RSC + ISR, public)
+/explore/[slug]          Public trip detail (RSC + ISR + generateMetadata)
 /login                   Login + signup (tabbed)
-/signup                  Alias → Login component (signup tab)
+/signup                  Alias → login route (signup tab)
 /forgot-password
 /reset-password
 /complete-profile        Protected (auth required, no role check)
 /register-center         Public
 
-/super-admin             ProtectedRoute: super_admin
-/super-admin/centers/:id
+/super-admin             Server layout: redirect if role !== 'super_admin'
+/super-admin/centers/[id]
 
-/admin                   ProtectedRoute: dive_center_admin | dive_center_staff
+/admin                   Server layout: redirect if role !== 'dive_center' && 'super_admin'
 /admin/trips
-/admin/trips/:id
+/admin/trips/[id]
 /admin/bookings
 /admin/settings
 
-/app                     ProtectedRoute: diver
+/app                     Server layout: redirect if role !== 'diver' && 'super_admin'
 /app/discover
-/app/trip/:id
+/app/trip/[id]
 /app/bookings
 /app/profile
 
-*                        NotFound
+not-found.tsx            Fallback for any unmatched segment (Next.js convention)
 ```
 
-**Lazy loading:** Every page uses `React.lazy(() => import('./pages/...'))` wrapped in a `<Suspense>` with a spinner fallback. This means each page chunk is only downloaded when the user first navigates to it.
+**Code splitting:** Next.js automatically code-splits at the route segment level. Each `page.tsx` and its dependencies are their own chunk; no manual `React.lazy()` or `<Suspense>` is required. Loading states are expressed via per-segment `loading.tsx` files.
 
 ---
 
@@ -1169,36 +1200,32 @@ The `locale` value from `useI18n()` is passed to `date-fns` format functions for
 ### 16.1 Test Inventory
 
 ```
-111 tests across 10 files:
+105 tests across 8 vitest files:
 
 src/test/
-├── mocks/supabase.ts          # Chainable Supabase mock
-└── test-utils.tsx             # renderWithProviders()
-
-src/components/__tests__/
-├── TripCard.test.tsx          # Card rendering, props, booking status badge
-└── ErrorBoundary.test.tsx     # Error capture, fallback UI
+└── mocks/supabase.ts          # Chainable Supabase mock
 
 src/services/__tests__/
 ├── trips.test.ts              # Service function unit tests
 ├── bookings.test.ts
-└── profiles.test.ts
-
-src/contexts/__tests__/
-└── AuthContext.test.tsx       # Auth state, session lifecycle
-
-src/__tests__/
-└── ProtectedRoute.test.tsx    # Role-based routing
+├── profiles.test.ts
+└── reviews.test.ts            # Added in Phase 1 Item 8
 
 src/lib/__tests__/
 ├── schemas.test.ts            # Zod schema validation
-├── i18n.test.ts               # Translation lookup + locale switching
-└── ...
+└── i18n.test.ts               # Translation lookup + locale switching
 
 src/hooks/__tests__/
 ├── useRealtimeSubscription.test.ts
 └── useBookingFilters.test.ts
+
+e2e/                           # Playwright specs (Phase 1 Item 9)
+├── auth.spec.ts
+├── booking-flow.spec.ts
+└── admin-confirm.spec.ts
 ```
+
+The old `AuthContext.test.tsx`, `ProtectedRoute.test.tsx`, `TripCard.test.tsx`, `ErrorBoundary.test.tsx`, and `useTripBooking.test.ts` suites were removed in [PR #38](https://github.com/jpbaquerizo/ScubaTrip/pull/38) alongside the components they tested. The new server-component-based auth flow is covered by the Playwright booking-flow spec (it exercises login + role-gated routing end-to-end).
 
 ### 16.2 Supabase Mock Pattern
 
@@ -1213,18 +1240,18 @@ mockAuth.getUser().returns({ data: { user }, error: null })
 ### 16.3 Running Tests
 
 ```bash
-npm run test           # Run all 111 tests (vitest run)
+npm run test           # Run all 105 vitest unit tests
 npm run test:watch     # Watch mode
-npx vitest run src/components/__tests__/TripCard.test.tsx  # Single file
+npm run test:e2e       # Playwright (spins up next dev -p 3000 via webServer)
+npx vitest run src/services/__tests__/trips.test.ts  # Single file
 ```
 
 ### 16.4 Coverage Gaps
 
 - `ProfileCompletionDialog.tsx` — not tested
-- `TripFormModal.tsx` — not tested
-- `useTripBooking.ts` — complex hook, partially tested
-- No end-to-end (e2e) tests — the full booking flow is only tested manually
-- Admin booking flow (confirm/reject) — not tested
+- `AdminTripFormModal.tsx` — not tested
+- Admin booking confirm/reject — covered by Playwright, no unit test
+- Payment flow (Phase 2) — not yet built, not yet tested
 
 ---
 
@@ -1238,23 +1265,30 @@ npx vitest run src/components/__tests__/TripCard.test.tsx  # Single file
 
 ### 17.2 Environment Variables
 
-Create `.env` from `.env.example`:
+Create `.env.local` from `.env.example` (Next.js reads `.env.local` automatically; it's gitignored by default):
 ```
-VITE_SUPABASE_URL=https://...supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY=eyJ...
-VITE_SUPABASE_PROJECT_ID=...
+NEXT_PUBLIC_SUPABASE_URL=https://...supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+NEXT_PUBLIC_SUPABASE_PROJECT_ID=...
+
+# Optional
+NEXT_PUBLIC_POSTHOG_KEY=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+NEXT_PUBLIC_SENTRY_DSN=https://...ingest.sentry.io/...
 ```
 
-**Never commit `.env`** — it contains live production credentials.
+**Never commit `.env` / `.env.local`** — they contain live production credentials. The Supabase anon key is intended for client exposure (protected by RLS), hence the `NEXT_PUBLIC_` prefix.
 
 ### 17.3 Local Development
 
 ```bash
 npm install
-npm run dev          # Starts Vite at http://localhost:8080
+npm run dev          # Starts Next.js at http://localhost:3000 (Turbopack)
 npm run lint         # ESLint
-npm run test         # All tests
-npm run build        # Production build to dist/
+npm run test         # Vitest unit tests (105 tests)
+npm run test:e2e     # Playwright end-to-end suite
+npm run build        # Next.js production build → .next/
+npm run start        # Serve the production build
 ```
 
 ### 17.4 Database Changes
@@ -1267,7 +1301,7 @@ supabase migration new <name>
 # Edit the generated file, then apply:
 supabase db push
 # Regenerate TypeScript types after schema changes:
-supabase gen types typescript --project-id $VITE_SUPABASE_PROJECT_ID > src/integrations/supabase/types.ts
+supabase gen types typescript --project-id $NEXT_PUBLIC_SUPABASE_PROJECT_ID > src/integrations/supabase/types.ts
 ```
 
 ---
@@ -1276,13 +1310,26 @@ supabase gen types typescript --project-id $VITE_SUPABASE_PROJECT_ID > src/integ
 
 ### 18.1 Vercel Configuration
 
+- **Framework preset:** Next.js (auto-detected — no manual override; [PR #38](https://github.com/jpbaquerizo/ScubaTrip/pull/38) flipped this off Vite).
+- **Build command / Output directory:** left empty; Vercel uses the Next.js defaults (`next build` → `.next/`).
+- **Runtime:** Fluid Compute (Vercel's default for Next.js App Router).
+- **`vercel.json`** now only contains HTTP headers — **no SPA rewrite** (the App Router handles all routing server-side):
+
 ```json
-// vercel.json
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
-    // 1-year immutable cache for hashed assets
-    // Security headers: X-Content-Type-Options, X-Frame-Options, Referrer-Policy
+    {
+      "source": "/(favicon\\.svg|favicon\\.png|apple-touch-icon\\.png|og-image\\.png|robots\\.txt)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=604800" }]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
   ]
 }
 ```
@@ -1297,19 +1344,17 @@ Pushing to `main` on GitHub triggers an automatic Vercel deployment. PRs get pre
 
 ## 19. Known Issues & Tech Debt
 
-| Issue | Impact | Effort to fix |
-|-------|--------|--------------|
-| No SSR/SSG — SPA only | All public trip pages (SEO potential) are invisible to search engines | High (Next.js migration) |
-| Group messaging UI not built | Feature gap — table + realtime already configured | Medium |
-| Staff invite acceptance not built | Centers can't onboard staff via email invite | Medium |
-| Available spots tracked via RPC, not computed | Risk of spots/booking count drift on edge cases | Medium |
-| No payment processing | Platform generates zero revenue from bookings | High |
-| No review/rating system | Trust signal gap for marketplace | Medium |
-| No waitlist for full trips | Lost demand when trips fill up | Low |
-| No srcset / WebP optimization | Mobile devices load full-resolution images unnecessarily | Low |
-| Bottom-nav overlaps sticky booking card | Layout bug on TripDetail on small screens | Low |
-| No e2e tests (Playwright) | Booking flow regressions only caught by manual testing | Medium |
-| No error tracking (Sentry) | Zero visibility into production errors | Medium |
-| No analytics events | Can't measure conversion funnels or feature usage | Medium |
-| Zustand used only for i18n | Unnecessary dependency (could use React Context) | Low |
-| TypeScript: `activeView` state slightly overloaded | Super admin "owns a center" is a workaround, not clean RBAC | Low |
+**Resolved in Phase 1** (April 2026): SSR/SSG (Item 10), review/rating system (Item 8), image srcset/WebP (Item 5), mobile bottom-nav overlap (Item 3), Playwright e2e tests (Item 9), Sentry error tracking (Item 1), PostHog analytics events (Item 2). See [docs/PHASE1_PLAN.md](./PHASE1_PLAN.md) for PR references.
+
+### Outstanding
+
+| Issue | Impact | Effort to fix | Tracking |
+|-------|--------|--------------|----------|
+| No payment processing | Platform generates zero revenue from bookings | High | [PHASE2_PLAN.md §3–4](./PHASE2_PLAN.md) |
+| Group messaging UI not built | Feature gap — table + realtime already configured | Medium | [PHASE2_PLAN.md §1](./PHASE2_PLAN.md) |
+| Staff invite acceptance not built | Centers can't onboard staff via email invite | Medium | [PHASE2_PLAN.md §2](./PHASE2_PLAN.md) |
+| No waitlist for full trips | Lost demand when trips fill up | Low | [PHASE2_PLAN.md §5](./PHASE2_PLAN.md) |
+| No audit log | Disputes hard to investigate | Medium | [PHASE2_PLAN.md §15](./PHASE2_PLAN.md) |
+| Available spots tracked via RPC, not computed | Risk of spots/booking count drift on edge cases | Medium | — |
+| Zustand used only for i18n | Unnecessary dependency (could use React Context) | Low | — |
+| Super-admin "owns a center" implicit | Works but conflates roles; cleaner RBAC possible | Low | — |
