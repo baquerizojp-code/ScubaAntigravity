@@ -2,10 +2,11 @@
 
 import { memo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Clock, Users, Heart, Star } from 'lucide-react';
 import { format } from 'date-fns';
-import { parseLocalDate, getImageUrl } from '@/lib/utils';
+import { parseLocalDate } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -47,19 +48,13 @@ const DiverTripCard = memo(({ trip, linkTo, bookingStatus, eager = false }: Prop
       className="block group relative aspect-[4/5] sm:aspect-[3/4] rounded-xl overflow-hidden shadow-xl transition-transform duration-500 hover:-translate-y-2"
     >
       {trip.image_url ? (
-        <img
-          src={getImageUrl(trip.image_url, { width: 400, quality: 80 }) ?? trip.image_url}
-          srcSet={[
-            `${getImageUrl(trip.image_url, { width: 400, quality: 80 })} 400w`,
-            `${getImageUrl(trip.image_url, { width: 800, quality: 75 })} 800w`,
-            `${getImageUrl(trip.image_url, { width: 1200, quality: 70 })} 1200w`,
-          ].join(', ')}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        <Image
+          src={trip.image_url}
           alt={trip.title}
-          className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          loading={eager ? 'eager' : 'lazy'}
-          fetchPriority={eager ? 'high' : 'auto'}
-          decoding="async"
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
+          priority={eager}
         />
       ) : (
         <div className="absolute inset-0 w-full h-full bg-ocean-900 transition-transform duration-700 group-hover:scale-110" />
