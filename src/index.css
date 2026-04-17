@@ -70,6 +70,7 @@
     --shadow-card: 0 1px 3px hsl(201 100% 36% / 0.06), 0 4px 12px hsl(201 100% 36% / 0.04);
     --shadow-card-hover: 0 4px 16px hsl(201 100% 36% / 0.1), 0 8px 32px hsl(201 100% 36% / 0.06);
     --shadow-ocean: 0 4px 20px hsl(201 100% 36% / 0.25);
+    --shadow-coral-glow: 0 8px 24px hsl(16 99% 65% / 0.20);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -163,5 +164,47 @@
 
   .shadow-ocean {
     box-shadow: var(--shadow-ocean);
+  }
+
+  .shadow-coral-glow {
+    box-shadow: var(--shadow-coral-glow);
+  }
+
+  /* Semantic type utilities from Abyssal Coral design system */
+  .h-hero {
+    font-family: var(--font-display, 'Plus Jakarta Sans', system-ui, sans-serif);
+    font-size: clamp(3rem, 6vw + 1rem, 5.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.95;
+  }
+
+  .hud-label {
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: hsl(var(--cyan-electric));
+  }
+
+  .caption {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .footer-link {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .lead {
+    font-size: 1.125rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: hsl(var(--muted-foreground));
   }
 }
