@@ -195,11 +195,6 @@ export async function rejectBooking(bookingId: string, reason: string) {
  * Approve a cancellation request (admin — uses RPC for atomic spot increment).
  */
 export async function approveCancellation(bookingId: string) {
-  // The approve_cancellation RPC is defined in migration 20260308195759 but
-  // isn't present in the live DB, so the generated Supabase types don't know
-  // about it. Tracked separately; @ts-expect-error unblocks tsc and will flag
-  // itself for removal once the migration is applied and types regenerated.
-  // @ts-expect-error approve_cancellation RPC not yet in generated types
   const { data, error } = await supabase.rpc('approve_cancellation', {
     _booking_id: bookingId,
   });
@@ -223,7 +218,6 @@ export async function denyCancellation(bookingId: string) {
  * We can reuse approve_cancellation RPC since it handles the spot incrementing logic.
  */
 export async function removeConfirmedBooking(bookingId: string) {
-  // @ts-expect-error approve_cancellation RPC not yet in generated types (see approveCancellation note above)
   const { error } = await supabase.rpc('approve_cancellation', {
     _booking_id: bookingId,
   });
