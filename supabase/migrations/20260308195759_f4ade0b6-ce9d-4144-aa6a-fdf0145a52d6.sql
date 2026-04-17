@@ -18,7 +18,7 @@ BEGIN
   IF v_trip_id IS NULL THEN RETURN FALSE; END IF;
 
   -- Authorization: caller must be staff of the dive center
-  IF NOT public.is_dive_center_staff(auth.uid(), v_center_id) THEN
+  IF NOT public.is_dive_center_owner(auth.uid(), v_center_id) THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
 
