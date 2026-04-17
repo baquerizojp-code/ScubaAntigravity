@@ -1,0 +1,477 @@
+'use client';
+
+import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
+import {
+  ArrowLeft,
+  Edit,
+  Check,
+  X,
+  Clock,
+  Users,
+  Calendar,
+  MapPin,
+  Anchor,
+  Info,
+  Ban,
+  Image as ImageIcon,
+} from 'lucide-react';
+import { useI18n } from '@/lib/i18n';
+import { fetchTripById } from '@/services/trips';
+import { fetchReviewsForTrip } from '@/services/reviews';
+import { ReviewsList } from '@/components/ReviewsList';
+import {
+  fetchBookingsByTripId,
+  confirmBooking,
+  rejectBooking,
+  removeConfirmedBooking,
+  type AdminBookingWithDetails,
+} from '@/services/bookings';
+import { useRealtimeSubscription } from '@/hooks/useRealtimeSubscription';
+import { TRIP_STATUS_CLASSES } from '@/lib/statusColors';
+import { parseLocalDate } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { AdminTripFormModal } from '@/app/_components/AdminTripFormModal';
+
+interface Props {
+  id: string;
+}
+
+export default function AdminTripDetail({ id }: Props) {
+  const router = useRouter();
+  const { t } = useI18n();
+  const queryClient = useQueryClient();
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [rejectDialog, setRejectDialog] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
+  const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
+  const [confirmWarningId, setConfirmWarningId] = useState<string | null>(null);
+
+  const { data: trip, isLoading: isLoadingTrip } = useQuery({
+    queryKey: ['admin-trip', id],
+    queryFn: () => fetchTripById(id),
+    enabled: !!id,
+  });
+
+  const { data: tripReviews = [] } = useQuery({
+    queryKey: ['admin-trip-reviews', id],
+    queryFn: () => fetchReviewsForTrip(id),
+    enabled: !!id,
+  });
+
+  const { data: bookings, isLoading: isLoadingBookings } = useQuery({
+    queryKey: ['admin-trip-bookings', id],
+    queryFn: () => fetchBookingsByTripId(id),
+    enabled: !!id,
+  });
+
+  useRealtimeSubscription({
+    channelName: `trip-bookings-${id}`,
+    table: 'bookings',
+    filter: `trip_id=eq.${id}`,
+    queryKeys: [
+      ['admin-trip-bookings', id],
+      ['admin-trip', id],
+    ],
+    enabled: !!id,
+  });
+
+  const pendingBookings = useMemo(
+    () => bookings?.filter((b) => b.status === 'pending') || [],
+    [bookings],
+  );
+  const confirmedBookings = useMemo(
+    () => bookings?.filter((b) => b.status === 'confirmed') || [],
+    [bookings],
+  );
+
+  const confirmMutation = useMutation({
+    mutationFn: (bookingId: string) => confirmBooking(bookingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-trip-bookings', id] });
+      queryClient.invalidateQueries({ queryKey: ['admin-trip', id] });
+      toast.success(t('admin.bookings.confirmed'));
+    },
+    onError: (err: Error) => toast.error(err.message || 'Error confirming booking'),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: ({ bookingId, reason }: { bookingId: string; reason: string }) =>
+      rejectBooking(bookingId, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-trip-bookings', id] });
+      setRejectDialog(null);
+      setRejectReason('');
+      toast.success(t('admin.bookings.rejected'));
+    },
+    onError: (err: Error) => toast.error(err.message || 'Error rejecting booking'),
+  });
+
+  const removeConfirmedMutation = useMutation({
+    mutationFn: (bookingId: string) => removeConfirmedBooking(bookingId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-trip-bookings', id] });
+      queryClient.invalidateQueries({ queryKey: ['admin-trip', id] });
+      toast.success(t('admin.tripDetail.diverRemoved'));
+    },
+    onError: (err: Error) => toast.error(err.message || 'Error removing diver'),
+  });
+
+  if (isLoadingTrip) {
+    return <div className="p-8 text-center text-muted-foreground">{t('common.loading')}</div>;
+  }
+
+  if (!trip) {
+    return <div className="p-8 text-center text-muted-foreground">{t('admin.tripDetail.notFound')}</div>;
+  }
+
+  const statusColor = (s: string) => TRIP_STATUS_CLASSES[s] || TRIP_STATUS_CLASSES.draft;
+
+  return (
+    <div className="max-w-5xl mx-auto w-full space-y-6 pb-12 overflow-x-hidden">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3 min-w-0">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/admin/trips')}
+            className="shrink-0 mt-0.5"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="min-w-0">
+            <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mb-1">
+              <h1 className="text-xl sm:text-3xl font-bold text-foreground leading-tight">
+                {trip.title}
+              </h1>
+              <Badge variant="outline" className={`capitalize ${statusColor(trip.status)}`}>
+                {trip.status}
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5 shrink-0" /> {trip.dive_site}
+              </span>
+              <span className="opacity-50">•</span>
+              <span className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5 shrink-0" />{' '}
+                {format(parseLocalDate(trip.trip_date), 'MMMM d, yyyy')}
+              </span>
+              <span className="opacity-50">•</span>
+              <span className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5 shrink-0" /> {trip.trip_time?.slice(0, 5)}
+              </span>
+            </p>
+          </div>
+        </div>
+        <Button onClick={() => setEditModalOpen(true)} className="gap-2 shrink-0">
+          <Edit className="h-4 w-4" /> <span className="hidden sm:inline">{t('admin.trips.edit')}</span>
+        </Button>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 space-y-6">
+          <Card className="overflow-hidden">
+            {trip.image_url ? (
+              <img
+                src={trip.image_url}
+                alt={trip.title}
+                className="w-full aspect-video object-cover"
+              />
+            ) : (
+              <div className="w-full aspect-video bg-ocean-900 flex flex-col items-center justify-center text-muted-foreground">
+                <ImageIcon className="h-10 w-10 opacity-40 mb-2" />
+                <span className="text-sm">{t('image.noImage')}</span>
+              </div>
+            )}
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Info className="h-4 w-4 text-primary" /> {t('admin.tripDetail.tripOverview')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm">
+              <div>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                  {t('admin.tripDetail.capacity')}
+                </span>
+                <div className="font-medium flex items-center justify-between">
+                  <span>
+                    {trip.total_spots - trip.available_spots} {t('admin.tripDetail.confirmed')} /{' '}
+                    {trip.total_spots} {t('admin.tripDetail.totalSpots')}
+                  </span>
+                  <div className="bg-secondary text-secondary-foreground rounded-full px-4 py-1.5 flex flex-col items-center justify-center shrink-0 min-w-[5.5rem] shadow-sm">
+                    <span className="text-lg font-bold leading-none">{trip.available_spots}</span>
+                    <span className="text-[10px] uppercase tracking-wide opacity-90 mt-0.5">
+                      {t('admin.tripDetail.available')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                  {t('admin.tripDetail.price')}
+                </span>
+                <span className="font-medium">${Number(trip.price_usd)} USD</span>
+              </div>
+              <div>
+                <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                  {t('admin.tripDetail.departurePoint')}
+                </span>
+                <span className="font-medium flex items-center gap-1">
+                  <Anchor className="h-3 w-3" /> {trip.departure_point}
+                </span>
+              </div>
+              {trip.description && (
+                <div>
+                  <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
+                    {t('admin.tripDetail.description')}
+                  </span>
+                  <p className="line-clamp-3 text-muted-foreground">{trip.description}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <div className="p-4 sm:p-6">
+              <Tabs defaultValue="confirmed">
+                <TabsList className="mb-4 w-full">
+                  <TabsTrigger value="confirmed" className="flex-1 gap-1.5">
+                    <Check className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{t('admin.tripDetail.confirmedDivers')}</span>
+                    <Badge variant="secondary" className="px-1.5 min-w-[1.25rem] shrink-0">
+                      {confirmedBookings.length}
+                    </Badge>
+                  </TabsTrigger>
+                  <TabsTrigger value="pending" className="flex-1 gap-1.5">
+                    <Clock className="h-4 w-4 shrink-0" />
+                    <span className="truncate">{t('admin.tripDetail.pendingRequests')}</span>
+                    {pendingBookings.length > 0 && (
+                      <Badge
+                        variant="default"
+                        className="px-1.5 min-w-[1.25rem] shrink-0 bg-warning hover:bg-warning/90 border-none text-warning-foreground"
+                      >
+                        {pendingBookings.length}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="confirmed" className="space-y-4 mt-0">
+                  {isLoadingBookings ? (
+                    <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+                  ) : confirmedBookings.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground border rounded-lg border-dashed">
+                      <Users className="h-8 w-8 mx-auto mb-2 opacity-20" />
+                      <p>{t('admin.tripDetail.noConfirmed')}</p>
+                    </div>
+                  ) : (
+                    confirmedBookings.map((b: AdminBookingWithDetails) => (
+                      <div
+                        key={b.id}
+                        className="flex items-center justify-between p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors"
+                      >
+                        <div>
+                          <p className="font-semibold">
+                            {b.diver_profiles?.full_name || t('admin.tripDetail.unknownDiver')}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {t('admin.tripDetail.cert')}:{' '}
+                            {b.diver_profiles?.certification || '-'} ·{' '}
+                            {b.diver_profiles?.logged_dives || 0} {t('admin.tripDetail.dives')}
+                          </p>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => setRemoveConfirmId(b.id)}
+                          disabled={removeConfirmedMutation.isPending}
+                        >
+                          <Ban className="h-4 w-4 sm:mr-2" />
+                          <span className="hidden sm:inline">{t('admin.tripDetail.remove')}</span>
+                        </Button>
+                      </div>
+                    ))
+                  )}
+                </TabsContent>
+
+                <TabsContent value="pending" className="space-y-4 mt-0">
+                  {isLoadingBookings ? (
+                    <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
+                  ) : pendingBookings.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground border rounded-lg border-dashed">
+                      <p>{t('admin.tripDetail.noPending')}</p>
+                    </div>
+                  ) : (
+                    pendingBookings.map((b: AdminBookingWithDetails) => (
+                      <div
+                        key={b.id}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg bg-warning/5 border-warning/20 gap-4"
+                      >
+                        <div>
+                          <p className="font-semibold">
+                            {b.diver_profiles?.full_name || t('admin.tripDetail.unknownDiver')}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {t('admin.tripDetail.cert')}:{' '}
+                            {b.diver_profiles?.certification || '-'} ·{' '}
+                            {b.diver_profiles?.logged_dives || 0} {t('admin.tripDetail.dives')}
+                          </p>
+                          {b.notes && (
+                            <p className="text-xs text-muted-foreground mt-1 italic">
+                              &ldquo;{b.notes}&rdquo;
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Button
+                            size="sm"
+                            className="bg-success hover:bg-success/90 text-success-foreground"
+                            onClick={() => {
+                              const missingContact =
+                                !b.diver_profiles?.emergency_contact_name ||
+                                !b.diver_profiles?.emergency_contact_phone;
+                              if (missingContact) {
+                                setConfirmWarningId(b.id);
+                              } else {
+                                confirmMutation.mutate(b.id);
+                              }
+                            }}
+                            disabled={confirmMutation.isPending || trip.available_spots <= 0}
+                          >
+                            <Check className="h-4 w-4 mr-1" /> {t('common.confirm')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                            onClick={() => setRejectDialog(b.id)}
+                          >
+                            <X className="h-4 w-4 mr-1" /> {t('admin.bookings.reject')}
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">{t('reviews.title')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ReviewsList reviews={tripReviews} />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      <AdminTripFormModal open={editModalOpen} onOpenChange={setEditModalOpen} trip={trip} />
+
+      <Dialog open={!!rejectDialog} onOpenChange={() => setRejectDialog(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('admin.bookings.rejectTitle')}</DialogTitle>
+          </DialogHeader>
+          <Textarea
+            placeholder={t('admin.bookings.rejectPlaceholder')}
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+          />
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setRejectDialog(null)}>
+              {t('common.cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() =>
+                rejectDialog &&
+                rejectMutation.mutate({ bookingId: rejectDialog, reason: rejectReason })
+              }
+              disabled={rejectMutation.isPending}
+            >
+              {t('admin.bookings.reject')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!confirmWarningId} onOpenChange={() => setConfirmWarningId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t('admin.bookings.confirmWithoutEmergencyTitle')}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('admin.bookings.confirmWithoutEmergency')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (confirmWarningId) {
+                  confirmMutation.mutate(confirmWarningId);
+                  setConfirmWarningId(null);
+                }
+              }}
+            >
+              {t('admin.bookings.confirmAnyway')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!removeConfirmId} onOpenChange={() => setRemoveConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('admin.tripDetail.remove')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('admin.tripDetail.confirmRemoveDiver')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => {
+                if (removeConfirmId) removeConfirmedMutation.mutate(removeConfirmId);
+                setRemoveConfirmId(null);
+              }}
+            >
+              {t('common.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
