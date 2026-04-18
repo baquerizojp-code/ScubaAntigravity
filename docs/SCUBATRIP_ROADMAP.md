@@ -517,6 +517,17 @@ Priority: Revenue, retention, and the features that justify SaaS tier upgrades.
 - [ ] Trip gallery (multiple images per trip)
 - [ ] Automated post-trip review request email (24h after trip_date)
 
+**Email notifications (all roles):**
+- [ ] Transactional email delivery that mirrors every in-app notification, across all three roles (diver, dive center staff, super admin)
+- [ ] Covers all current `notifications` types: `new_booking`, `booking_confirmed`, `booking_rejected`, `cancellation_request`, `booking_cancelled`, `center_approved`, `center_rejected`
+- [ ] Architecture: Supabase Database Webhook on `notifications` INSERT → Next.js API route → Resend. Keeps the existing DB-trigger flow untouched; email is a side channel off the single `notifications` INSERT funnel
+- [ ] Schema additions: `notifications.email_sent_at` (idempotency guard), `email_notifications_enabled` + `preferred_locale` on `diver_profiles` and `dive_centers`
+- [ ] React Email templates per notification type, localized EN + ES to match the user's in-app language
+- [ ] Unsubscribe page (token-signed link, no auth) + opt-out toggle in profile settings (CAN-SPAM requirement)
+- [ ] **Prerequisite:** verified sending domain with SPF + DKIM + DMARC. Blocks until the custom-domain migration lands, or until a dedicated email domain (~$12/yr) is purchased separately
+- [ ] **Effort:** ~2–3 days for production-ready scope (~1 day for Spanish-only MVP without opt-out, but not shippable to real users without unsubscribe)
+- [ ] **Cost:** $0/mo on Resend free tier (3K emails/mo) at projected early volume; $20/mo at 50K/mo
+
 **Discovery & SEO:**
 - [ ] Center public profile pages (e.g., `/centers/galapagos-dive-center`)
 - [ ] Open Graph images for trips (auto-generated with trip photo + title + price)
@@ -750,6 +761,8 @@ This takes 30 minutes/month and saves the company if a migration goes wrong.
 - Transactional emails from: `noreply@scubatrip.app`
 - Booking confirmations, review requests, cancellation notifications
 - SPF + DKIM configured → significantly better deliverability
+
+The full email notification system — transactional emails for every `notifications` table event across divers, dive centers, and super admin — is scheduled as a Phase 2 item (see §6, Phase 2 "Email notifications (all roles)").
 
 ### 9.5 Monitoring
 
