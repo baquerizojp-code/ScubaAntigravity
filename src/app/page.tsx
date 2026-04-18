@@ -6,6 +6,7 @@ import ScubaMaskLogo from '@/components/ScubaMaskLogo';
 import heroImageWebp from '@/assets/hero-ocean.webp';
 import heroImageMobileWebp from '@/assets/hero-ocean-mobile.webp';
 import heroImageFallback from '@/assets/hero-ocean.jpg';
+import diverCommunityImg from '@/assets/diver-community.png';
 import Navbar from './_components/Navbar';
 import { getLocale } from './_lib/server-locale';
 import { translate } from './_lib/i18n';
@@ -226,8 +227,8 @@ export default async function LandingPage() {
             <div className="relative lg:w-[55%] flex-shrink-0">
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
               <Image
-                src={heroImageFallback}
-                alt="Divers exploring underwater"
+                src={diverCommunityImg}
+                alt="Diving community exploring underwater"
                 className="w-full h-[280px] sm:h-[360px] lg:h-[420px] object-cover rounded-xl relative z-10"
                 placeholder="blur"
                 sizes="(max-width: 1024px) 100vw, 55vw"
