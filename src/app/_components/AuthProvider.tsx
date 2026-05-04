@@ -70,8 +70,12 @@ export default function AuthProvider({ session, children }: Props) {
 
   const signOut = async () => {
     const supabase = createClient();
-    await supabase.auth.signOut();
-    router.refresh();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Lock conflicts during sign-out are safe to ignore; navigate regardless
+    }
+    router.push('/login');
   };
 
   return (

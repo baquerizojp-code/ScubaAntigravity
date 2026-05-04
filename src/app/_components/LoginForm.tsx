@@ -65,8 +65,33 @@ export default function LoginForm() {
     localStorage.setItem('scubatrip-remember-me', rememberMe ? 'true' : 'false');
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) toast.error(error.message);
-    else track('login_completed');
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    track('login_completed');
+
+    // Navigate explicitly so the form is not stranded if the
+    // onAuthStateChange listener stalls (Supabase Web Lock contention).
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: roleRow } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      if (!roleRow) {
+        if (from) localStorage.setItem('pending_redirect', from);
+        router.replace('/complete-profile');
+        return;
+      }
+      if (from) router.replace(from);
+      else if (roleRow.role === 'diver') router.replace('/app/discover');
+      else router.replace('/admin');
+    } catch {
+      router.refresh();
+    }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
