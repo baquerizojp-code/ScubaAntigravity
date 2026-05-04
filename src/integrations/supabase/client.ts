@@ -1,7 +1,5 @@
-import { createBrowserClient } from '@supabase/ssr';
-import type { Database } from './types';
+import { createClient } from './browser';
 
-export const supabase = createBrowserClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+// Re-export the singleton browser client so services and hooks share
+// the same instance as auth components — prevents Web Lock contention.
+export const supabase = createClient();
