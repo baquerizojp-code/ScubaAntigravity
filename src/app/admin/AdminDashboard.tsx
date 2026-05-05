@@ -14,10 +14,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getTodayDateString } from '@/lib/utils';
 import { useAuth } from '@/app/_components/AuthProvider';
+import { getLocalizedTripText } from '@/lib/tripText';
 
 export default function AdminDashboard() {
   const { diveCenterId } = useAuth();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const router = useRouter();
 
   const { data: trips = [] } = useQuery({
@@ -173,7 +174,7 @@ export default function AdminDashboard() {
                   >
                     <td className="px-2 py-3 sm:p-4 max-w-[120px] sm:max-w-[200px]">
                       <p className="font-bold text-foreground text-xs sm:text-sm group-hover:text-primary transition-colors truncate">
-                        {trip.title}
+                        {getLocalizedTripText(trip.title, locale)}
                       </p>
                       <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                         {trip.dive_site}

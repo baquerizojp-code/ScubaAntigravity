@@ -1,10 +1,21 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables, TablesInsert, TablesUpdate } from '@/integrations/supabase/types';
 import { getTodayDateString } from '@/lib/utils';
+import type { LocalizedText } from '@/lib/tripText';
 
-export type Trip = Tables<'trips'>;
-export type TripInsert = TablesInsert<'trips'>;
-export type TripUpdate = TablesUpdate<'trips'>;
+// title and description are now JSONB {en, es} — override the generated text types
+export type Trip = Omit<Tables<'trips'>, 'title' | 'description'> & {
+  title: LocalizedText;
+  description: LocalizedText | null;
+};
+export type TripInsert = Omit<TablesInsert<'trips'>, 'title' | 'description'> & {
+  title: LocalizedText;
+  description?: LocalizedText | null;
+};
+export type TripUpdate = Omit<TablesUpdate<'trips'>, 'title' | 'description'> & {
+  title?: LocalizedText;
+  description?: LocalizedText | null;
+};
 export type TripWithCenter = Trip & {
   dive_centers:
     | { name: string; logo_url: string | null; avg_rating: number | null; review_count: number }

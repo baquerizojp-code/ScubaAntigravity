@@ -5,8 +5,19 @@ import { MAX_TRIP_SPOTS } from '@/lib/constants';
  * Trip creation/editing form schema.
  */
 export const tripSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().optional().default(''),
+  title: z.object({
+    en: z.string().min(1, 'English title is required'),
+    es: z.string().min(1, 'Spanish title is required'),
+  }),
+  description: z
+    .object({ en: z.string(), es: z.string() })
+    .refine(
+      (d) =>
+        (d.en.trim() === '' && d.es.trim() === '') ||
+        (d.en.trim() !== '' && d.es.trim() !== ''),
+      { message: 'Fill description in both languages or leave both empty' }
+    )
+    .default({ en: '', es: '' }),
   dive_site: z.string().min(1, 'Dive site is required'),
   departure_point: z.string().min(1, 'Departure point is required'),
   trip_date: z.string().min(1, 'Date is required').refine((val) => {

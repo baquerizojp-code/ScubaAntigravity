@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { FileText, Send } from 'lucide-react';
+import { FileText, Send, Languages } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
 import { createTrip, updateTrip } from '@/services/trips';
 import { tripSchema } from '@/lib/schemas';
@@ -13,14 +13,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { getTodayDateString } from '@/lib/utils';
 import { MAX_TRIP_SPOTS, MAX_FUTURE_TRIP_DAYS } from '@/lib/constants';
 import type { TripStatus, TripDifficulty, CertificationLevel } from '@/types';
+import type { LocalizedText } from '@/lib/tripText';
 import { useAuth } from './AuthProvider';
 
 export interface TripFormData {
-  title: string;
-  description: string;
+  title: { en: string; es: string };
+  description: { en: string; es: string };
   dive_site: string;
   departure_point: string;
   trip_date: string;
@@ -35,8 +37,8 @@ export interface TripFormData {
 }
 
 const emptyForm: TripFormData = {
-  title: '',
-  description: '',
+  title: { en: '', es: '' },
+  description: { en: '', es: '' },
   dive_site: '',
   departure_point: '',
   trip_date: '',
@@ -53,8 +55,8 @@ const emptyForm: TripFormData = {
 export interface TripFormEditData {
   id?: string;
   status?: TripStatus;
-  title: string;
-  description: string | null;
+  title: LocalizedText;
+  description: LocalizedText | null;
   dive_site: string;
   departure_point: string;
   trip_date: string;
@@ -75,6 +77,15 @@ interface TripFormModalProps {
   onSuccess?: () => void;
 }
 
+function LangTabTrigger({ value, label, filled }: { value: string; label: string; filled: boolean }) {
+  return (
+    <TabsTrigger value={value} className="flex items-center gap-1.5">
+      {label}
+      <span className={`w-2 h-2 rounded-full ${filled ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
+    </TabsTrigger>
+  );
+}
+
 export function AdminTripFormModal({ open, onOpenChange, trip, onSuccess }: TripFormModalProps) {
   const { diveCenterId } = useAuth();
   const { t } = useI18n();
@@ -85,8 +96,8 @@ export function AdminTripFormModal({ open, onOpenChange, trip, onSuccess }: Trip
   useEffect(() => {
     if (trip) {
       setForm({
-        title: trip.title,
-        description: trip.description || '',
+        title: { en: trip.title?.en ?? '', es: trip.title?.es ?? '' },
+        description: { en: trip.description?.en ?? '', es: trip.description?.es ?? '' },
         dive_site: trip.dive_site,
         departure_point: trip.departure_point,
         trip_date: trip.trip_date,
@@ -107,10 +118,15 @@ export function AdminTripFormModal({ open, onOpenChange, trip, onSuccess }: Trip
 
   const saveMutation = useMutation({
     mutationFn: async ({ formData, targetStatus }: { formData: TripFormData; targetStatus: TripStatus }) => {
+      const descriptionPayload =
+        (formData.description.en ?? '').trim() === '' && (formData.description.es ?? '').trim() === ''
+          ? null
+          : formData.description;
+
       const payload = {
         dive_center_id: diveCenterId!,
         title: formData.title,
-        description: formData.description || null,
+        description: descriptionPayload,
         dive_site: formData.dive_site,
         departure_point: formData.departure_point,
         trip_date: formData.trip_date,
@@ -152,7 +168,7 @@ export function AdminTripFormModal({ open, onOpenChange, trip, onSuccess }: Trip
     if (!result.success) {
       const errors: Record<string, string> = {};
       result.error.issues.forEach((issue) => {
-        const key = issue.path[0] as string;
+        const key = issue.path.join('.');
         errors[key] = issue.message;
       });
       setFormErrors(errors);
@@ -163,15 +179,21 @@ export function AdminTripFormModal({ open, onOpenChange, trip, onSuccess }: Trip
     saveMutation.mutate({ formData: form, targetStatus });
   };
 
+  const setTitleLocale = (locale: 'en' | 'es', value: string) =>
+    setForm((f) => ({ ...f, title: { ...f.title, [locale]: value } }));
+
+  const setDescLocale = (locale: 'en' | 'es', value: string) =>
+    setForm((f) => ({ ...f, description: { ...f.description, [locale]: value } }));
+
   const isEditingPublished = trip?.id && trip?.status === 'published';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <DialogTitle>{trip?.id ? t('admin.trips.edit') : t('admin.trips.create')}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-4 min-w-0 w-full">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <Label>{t('admin.trips.field.image') || 'Imagen del Viaje'}</Label>
@@ -181,14 +203,59 @@ export function AdminTripFormModal({ open, onOpenChange, trip, onSuccess }: Trip
                 bucket="trip-images"
               />
             </div>
-            <div className="md:col-span-2">
-              <Label>{t('admin.trips.field.title')}</Label>
-              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+
+            {/* Bilingual title + description */}
+            <div className="md:col-span-2 rounded-xl border border-border bg-muted/30 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Languages className="w-4 h-4 text-muted-foreground" />
+                <Label className="cursor-default">{t('admin.trips.field.titleAndDescription')}</Label>
+              </div>
+              <Tabs defaultValue="es">
+                <TabsList className="mb-3">
+                  <LangTabTrigger
+                    value="es"
+                    label={t('admin.trips.form.languageTab.es')}
+                    filled={form.title.es.trim() !== ''}
+                  />
+                  <LangTabTrigger
+                    value="en"
+                    label={t('admin.trips.form.languageTab.en')}
+                    filled={form.title.en.trim() !== ''}
+                  />
+                </TabsList>
+
+                {(['es', 'en'] as const).map((lang) => (
+                  <TabsContent key={lang} value={lang} className="space-y-3 mt-0">
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">
+                        {t('admin.trips.field.title')}
+                      </Label>
+                      <Input
+                        value={form.title[lang]}
+                        onChange={(e) => setTitleLocale(lang, e.target.value)}
+                      />
+                      {formErrors[`title.${lang}`] && (
+                        <p className="text-sm text-destructive mt-1">{formErrors[`title.${lang}`]}</p>
+                      )}
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">
+                        {t('admin.trips.field.description')}
+                      </Label>
+                      <Textarea
+                        value={form.description[lang]}
+                        onChange={(e) => setDescLocale(lang, e.target.value)}
+                        rows={3}
+                      />
+                      {formErrors['description'] && lang === 'es' && (
+                        <p className="text-sm text-destructive mt-1">{formErrors['description']}</p>
+                      )}
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
             </div>
-            <div className="md:col-span-2">
-              <Label>{t('admin.trips.field.description')}</Label>
-              <Textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} />
-            </div>
+
             <div>
               <Label>{t('admin.trips.field.diveSite')}</Label>
               <Input value={form.dive_site} onChange={(e) => setForm({ ...form, dive_site: e.target.value })} required />

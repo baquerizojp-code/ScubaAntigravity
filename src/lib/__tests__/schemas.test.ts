@@ -3,7 +3,7 @@ import { tripSchema, diveCenterSchema, staffInviteSchema } from '@/lib/schemas';
 
 describe('tripSchema', () => {
   const validTrip = {
-    title: 'Morning Reef Dive',
+    title: { en: 'Morning Reef Dive', es: 'Inmersión Matutina en Arrecife' },
     dive_site: 'Cancún Reef',
     departure_point: 'Marina Cancún',
     trip_date: '2027-04-01',
@@ -22,8 +22,40 @@ describe('tripSchema', () => {
     expect(result.success).toBe(true);
   });
 
-  it('fails when title is empty', () => {
-    const result = tripSchema.safeParse({ ...validTrip, title: '' });
+  it('fails when English title is empty', () => {
+    const result = tripSchema.safeParse({ ...validTrip, title: { en: '', es: 'Arrecife' } });
+    expect(result.success).toBe(false);
+  });
+
+  it('fails when Spanish title is empty', () => {
+    const result = tripSchema.safeParse({ ...validTrip, title: { en: 'Reef', es: '' } });
+    expect(result.success).toBe(false);
+  });
+
+  it('fails when both title locales are empty', () => {
+    const result = tripSchema.safeParse({ ...validTrip, title: { en: '', es: '' } });
+    expect(result.success).toBe(false);
+  });
+
+  it('passes when description is omitted', () => {
+    const { ...rest } = validTrip;
+    const result = tripSchema.safeParse(rest);
+    expect(result.success).toBe(true);
+  });
+
+  it('passes when both description locales are filled', () => {
+    const result = tripSchema.safeParse({
+      ...validTrip,
+      description: { en: 'Great dive', es: 'Buena inmersión' },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it('fails when only one description locale is filled', () => {
+    const result = tripSchema.safeParse({
+      ...validTrip,
+      description: { en: 'Great dive', es: '' },
+    });
     expect(result.success).toBe(false);
   });
 
@@ -57,7 +89,7 @@ describe('tripSchema', () => {
 
   it('allows optional fields to be omitted', () => {
     const minimal = {
-      title: 'Test',
+      title: { en: 'Test', es: 'Prueba' },
       dive_site: 'Site',
       departure_point: 'Point',
       trip_date: '2027-04-01',
@@ -142,7 +174,7 @@ describe('staffInviteSchema', () => {
 // -----------------------------------------------------------------------
 describe('tripSchema edge cases', () => {
   const base = {
-    title: 'Test',
+    title: { en: 'Test', es: 'Prueba' },
     dive_site: 'Site',
     departure_point: 'Point',
     trip_date: '2027-04-01',

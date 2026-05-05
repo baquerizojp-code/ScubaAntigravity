@@ -37,7 +37,7 @@ export default function ExploreFilters({ initialTrips, locale }: ExploreFiltersP
     <>
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="animate-fade-in">
-          <span className="font-headline uppercase tracking-widest text-xs text-secondary font-bold mb-2 block">
+          <span className="font-headline uppercase tracking-wide text-xs text-secondary font-bold mb-2 block truncate">
             {t('diver.discover.subtitle')}
           </span>
           <h1 className="text-4xl md:text-5xl font-extrabold font-headline text-primary tracking-tight leading-none">

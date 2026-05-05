@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { track } from '@/lib/analytics';
 import { useI18n } from '@/lib/i18n';
+import { getLocalizedTripText } from '@/lib/tripText';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -44,7 +45,7 @@ import { useTripBooking } from './useTripBooking';
 
 export default function TripDetail({ id }: { id: string }) {
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const {
     trip,
@@ -142,7 +143,7 @@ export default function TripDetail({ id }: { id: string }) {
                 `${getImageUrl(trip.image_url, { width: 1600, quality: 75 })} 1600w`,
               ].join(', ')}
               sizes="100vw"
-              alt={trip.title}
+              alt={getLocalizedTripText(trip.title, locale)}
               className="w-full h-full object-cover scale-105 transform hover:scale-100 transition-transform duration-[20s] ease-out"
               fetchPriority="high"
               decoding="async"
@@ -173,7 +174,7 @@ export default function TripDetail({ id }: { id: string }) {
               </div>
 
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-black font-headline text-foreground tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
-                {trip.title}
+                {getLocalizedTripText(trip.title, locale)}
               </h1>
 
               <p className="text-lg md:text-xl text-foreground font-light max-w-2xl flex items-center gap-2 bg-background/40 backdrop-blur-sm w-fit px-4 py-2 rounded-xl border border-foreground/10">
@@ -195,7 +196,7 @@ export default function TripDetail({ id }: { id: string }) {
                 {t('explore.trip.theExperience')}
               </h2>
               <div className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line prose prose-invert max-w-none">
-                {trip.description || t('explore.trip.defaultDescription')}
+                {getLocalizedTripText(trip.description, locale) || t('explore.trip.defaultDescription')}
               </div>
             </div>
 

@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Ship } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
+import { getLocalizedTripText, type LocalizedText } from '@/lib/tripText';
 import { fetchTripsByCenter, deleteTrip } from '@/services/trips';
 import { getTodayDateString, parseLocalDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -31,7 +32,7 @@ import {
 
 export default function AdminTrips() {
   const { diveCenterId, centerStatus } = useAuth();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const canCreateTrips = centerStatus === 'approved';
   const queryClient = useQueryClient();
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function AdminTrips() {
     if (editParam && trips?.length) {
       const tripToEdit = trips.find((tr) => tr.id === editParam);
       if (tripToEdit) {
-        setEditingTrip(tripToEdit);
+        setEditingTrip({ ...tripToEdit, title: tripToEdit.title as LocalizedText, description: tripToEdit.description as LocalizedText | null });
         setDialogOpen(true);
         router.replace('/admin/trips');
       }
@@ -86,8 +87,8 @@ export default function AdminTrips() {
     },
   });
 
-  const openEdit = (trip: TripFormEditData) => {
-    setEditingTrip(trip);
+  const openEdit = (trip: { title: unknown; description: unknown } & Omit<TripFormEditData, 'title' | 'description'>) => {
+    setEditingTrip({ ...trip, title: trip.title as LocalizedText, description: trip.description as LocalizedText | null });
     setDialogOpen(true);
   };
 
@@ -151,7 +152,7 @@ export default function AdminTrips() {
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-foreground truncate">{trip.title}</h3>
+                  <h3 className="font-semibold text-foreground truncate">{getLocalizedTripText(trip.title, locale)}</h3>
                   <Badge variant="outline" className={`capitalize ${statusColor(trip.status)}`}>
                     {trip.status}
                   </Badge>

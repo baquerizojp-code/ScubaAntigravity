@@ -8,9 +8,13 @@ import { MapPin, Calendar, Clock, Users, Heart, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n';
+import { getLocalizedTripText } from '@/lib/tripText';
 import type { Tables } from '@/integrations/supabase/types';
+import type { LocalizedText } from '@/lib/tripText';
 
-export type TripWithCenter = Tables<'trips'> & {
+export type TripWithCenter = Omit<Tables<'trips'>, 'title' | 'description'> & {
+  title: LocalizedText;
+  description: LocalizedText | null;
   dive_centers: {
     name: string;
     logo_url: string | null;
@@ -50,7 +54,7 @@ const DiverTripCard = memo(({ trip, linkTo, bookingStatus, eager = false }: Prop
       {trip.image_url ? (
         <Image
           src={trip.image_url}
-          alt={trip.title}
+          alt={getLocalizedTripText(trip.title, locale)}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -87,7 +91,7 @@ const DiverTripCard = memo(({ trip, linkTo, bookingStatus, eager = false }: Prop
                 <MapPin className="w-3 h-3" />
                 {trip.dive_site}
               </p>
-              <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-1">{trip.title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-1">{getLocalizedTripText(trip.title, locale)}</h3>
             </div>
             <div className="text-right shrink-0">
               <p className="text-xs text-ocean-200">from</p>

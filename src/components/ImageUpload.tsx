@@ -54,7 +54,7 @@ const ImageUpload = ({ value, onChange, bucket, path = '', className = '' }: Ima
 
   return (
     <div className={`space-y-4 w-full ${className}`}>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-center gap-4">
         {value ? (
           <div className="relative w-40 h-40 rounded-lg overflow-hidden border border-border">
             <img 
@@ -79,7 +79,7 @@ const ImageUpload = ({ value, onChange, bucket, path = '', className = '' }: Ima
           </div>
         )}
 
-        <div className="flex-1">
+        <div className="w-full sm:flex-1 min-w-0">
           <input
             type="file"
             id="image-upload"

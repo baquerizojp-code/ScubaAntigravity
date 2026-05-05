@@ -10,6 +10,7 @@ import Navbar from './_components/Navbar';
 import { getLocale } from './_lib/server-locale';
 import { translate } from './_lib/i18n';
 import { fetchPublishedTrips } from './_lib/queries';
+import { getLocalizedTripText } from '@/lib/tripText';
 
 const features = [
   { icon: Search, titleKey: 'landing.features.discover.title', descKey: 'landing.features.discover.desc' },
@@ -141,7 +142,7 @@ export default async function LandingPage() {
                   {trip.image_url ? (
                     <img
                       src={trip.image_url}
-                      alt={trip.title}
+                      alt={getLocalizedTripText(trip.title, locale)}
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                       loading="lazy"
                     />
@@ -163,7 +164,7 @@ export default async function LandingPage() {
                       </p>
                     )}
                     <p className="font-headline font-bold text-white text-lg leading-tight line-clamp-1">
-                      {trip.title}
+                      {getLocalizedTripText(trip.title, locale)}
                     </p>
                     {(trip.dive_centers?.avg_rating ?? 0) > 0 && (
                       <div className="flex items-center gap-1 mt-1.5">
