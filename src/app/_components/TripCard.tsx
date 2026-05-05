@@ -5,6 +5,7 @@ import { MapPin, Calendar, Clock, Users, Heart, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { parseLocalDate } from '@/lib/utils';
 import { translate, type Locale } from '@/app/_lib/i18n';
+import { getLocalizedTripText } from '@/lib/tripText';
 import type { TripWithCenter } from '@/app/_lib/queries';
 
 interface TripCardProps {
@@ -16,6 +17,7 @@ interface TripCardProps {
 
 export default function TripCard({ trip, locale, eager = false }: TripCardProps) {
   const t = (k: string) => translate(k, locale);
+  const title = getLocalizedTripText(trip.title, locale);
 
   return (
     <Link
@@ -25,7 +27,7 @@ export default function TripCard({ trip, locale, eager = false }: TripCardProps)
       {trip.image_url ? (
         <Image
           src={trip.image_url}
-          alt={trip.title}
+          alt={title}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -49,7 +51,7 @@ export default function TripCard({ trip, locale, eager = false }: TripCardProps)
                 <MapPin className="w-3 h-3" />
                 {trip.dive_site}
               </p>
-              <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-1">{trip.title}</h3>
+              <h3 className="text-lg sm:text-xl font-bold font-headline leading-tight line-clamp-1">{title}</h3>
             </div>
             <div className="text-right shrink-0">
               <p className="text-xs text-ocean-200">from</p>

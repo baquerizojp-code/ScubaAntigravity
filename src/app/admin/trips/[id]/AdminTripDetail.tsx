@@ -20,6 +20,7 @@ import {
   Image as ImageIcon,
 } from 'lucide-react';
 import { useI18n } from '@/lib/i18n';
+import { getLocalizedTripText } from '@/lib/tripText';
 import { fetchTripById } from '@/services/trips';
 import { fetchReviewsForTrip } from '@/services/reviews';
 import { ReviewsList } from '@/components/ReviewsList';
@@ -57,7 +58,7 @@ interface Props {
 
 export default function AdminTripDetail({ id }: Props) {
   const router = useRouter();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const queryClient = useQueryClient();
 
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -161,7 +162,7 @@ export default function AdminTripDetail({ id }: Props) {
           <div className="min-w-0">
             <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mb-1">
               <h1 className="text-xl sm:text-3xl font-bold text-foreground leading-tight">
-                {trip.title}
+                {getLocalizedTripText(trip.title, locale)}
               </h1>
               <Badge variant="outline" className={`capitalize ${statusColor(trip.status)}`}>
                 {trip.status}
@@ -194,7 +195,7 @@ export default function AdminTripDetail({ id }: Props) {
             {trip.image_url ? (
               <img
                 src={trip.image_url}
-                alt={trip.title}
+                alt={getLocalizedTripText(trip.title, locale)}
                 className="w-full aspect-video object-cover"
               />
             ) : (
@@ -243,12 +244,14 @@ export default function AdminTripDetail({ id }: Props) {
                   <Anchor className="h-3 w-3" /> {trip.departure_point}
                 </span>
               </div>
-              {trip.description && (
+              {getLocalizedTripText(trip.description, locale) && (
                 <div>
                   <span className="text-muted-foreground block text-xs uppercase tracking-wider mb-1">
                     {t('admin.tripDetail.description')}
                   </span>
-                  <p className="line-clamp-3 text-muted-foreground">{trip.description}</p>
+                  <p className="line-clamp-3 text-muted-foreground">
+                    {getLocalizedTripText(trip.description, locale)}
+                  </p>
                 </div>
               )}
             </CardContent>

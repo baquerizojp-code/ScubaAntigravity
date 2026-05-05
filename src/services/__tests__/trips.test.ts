@@ -47,7 +47,7 @@ describe('fetchTripsByCenter', () => {
 // -----------------------------------------------------------------------
 describe('fetchTripById', () => {
   it('returns a single trip with dive center', async () => {
-    const trip = { id: 't1', title: 'Reef Dive', dive_centers: { name: 'Cancun Divers' } };
+    const trip = { id: 't1', title: { en: 'Reef Dive', es: 'Inmersión en Arrecife' }, dive_centers: { name: 'Cancun Divers' } };
     mockFrom.mockImplementation(() => testChain({ data: trip, error: null }) as any);
 
     const result = await fetchTripById('t1');
@@ -90,10 +90,10 @@ describe('fetchPublishedTrips', () => {
 // -----------------------------------------------------------------------
 describe('createTrip', () => {
   it('inserts and returns the created trip', async () => {
-    const newTrip = { id: 't-new', title: 'New Dive' };
+    const newTrip = { id: 't-new', title: { en: 'New Dive', es: 'Nueva Inmersión' } };
     mockFrom.mockImplementation(() => testChain({ data: newTrip, error: null }) as any);
 
-    const result = await createTrip({ title: 'New Dive' } as TripInsert);
+    const result = await createTrip({ title: { en: 'New Dive', es: 'Nueva Inmersión' } } as TripInsert);
     expect(result).toEqual(newTrip);
   });
 });
@@ -103,10 +103,10 @@ describe('createTrip', () => {
 // -----------------------------------------------------------------------
 describe('updateTrip', () => {
   it('updates and returns the trip', async () => {
-    const updated = { id: 't1', title: 'Updated' };
+    const updated = { id: 't1', title: { en: 'Updated', es: 'Actualizado' } };
     mockFrom.mockImplementation(() => testChain({ data: updated, error: null }) as any);
 
-    const result = await updateTrip('t1', { title: 'Updated' });
+    const result = await updateTrip('t1', { title: { en: 'Updated', es: 'Actualizado' } });
     expect(result).toEqual(updated);
   });
 });

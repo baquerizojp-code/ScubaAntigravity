@@ -1,8 +1,11 @@
 import { createClient } from '@/integrations/supabase/server';
 import type { Tables } from '@/integrations/supabase/types';
 import { getTodayDateString } from '@/lib/utils';
+import type { LocalizedText } from '@/lib/tripText';
 
-export type TripWithCenter = Tables<'trips'> & {
+export type TripWithCenter = Omit<Tables<'trips'>, 'title' | 'description'> & {
+  title: LocalizedText;
+  description: LocalizedText | null;
   dive_centers:
     | { name: string; logo_url: string | null; avg_rating: number | null; review_count: number }
     | null;

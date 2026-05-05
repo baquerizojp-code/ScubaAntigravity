@@ -18,6 +18,7 @@ import {
   assignDiverRole,
 } from '@/services/profiles';
 import { useI18n } from '@/lib/i18n';
+import { getLocalizedTripText } from '@/lib/tripText';
 import { DEFAULT_TRIP_DURATION_HOURS } from '@/lib/constants';
 import { downloadICSFile, getGoogleCalendarUrl } from '@/lib/calendar';
 import type { Tables, Database } from '@/integrations/supabase/types';
@@ -65,7 +66,7 @@ function isProfileComplete(profile: DiverProfile | null): boolean {
 export function useTripBooking(tripId: string | undefined) {
   const router = useRouter();
   const { user } = useAuth();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   const [trip, setTrip] = useState<TripWithCenter | null>(null);
   const [loading, setLoading] = useState(true);
@@ -256,7 +257,7 @@ export function useTripBooking(tripId: string | undefined) {
   const handleAddToCalendar = (type: 'ics' | 'google') => {
     if (!trip) return;
     const event = {
-      title: trip.title,
+      title: getLocalizedTripText(trip.title, locale),
       description: `${trip.dive_centers?.name || ''}\n${trip.dive_site}\n${trip.departure_point}`,
       location: `${trip.dive_site}, ${trip.departure_point}`,
       startDate: trip.trip_date,

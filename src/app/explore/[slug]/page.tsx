@@ -13,6 +13,7 @@ import BookButton from '../../_components/BookButton';
 import { fetchTripBySlug, fetchReviewsForTrip } from '../../_lib/queries';
 import { getLocale } from '../../_lib/server-locale';
 import { translate } from '../../_lib/i18n';
+import { getLocalizedTripText } from '@/lib/tripText';
 
 export const revalidate = 300;
 
@@ -22,27 +23,29 @@ interface TripPageProps {
 
 export async function generateMetadata({ params }: TripPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const trip = await fetchTripBySlug(slug);
+  const [trip, locale] = await Promise.all([fetchTripBySlug(slug), getLocale()]);
   if (!trip) return { title: 'Trip not found' };
 
+  const titleText = getLocalizedTripText(trip.title, locale);
+  const descText = getLocalizedTripText(trip.description, locale);
   const description =
-    trip.description?.slice(0, 160) ??
+    descText.slice(0, 160) ||
     `Dive ${trip.dive_site} on ${format(parseLocalDate(trip.trip_date), 'MMM dd, yyyy')}.`;
   const image = trip.image_url ? getImageUrl(trip.image_url, { width: 1200, quality: 80 }) : undefined;
 
   return {
-    title: trip.title,
+    title: titleText,
     description,
     alternates: { canonical: `/explore/${trip.slug}` },
     openGraph: {
-      title: trip.title,
+      title: titleText,
       description,
       images: image ? [image] : undefined,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title: trip.title,
+      title: titleText,
       description,
       images: image ? [image] : undefined,
     },
@@ -54,6 +57,9 @@ export default async function TripDetailPage({ params }: TripPageProps) {
   const locale = await getLocale();
   const trip = await fetchTripBySlug(slug);
   if (!trip) notFound();
+
+  const tripTitle = getLocalizedTripText(trip.title, locale);
+  const tripDescription = getLocalizedTripText(trip.description, locale);
 
   const reviews = await fetchReviewsForTrip(trip.id);
   const t = (k: string) => translate(k, locale);
@@ -68,7 +74,7 @@ export default async function TripDetailPage({ params }: TripPageProps) {
           {trip.image_url ? (
             <Image
               src={trip.image_url}
-              alt={trip.title}
+              alt={tripTitle}
               fill
               sizes="100vw"
               priority
@@ -108,7 +114,7 @@ export default async function TripDetailPage({ params }: TripPageProps) {
               </div>
 
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-black font-headline text-foreground tracking-tighter leading-[0.9] mb-6 drop-shadow-2xl">
-                {trip.title}
+                {tripTitle}
               </h1>
 
               <p className="text-xl md:text-2xl text-foreground font-light max-w-2xl flex items-center gap-2 bg-background/40 backdrop-blur-sm w-fit px-4 py-2 rounded-xl border border-foreground/10">
@@ -131,7 +137,7 @@ export default async function TripDetailPage({ params }: TripPageProps) {
                 {t('explore.trip.theExperience')}
               </h2>
               <div className="text-lg text-muted-foreground leading-relaxed whitespace-pre-line prose prose-invert max-w-none">
-                {trip.description || t('explore.trip.defaultDescription')}
+                {tripDescription || t('explore.trip.defaultDescription')}
               </div>
             </div>
 
